@@ -1,7 +1,41 @@
-Zzz.js
+WebModule
 =========
 
 The WebModule is module template for Mobile Web Application.
+
+# Document
+
+https://github.com/uupaa/WebModule/wiki/WebModule
+
+# How to use
+
+1. Clone WebModule to your work space, and add permission to the clone command.
+
+    ```sh
+    $ git clone git@github.com:uupaa/WebModule.git
+    $ chmod +x WebModule/clone
+    ```
+
+2. Create new repository 'MyModule.js' in the GitHub and clone it.
+
+    ```sh
+    $ git clone git@github.com:uupaa/MyModule.js.git
+    $ cd MyModule.js
+    ```
+
+3. Execute clone command.
+
+    ```sh
+    $ pwd
+    > MyModule.js
+    $ ../WebModule/clone USER_NAME
+    ```
+
+=========
+Zzz.js
+=========
+
+Zzz.js description.
 
 # Document
 

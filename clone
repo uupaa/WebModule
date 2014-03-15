@@ -7,38 +7,50 @@
 
     ```sh
     $ git clone git@github.com:uupaa/WebModule.git
-    $ chmod +x WebModule/clone USER_NAME
+    $ chmod +x WebModule/clone
     ```
 
-2. Create new repository 'Foo.js' in the GitHub and clone it.
+2. Create new repository 'MyModule.js' in the GitHub and clone it.
 
     ```sh
-    $ git clone git@github.com:uupaa/Foo.js.git
-    $ cd Foo.js
+    $ git clone git@github.com:uupaa/MyModule.js.git
+    $ cd MyModule.js
     ```
 
 3. Execute clone command.
 
     ```sh
     $ pwd
-    > Foo.js
-    $ ../WebModule/clone [USER_NAME]
+    > MyModule.js
+    $ ../WebModule/clone USER_NAME
     ```
  */
+
+var _CONSOLE_COLOR = {
+        RED:    "\u001b[31m",
+        YELLOW: "\u001b[33m",
+        GREEN:  "\u001b[32m",
+        CLEAR:  "\u001b[0m"
+    };
 
 var fs = require("fs");
 var argv = process.argv.slice(2);
 
 var _;
-var repositoryFullName = process.cwd().split("/").pop();                               // "Foo.js"
-var repositoryName     = (_ = repositoryFullName.split("."), _.pop(), _.join("."));    // "Foo"
+var repositoryFullName = process.cwd().split("/").pop();                               // "MyModule.js"
+var repositoryName     = (_ = repositoryFullName.split("."), _.pop(), _.join("."));    // "MyModule"
 var from               = (_ = process.argv[1].split("/"), _.pop(), _.join("/")) + "/"; // ".../Zzz.js"
 var to                 = process.cwd() + "/";
-var userName           = argv.length ? argv[0] : "uupaa";
+var userName           = argv[0] || "";
+
+if (!userName) {
+    console.log(_CONSOLE_COLOR.RED + "Usage: ../WebModule/clone USER_NAME" + _CONSOLE_COLOR.CLEAR);
+    return;
+}
 
 function clone(from,           // @arg String: copy from.
                to,             // @arg String: copy to.
-               repositoryName, // @arg String: repository name. eg: "Foo"
+               repositoryName, // @arg String: repository name. eg: "MyModule"
                tree) {         // @arg Object: source tree.
 
     for (var node in tree) {    // node  are "lib", "Zzz.js", ...
@@ -50,7 +62,7 @@ function clone(from,           // @arg String: copy from.
             var sourceName      = value[2] || node;
 
             // replace node name.
-            //      "Zzz.js" -> "Foo.js"
+            //      "Zzz.js" -> "MyModule.js"
             var targetName = node.replace(/Zzz/g, repositoryName).
                                   replace(/zzz/g, repositoryName.toLowerCase());
             // already exists?
@@ -76,6 +88,10 @@ function clone(from,           // @arg String: copy from.
                 //      { "name": "WebModule" } -> { "name": userName + repositoryFullName }
                 if (node === "package.json") {
                     data = data.replace(/WebModule/, userName + repositoryFullName);
+                }
+
+                if (node === "README.md") {
+                    data = data.split("=========").slice(2).join("=========");
                 }
 
                 // replace zzz to repository name.
