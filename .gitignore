@@ -1,0 +1,7 @@
+node_modules
+lint/plato/assets
+lint/plato/files
+lint/plato/*.html
+.Minify*
+lib/*.min.js
+

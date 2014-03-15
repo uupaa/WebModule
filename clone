@@ -1,0 +1,131 @@
+#!/usr/bin/env node
+
+/*
+# Usage:
+
+1. Clone WebModule to your work space, and add permission to the clone command.
+
+    ```sh
+    $ git clone git@github.com:uupaa/WebModule.git
+    $ chmod +x WebModule/clone USER_NAME
+    ```
+
+2. Create new repository 'Foo.js' in the GitHub and clone it.
+
+    ```sh
+    $ git clone git@github.com:uupaa/Foo.js.git
+    $ cd Foo.js
+    ```
+
+3. Execute clone command.
+
+    ```sh
+    $ pwd
+    > Foo.js
+    $ ../WebModule/clone [USER_NAME]
+    ```
+ */
+
+var fs = require("fs");
+var argv = process.argv.slice(2);
+
+var _;
+var repositoryFullName = process.cwd().split("/").pop();                               // "Foo.js"
+var repositoryName     = (_ = repositoryFullName.split("."), _.pop(), _.join("."));    // "Foo"
+var from               = (_ = process.argv[1].split("/"), _.pop(), _.join("/")) + "/"; // ".../Zzz.js"
+var to                 = process.cwd() + "/";
+var userName           = argv.length ? argv[0] : "uupaa";
+
+function clone(from,           // @arg String: copy from.
+               to,             // @arg String: copy to.
+               repositoryName, // @arg String: repository name. eg: "Foo"
+               tree) {         // @arg Object: source tree.
+
+    for (var node in tree) {    // node  are "lib", "Zzz.js", ...
+        var value = tree[node]; // value are { ... }, [false], [false, "ts.index.html"]
+
+        if (Array.isArray(value)) {
+            var overwrite       = value[0];
+            var replaceUserName = value[1] || false;
+            var sourceName      = value[2] || node;
+
+            // replace node name.
+            //      "Zzz.js" -> "Foo.js"
+            var targetName = node.replace(/Zzz/g, repositoryName).
+                                  replace(/zzz/g, repositoryName.toLowerCase());
+            // already exists?
+            var exists = fs.existsSync(to + targetName);
+
+            if (overwrite || !exists) {
+                if (overwrite) {
+                    console.log("  overwrite: " + to + targetName);
+                } else if (!exists) {
+                    console.log("  clone: " + to + targetName);
+                }
+
+                var data = fs.readFileSync(from + sourceName, "UTF-8");
+
+                // replace jsperf url.
+                //      "http://jsperf.com/uupaa-zzz/" -> "http://jsperf.com/USER_NAME-WebModule/"
+                data = data.replace(/jsperf.com.uupaa.zzz/, function(_) {
+                    return "jsperf.com/" + userName.toLowerCase() +
+                           "-" + repositoryName.replace("_", "-").toLowerCase();
+                });
+
+                // replace module name in package.json.
+                //      { "name": "WebModule" } -> { "name": userName + repositoryFullName }
+                if (node === "package.json") {
+                    data = data.replace(/WebModule/, userName + repositoryFullName);
+                }
+
+                // replace zzz to repository name.
+                data = data.replace(/Zzz/g, repositoryName).
+                            replace(/zzz/g, repositoryName.toLowerCase());
+
+                // replace user name.
+                //      "github.com/uupaa" -> "github.com/userName"
+                if (replaceUserName) {
+                    data = data.replace(/github.com(.)uupaa/g, function(_, sep) {
+                        return "github.com" + sep + userName;
+                    });
+                }
+
+                fs.writeFileSync(to + targetName, data);
+            }
+        } else { // Object -> Tree -> mkdir
+            if (!fs.existsSync(to + node)) {
+                console.log("  mkdir: " + to + node + "/");
+                fs.mkdirSync(to + node);
+            }
+            clone(from + node + "/", to + node + "/", repositoryName, tree[node]);
+        }
+    }
+}
+
+clone(from, to, repositoryName, {
+     // tree                    [overwrite, replaceUserName, source name]
+        "alt": {
+            "Zzz.ts":           [false,     true],
+        },
+        "lib": {
+            "Zzz.js":           [false,     true],
+        },
+        "lint": {
+            "plato.js":         [false],
+            "plato": {
+            }
+        },
+        "test": {
+            "index.html":       [false],
+            "index.node.js":    [false],
+            "test.js":          [false],
+        },
+        ".gitignore":           [false],
+        ".jshintrc":            [false],
+        ".npmignore":           [false],
+        "index.js":             [false],
+        "LICENSE":              [false],
+        "package.json":         [false,     true],
+        "README.md":            [true,      true]
+    });
+

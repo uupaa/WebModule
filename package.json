@@ -1,0 +1,41 @@
+{
+  "name":           "WebModule",
+  "version":        "0.0.0",
+  "description":    "The WebModule is module template for Mobile Web Application.",
+  "url":            "https://github.com/uupaa/Zzz.js",
+  "keywords":       ["Zzz", "util", "uupaa", "WebModule"],
+  "repository": {
+    "type":         "git",
+    "url":          "https://github.com/uupaa/Zzz.js.git"
+  },
+  "scripts": {
+    "watch":        "node node_modules/uupaa.watch.js --verbose --action build ./lib/Zzz.js",
+    "build":        "node node_modules/uupaa.minify.js --module all --output ./lib/Zzz.min.js --verbose --keep --pretty",
+    "build-simple": "node node_modules/uupaa.minify.js --module all --output ./lib/Zzz.min.js --verbose --keep --pretty --nowrap --simple",
+    "build-release":"node node_modules/uupaa.minify.js --module all --output ./lib/Zzz.min.js --verbose",
+    "tsc":          "tsc -m commonjs -d ./alt/Zzz.ts; cp -f ./alt/Zzz.js ./lib/Zzz.js; npm run build-simple",
+    "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html",
+    "lint":         "node lint/plato.js; open lint/plato/index.html"
+  },
+  "build": {
+    "all": { "lib/Zzz.js": "" },
+    "node": { },
+    "worker": { },
+    "browser": { }
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "uupaa.valid.js":   "",
+    "uupaa.help.js":    "",
+    "uupaa.task.js":    "",
+    "uupaa.test.js":    "",
+    "uupaa.watch.js":   "",
+    "uupaa.minify.js":  ""
+  },
+  "lib":            "./lib/",
+  "main":           "./index.js",
+  "author":         "uupaa <uupaa.js@gmail.com>",
+  "license":        "MIT",
+  "contributors":   []
+}

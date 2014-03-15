@@ -1,0 +1,25 @@
+{
+// http://www.jshint.com/docs/options/
+
+    // --- Enforcing options ---
+    "bitwise":  false, // true is prohibits the use of bitwise operators.
+    "undef":    true,
+    "unused":   true,
+    "maxlen":   200,
+
+    // --- Relaxing options ---
+    "debug":    true,
+    "gcl":      true,
+    "maxerr":   10000,
+    "proto":    true,
+    "sub":      true,
+
+    // --- Environments ---
+    "browser":  true,
+    "node":     true,
+    "worker":   true,
+    "devel":    true,
+    "phantom":  true,
+    "nonstandard": true
+}
+
