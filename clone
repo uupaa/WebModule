@@ -87,7 +87,7 @@ function clone(from,           // @arg String: copy from.
                 // replace module name in package.json.
                 //      { "name": "webmodule" } -> { "name": userName + repositoryFullName }
                 if (node === "package.json") {
-                    data = data.replace(/webmodule/, userName + repositoryFullName);
+                    data = data.replace(/webmodule/, (userName + "." + repositoryFullName).toLowerCase());
                 }
 
                 if (node === "README.md") {
