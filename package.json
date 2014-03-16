@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.3",
+  "version":        "0.0.4",
   "description":    "The WebModule is module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["Zzz", "util", "uupaa", "WebModule"],
@@ -10,9 +10,9 @@
   },
   "scripts": {
     "watch":        "node node_modules/uupaa.watch.js --verbose --action build ./lib/Zzz.js",
-    "build":        "node node_modules/uupaa.minify.js --module all --output ./lib/Zzz.min.js --verbose --keep --pretty",
-    "build-simple": "node node_modules/uupaa.minify.js --module all --output ./lib/Zzz.min.js --verbose --keep --pretty --nowrap --simple",
-    "build-release":"node node_modules/uupaa.minify.js --module all --output ./lib/Zzz.min.js --verbose",
+    "build":        "node node_modules/uupaa.minify.js --output ./lib/Zzz.min.js --verbose --keep --pretty",
+    "build-simple": "node node_modules/uupaa.minify.js --output ./lib/Zzz.min.js --verbose --keep --pretty --nowrap --simple",
+    "build-release":"node node_modules/uupaa.minify.js --output ./lib/Zzz.min.js --verbose --build all",
     "tsc":          "tsc -m commonjs -d ./alt/Zzz.ts; cp -f ./alt/Zzz.js ./lib/Zzz.js; npm run build-simple",
     "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html",
     "lint":         "node lint/plato.js; open lint/plato/index.html"
