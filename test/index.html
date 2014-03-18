@@ -5,7 +5,6 @@
 onmessage = function(event) {
     var baseDir = event.data.baseDir;
 
-    if (typeof exports === "undefined") { exports = {}; } // for TypeScript
     importScripts(baseDir + "../node_modules/uupaa.valid.js/lib/Valid.js");
     importScripts(baseDir + "../node_modules/uupaa.help.js/lib/Help.js");
     importScripts(baseDir + "../node_modules/uupaa.task.js/lib/Task.js");
@@ -18,9 +17,6 @@ onmessage = function(event) {
 };
 </script>
 
-<script>
-if (typeof exports === "undefined") { exports = {}; } // for TypeScript
-</script>
 <script src="../node_modules/uupaa.valid.js/lib/Valid.js"></script>
 <script src="../node_modules/uupaa.help.js/lib/Help.js"></script>
 <script src="../node_modules/uupaa.task.js/lib/Task.js"></script>

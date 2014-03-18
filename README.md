@@ -73,7 +73,6 @@ console.log( Zzz() );
     $ brew install closure-compiler
     $ brew install node
     $ npm install -g plato
-    $ npm install -g typescript
     ```
 
 2. Clone Repository and Install

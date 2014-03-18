@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.5",
+  "version":        "0.0.6",
   "description":    "The WebModule is module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["Zzz", "util", "uupaa", "WebModule"],
@@ -9,21 +9,16 @@
     "url":          "https://github.com/uupaa/Zzz.js.git"
   },
   "scripts": {
-    "watch":        "node node_modules/uupaa.watch.js --verbose --action build ./lib/Zzz.js",
-    "build":        "node node_modules/uupaa.minify.js --output ./lib/Zzz.min.js --verbose --keep --pretty ./lib/Zzz.js",
-    "build-simple": "node node_modules/uupaa.minify.js --output ./lib/Zzz.min.js --verbose --keep --pretty --nowrap --simple ./lib/Zzz.js",
-    "build-release":"node node_modules/uupaa.minify.js --output ./lib/Zzz.min.js --verbose --build all",
+    "watch":        "node node_modules/uupaa.watch.js --verbose --action build",
+    "build":        "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty",
+    "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
+    "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module",
     "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html",
-    "lint":         "node lint/plato.js; open lint/plato/index.html",
-    "alt":          "npm run tsc; npm run build",
-    "alt-simple":   "npm run tsc; npm run build-simple",
-    "tsc":          "tsc -m commonjs -d ./alt/Zzz.ts; cp ./alt/Zzz.js ./lib/Zzz.js"
+    "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
   },
-  "build": {
-    "all": { "lib/Zzz.js": "" },
-    "node": { },
-    "worker": { },
-    "browser": { }
+  "x-build": {
+    "inputs":       ["lib/Zzz.js"],
+    "output":       "lib/Zzz.min.js"
   },
   "dependencies": {
   },
@@ -33,6 +28,7 @@
     "uupaa.task.js":    "",
     "uupaa.test.js":    "",
     "uupaa.watch.js":   "",
+    "uupaa.plato.js":   "",
     "uupaa.minify.js":  ""
   },
   "lib":            "./lib/",

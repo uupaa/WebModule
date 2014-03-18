@@ -120,14 +120,13 @@ function clone(from,           // @arg String: copy from.
 
 clone(from, to, repositoryName, {
      // tree                    [overwrite, replaceUserName, source name]
-        "alt": {
-            "Zzz.ts":           [false,     true],
+        "bin": {
+            "Zzz.js":           [false,     true],
         },
         "lib": {
             "Zzz.js":           [false,     true],
         },
         "lint": {
-            "plato.js":         [false],
             "plato": {
             }
         },
