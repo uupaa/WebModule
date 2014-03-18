@@ -39,7 +39,7 @@ Zzz.js description.
 
 # Document
 
-https://github.com/uupaa/Zzz.js/wiki/Zzz.js
+https://github.com/uupaa/Zzz.js/wiki/Zzz
 
 # How to use
 
