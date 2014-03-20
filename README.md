@@ -13,7 +13,6 @@ https://github.com/uupaa/WebModule/wiki/WebModule
 
     ```sh
     $ git clone git@github.com:uupaa/WebModule.git
-    $ chmod +x WebModule/clone
     ```
 
 2. Create new repository 'MyModule.js' in the GitHub and clone it.
@@ -27,8 +26,10 @@ https://github.com/uupaa/WebModule/wiki/WebModule
 
     ```sh
     $ pwd
+
     > MyModule.js
-    $ ../WebModule/clone USER_NAME
+
+    $ node ../WebModule/clone GITHUB-USER-NAME
     ```
 
 =========
