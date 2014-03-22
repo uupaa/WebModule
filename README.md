@@ -9,7 +9,7 @@ https://github.com/uupaa/WebModule/wiki/WebModule
 
 # How to use
 
-1. Clone WebModule to your work space, and add permission to the clone command.
+1. Clone WebModule to your work space.
 
     ```sh
     $ git clone git@github.com:uupaa/WebModule.git

@@ -3,11 +3,10 @@
 /*
 # Usage:
 
-1. Clone WebModule to your work space, and add permission to the clone command.
+1. Clone WebModule to your work space.
 
     ```sh
     $ git clone git@github.com:uupaa/WebModule.git
-    $ chmod +x WebModule/clone
     ```
 
 2. Create new repository 'MyModule.js' in the GitHub and clone it.
@@ -21,8 +20,10 @@
 
     ```sh
     $ pwd
+
     > MyModule.js
-    $ ../WebModule/clone USER_NAME
+
+    $ node ../WebModule/clone GITHUB-USER-NAME
     ```
  */
 
