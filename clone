@@ -39,10 +39,16 @@ var argv = process.argv.slice(2);
 
 var _;
 var repositoryFullName = process.cwd().split("/").pop();                               // "MyModule.js"
-var repositoryName     = (_ = repositoryFullName.split("."), _.pop(), _.join("."));    // "MyModule"
+var repositoryName     = "";
 var from               = (_ = process.argv[1].split("/"), _.pop(), _.join("/")) + "/"; // ".../Zzz.js"
 var to                 = process.cwd() + "/";
 var userName           = argv[0] || "";
+
+if (repositoryFullName.indexOf(".") >= 0) { // has dot.
+    repositoryName     = (_ = repositoryFullName.split("."), _.pop(), _.join("."));    // "MyModule"
+} else {
+    repositoryName     = repositoryFullName;    // "MyModule"
+}
 
 if (!userName) {
     console.log(_CONSOLE_COLOR.RED + "Usage: ../WebModule/clone USER_NAME" + _CONSOLE_COLOR.CLEAR);
