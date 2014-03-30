@@ -20,12 +20,12 @@ function testZzz_value(next) {
 
     var result = new Zzz(123.4).value();
 
-    if (result !== 123.4) {
-        console.log("testZzz_value ng");
-        next && next.miss(); // see Task.js
-    } else {
+    if (result === 123.4) {
         console.log("testZzz_value ok");
-        next && next.pass(); // see Task.js
+        next && next.pass();
+    } else {
+        console.error("testZzz_value ng");
+        next && next.miss();
     }
 }
 
@@ -36,12 +36,12 @@ function testZzz_isNumber(next) {
             new Zzz(123.0).isNumber()   // true
         ];
 
-    if (/false/.test(result.join())) {
-        console.log("testZzz_isNumber ng");
-        next && next.miss();
-    } else {
+    if (!/false/.test(result.join())) {
         console.log("testZzz_isNumber ok");
         next && next.pass();
+    } else {
+        console.error("testZzz_isNumber ng");
+        next && next.miss();
     }
 }
 
@@ -52,12 +52,12 @@ function testZzz_isInteger(next) {
             new Zzz(123.0).isInteger()  // true
         ];
 
-    if (/false/.test(result.join())) {
-        console.log("testZzz_isInteger ng");
-        next && next.miss();
-    } else {
+    if (!/false/.test(result.join())) {
         console.log("testZzz_isInteger ok");
         next && next.pass();
+    } else {
+        console.error("testZzz_isInteger ng");
+        next && next.miss();
     }
 }
 
