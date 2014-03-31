@@ -4,4 +4,5 @@ lint/plato/files
 lint/plato/*.html
 .Minify*
 lib/*.min.js
+release/*.min.js
 
