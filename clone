@@ -141,7 +141,6 @@ clone(from, to, repositoryName, {
             }
         },
         "release": {
-            "Zzz.min.js":       [false,     true],
         },
         "test": {
             "index.html":       [false],
