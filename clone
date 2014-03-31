@@ -127,6 +127,9 @@ function clone(from,           // @arg String: copy from.
 
 clone(from, to, repositoryName, {
      // tree                    [overwrite, replaceUserName, source name]
+        "alt": {
+            "Zzz.ts":           [false,     true],
+        },
         "bin": {
             "Zzz.js":           [false,     true],
         },
@@ -136,6 +139,9 @@ clone(from, to, repositoryName, {
         "lint": {
             "plato": {
             }
+        },
+        "release": {
+            "Zzz.min.js":       [false,     true],
         },
         "test": {
             "index.html":       [false],

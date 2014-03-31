@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.10",
+  "version":        "0.0.11",
   "description":    "The WebModule is module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule"],
@@ -18,7 +18,7 @@
   },
   "x-build": {
     "inputs":       ["lib/Zzz.js"],
-    "output":       "lib/Zzz.min.js"
+    "output":       "release/Zzz.min.js"
   },
   "dependencies": {
   },

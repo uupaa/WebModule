@@ -9,7 +9,7 @@ onmessage = function(event) {
     importScripts(baseDir + "../node_modules/uupaa.task.js/lib/Task.js");
     importScripts(baseDir + "../node_modules/uupaa.test.js/lib/Test.js");
     importScripts(baseDir + "../lib/Zzz.js");
-    importScripts(baseDir + "../lib/Zzz.min.js");
+    importScripts(baseDir + "../release/Zzz.min.js");
     importScripts(baseDir + "./test.js");
 
     self.postMessage({ error: self.errorMessage || "" });
@@ -21,7 +21,7 @@ onmessage = function(event) {
 <script src="../node_modules/uupaa.task.js/lib/Task.js"></script>
 <script src="../node_modules/uupaa.test.js/lib/Test.js"></script>
 <script src="../lib/Zzz.js"></script>
-<script src="../lib/Zzz.min.js"></script>
+<script src="../release/Zzz.min.js"></script>
 <script src="./test.js"></script>
 </body></html>
 
