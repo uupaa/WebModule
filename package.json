@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.12",
+  "version":        "0.0.13",
   "description":    "The WebModule is module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule"],

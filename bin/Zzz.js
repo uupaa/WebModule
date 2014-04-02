@@ -2,15 +2,16 @@
 
 (function(global) {
 
-var _USAGE = '\n'+
-'   Usage:\n' +
-'       node bin/Zzz.js [--help]\n' +
-'                       [--verbose]\n' +
-'                       [--output output-file]\n' +
-'                       input-file [input-file ...]\n' +
-'\n'+
-'   See:\n'+
-'       https://github.com/uupaa/Zzz.js/wiki/Zzz.js \n';
+var _USAGE = _multiline(function() {/*
+    Usage:
+        node bin/Zzz.js [--help]
+                        [--verbose]
+                        [--output output-file]
+                        input-file [input-file ...]
+
+    See:
+        https://github.com/uupaa/Zzz.js/wiki/Zzz.js
+*/});
 
 
 var _CONSOLE_COLOR = {
@@ -25,7 +26,7 @@ var fs      = require("fs");
 var argv    = process.argv.slice(2);
 var options = _parseCommandLineOptions({
         help:       false,      // Boolean: true is show help.
-        verbose:    false       // Boolean: true is verbose mode.
+        verbose:    false,      // Boolean: true is verbose mode.
         output:     "a.out",    // String: output file.
         inputs:     []          // StringArray: input files. [file, ...]
     });
@@ -38,6 +39,7 @@ if (options.help) {
 if (options.verbose) {
 }
 
+/*
 Zzz({
     "verbose":      options.verbose,
     "output":       options.output,
@@ -45,8 +47,10 @@ Zzz({
 }, function(err) {
     //
 });
+ */
 
-function _parseCommandLineOptions(options) {
+function _parseCommandLineOptions(options) { // @arg Object:
+                                             // @ret Object:
     for (var i = 0, iz = argv.length; i < iz; ++i) {
         switch (argv[i]) {
         case "-h":
@@ -62,6 +66,11 @@ function _parseCommandLineOptions(options) {
         }
     }
     return options;
+}
+
+function _multiline(fn) { // @arg Function:
+                          // @ret String:
+    return (fn + "").split("\n").slice(1, -1).join("\n");
 }
 
 })((this || 0).self || global);
