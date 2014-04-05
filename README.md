@@ -12,8 +12,10 @@ https://github.com/uupaa/WebModule/wiki/WebModule
 1. Clone WebModule to your work space.
 
     ```sh
-    $ npm install -g uupaa.task.js
     $ git clone git@github.com:uupaa/WebModule.git
+    $ cd WebModule
+    $ npm install
+    $ cd ..
     ```
 
 2. Create new repository 'MyModule.js' in the GitHub, and clone it.
@@ -28,4 +30,13 @@ https://github.com/uupaa/WebModule/wiki/WebModule
     ```sh
     $ node ../WebModule/clone GITHUB-USER-NAME
     ```
+
+
+```
+    workspace/
+        |
+        + WebModule/
+        |
+        + MyModule.js/
+```
 
