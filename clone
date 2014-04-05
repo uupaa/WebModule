@@ -1,31 +1,28 @@
 #!/usr/bin/env node
 
-/*
-# Usage:
+var _USAGE = _multiline(function() {/*
+    Usage:
 
-1. Clone WebModule to your work space.
+        1. Clone WebModule to your work space.
 
-    ```sh
-    $ git clone git@github.com:uupaa/WebModule.git
-    ```
+            ```sh
+            $ npm install -g uupaa.task.js
+            $ git clone git@github.com:uupaa/WebModule.git
+            ```
 
-2. Create new repository 'MyModule.js' in the GitHub and clone it.
+        2. Create new repository 'MyModule.js' in the GitHub, and clone it.
 
-    ```sh
-    $ git clone git@github.com:uupaa/MyModule.js.git
-    $ cd MyModule.js
-    ```
+            ```sh
+            $ git clone git@github.com:uupaa/MyModule.js.git
+            $ cd MyModule.js
+            ```
 
-3. Execute clone command.
+        3. Execute clone command.
 
-    ```sh
-    $ pwd
-
-    > MyModule.js
-
-    $ node ../WebModule/clone GITHUB-USER-NAME
-    ```
- */
+            ```sh
+            $ node ../WebModule/clone GITHUB-USER-NAME
+            ```
+*/});
 
 var _CONSOLE_COLOR = {
         RED:    "\u001b[31m",
@@ -34,125 +31,185 @@ var _CONSOLE_COLOR = {
         CLEAR:  "\u001b[0m"
     };
 
-var fs = require("fs");
-var argv = process.argv.slice(2);
+var rl                 = require("readline");
+var fs                 = require("fs");
+var readline           = require("readline");
+var Task               = require("uupaa.task.js");
+var argv               = process.argv.slice(2);
+var githubUserName     = argv[0] || "";
 
-var _;
-var repositoryFullName = process.cwd().split("/").pop();                               // "MyModule.js"
-var repositoryName     = "";
-var from               = (_ = process.argv[1].split("/"), _.pop(), _.join("/")) + "/"; // ".../Zzz.js"
-var to                 = process.cwd() + "/";
-var userName           = argv[0] || "";
+var repositoryFullName = process.cwd().split("/").pop();
+var repositoryName     = repositoryFullName.indexOf(".") >= 0
+                       ? repositoryFullName.split(".").slice(0, -1).join(".")
+                       : repositoryFullName;
 
-if (repositoryFullName.indexOf(".") >= 0) { // has dot.
-    repositoryName     = (_ = repositoryFullName.split("."), _.pop(), _.join("."));    // "MyModule"
-} else {
-    repositoryName     = repositoryFullName;    // "MyModule"
-}
+var fromDir            = process.argv[1].split("/").slice(0, -1).join("/") + "/";
+var toDir              = process.cwd() + "/";
 
-if (!userName) {
-    console.log(_CONSOLE_COLOR.RED + "Usage: ../WebModule/clone USER_NAME" + _CONSOLE_COLOR.CLEAR);
+// console.log( "repositoryFullName: " + repositoryFullName  ); // "Foo.js"
+// console.log( "repositoryName:     " + repositoryName      ); // "Foo"
+// console.log( "fromDir:            " + fromDir             ); // "/Users/uupaa/oss/WebModule/"
+// console.log( "toDir:              " + toDir               ); // "/Users/uupaa/oss/Foo.js"
+// return;
+
+if (!githubUserName) {
+    console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
     return;
 }
 
-function clone(from,           // @arg String: copy from.
-               to,             // @arg String: copy to.
-               repositoryName, // @arg String: repository name. eg: "MyModule"
-               tree) {         // @arg Object: source tree.
+_clone(fromDir, toDir, {
+ // fileName                [scan, sourceFileName]
+    "alt": {
+        "Zzz.ts":           [true],
+    },
+    "bin": {
+        "Zzz.js":           [true],
+    },
+    "lib": {
+        "Zzz.js":           [true],
+    },
+    "lint": {
+        "plato": {
+            "README.md":    [],
+        }
+    },
+    "release": {
+        "README.md":        [],
+    },
+    "test": {
+        "index.html":       [true],
+        "index.node.js":    [true],
+        "test.js":          [true],
+    },
+    ".gitignore":           [],
+    ".jshintrc":            [],
+    ".npmignore":           [],
+    "index.js":             [],
+    "LICENSE":              [],
+    "package.json":         [true],
+    "README.md":            [true, "MODULE_README.md"]
+});
+// rl.close();
 
-    for (var node in tree) {    // node  are "lib", "Zzz.js", ...
-        var value = tree[node]; // value are { ... }, [false], [false, "ts.index.html"]
+// =========================================================
 
-        if (Array.isArray(value)) {
-            var overwrite       = value[0];
-            var replaceUserName = value[1] || false;
-            var sourceName      = value[2] || node;
+function _clone(fromDir,    // @arg String: copy from dir. has tail slash(/)
+                toDir,      // @arg String: copy to dir. has tail slash(/)
+                fileTree) { // @arg Object: source file tree.
 
-            // replace node name.
-            //      "Zzz.js" -> "MyModule.js"
-            var targetName = node.replace(/Zzz/g, repositoryName).
-                                  replace(/zzz/g, repositoryName.toLowerCase());
-            // already exists?
-            var exists = fs.existsSync(to + targetName);
+    var overwriteFiles = []; // [ [targetFile, sourceText], ... ]
 
-            if (overwrite || !exists) {
-                if (overwrite) {
-                    console.log("  overwrite: " + to + targetName);
-                } else if (!exists) {
-                    console.log("  clone: " + to + targetName);
+    _doClone(overwriteFiles, fromDir, toDir, fileTree);
+
+    if (overwriteFiles.length) {
+        var rl = readline.createInterface(process.stdin, process.stdout);
+        Task.loop(overwriteFiles, _tick, function() {
+            rl.close();
+        });
+
+        function _tick(task, index, overwriteFiles) {
+            var ary = overwriteFiles[index];
+            var targetFile = ary[0];
+            var sourceText = ary[1];
+
+            rl.question("  exists:    " + targetFile + " - overwrite it? (y/n): ",
+                       function(answer) {
+
+                if (/^y$/i.test(answer)) {
+                    console.log(_CONSOLE_COLOR.YELLOW + "  overwrite: " + targetFile + _CONSOLE_COLOR.CLEAR);
+                    fs.writeFileSync(targetFile, sourceText);
+                } else {
+                    console.log("  skip:      " + targetFile);
                 }
-
-                var data = fs.readFileSync(from + sourceName, "UTF-8");
-
-                // replace jsperf url.
-                //      "http://jsperf.com/uupaa-zzz/" -> "http://jsperf.com/USER_NAME-WebModule/"
-                data = data.replace(/jsperf.com.uupaa.zzz/, function(_) {
-                    return "jsperf.com/" + userName.toLowerCase() +
-                           "-" + repositoryName.replace("_", "-").toLowerCase();
-                });
-
-                // replace module name in package.json.
-                //      { "name": "webmodule" } -> { "name": userName + repositoryFullName }
-                if (node === "package.json") {
-                    data = data.replace(/webmodule/, (userName + "." + repositoryFullName).toLowerCase());
-                }
-
-                if (node === "README.md") {
-                    data = data.split("=========").slice(2).join("=========");
-                }
-
-                // replace zzz to repository name.
-                data = data.replace(/Zzz/g, repositoryName).
-                            replace(/zzz/g, repositoryName.toLowerCase());
-
-                // replace user name.
-                //      "github.com/uupaa" -> "github.com/userName"
-                if (replaceUserName) {
-                    data = data.replace(/github.com(.)uupaa/g, function(_, sep) {
-                        return "github.com" + sep + userName;
-                    });
-                }
-
-                fs.writeFileSync(to + targetName, data);
-            }
-        } else { // Object -> Tree -> mkdir
-            if (!fs.existsSync(to + node)) {
-                console.log("  mkdir: " + to + node + "/");
-                fs.mkdirSync(to + node);
-            }
-            clone(from + node + "/", to + node + "/", repositoryName, tree[node]);
+                task.pass();
+            });
         }
     }
 }
 
-clone(from, to, repositoryName, {
-     // tree                    [overwrite, replaceUserName, source name]
-        "alt": {
-            "Zzz.ts":           [false,     true],
-        },
-        "bin": {
-            "Zzz.js":           [false,     true],
-        },
-        "lib": {
-            "Zzz.js":           [false,     true],
-        },
-        "lint": {
-            "plato": {
+function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
+    for (fileName in fileTree) {
+        _loop(overwriteFiles, fileName, fileTree);
+    }
+
+    function _loop(overwriteFiles, fileName, fileTree) {
+        var options        = fileTree[fileName]; // [scan, sourceFileName]
+        var scan           = options[0] || false;
+        var sourceFileName = options[1] || "";
+
+        if ( !Array.isArray(options) ) {
+            if ( !fs.existsSync(toDir + fileName) ) {
+                console.log("  mkdir:     " + toDir + fileName + "/");
+                fs.mkdirSync(toDir + fileName);
             }
-        },
-        "release": {
-        },
-        "test": {
-            "index.html":       [false],
-            "index.node.js":    [false],
-            "test.js":          [false],
-        },
-        ".gitignore":           [false],
-        ".jshintrc":            [false],
-        ".npmignore":           [false],
-        "index.js":             [false],
-        "LICENSE":              [false],
-        "package.json":         [false,     true],
-        "README.md":            [true,      true]
-    });
+            // recursive call
+            _doClone(overwriteFiles,
+                     fromDir + fileName + "/",
+                     toDir   + fileName + "/",
+                     fileTree[fileName]);
+
+        } else {
+            var sourceFile = fromDir + (sourceFileName || fileName);
+            var targetFile = toDir   + fileName;
+
+            if ( /zzz/i.test(targetFile) ) { // replace fileName. "dir/Zzz.js" -> "dir/MyModule.js"
+                targetFile = targetFile.replace(/Zzz/g, repositoryName).
+                                        replace(/zzz/g, repositoryName.toLowerCase());
+            }
+
+            var targetFileAlreadyExists = fs.existsSync(targetFile);
+            var sourceText = fs.readFileSync(sourceFile, "UTF-8");
+            var targetText = targetFileAlreadyExists ? fs.readFileSync(targetFile, "UTF-8")
+                                                     : "";
+
+            if (scan) {
+                sourceText = _repleaceText(sourceText);
+            }
+            if (targetText && targetText !== sourceText) {
+                overwriteFiles.push([targetFile, sourceText]);
+            } else {
+                if (targetFileAlreadyExists) {
+                    console.log("  overwrite: " + targetFile);
+                } else {
+                    console.log("  clone:     " + targetFile);
+                }
+                fs.writeFileSync(targetFile, sourceText);
+            }
+        }
+    }
+
+    function _repleaceText(text) {
+
+        // Replace JSPerf URL.
+        //      "http://jsperf.com/uupaa-zzz/" -> "http://jsperf.com/GITHUB-USERNAME-WebModule/"
+        text = text.replace(/jsperf.com.uupaa.zzz/, function(_) {
+            return "jsperf.com/" + githubUserName.toLowerCase() +
+                             "-" + repositoryName.replace("_", "-").toLowerCase();
+        });
+
+        // Replace module name in package.json.
+        //      { "name": "webmodule" } -> { "name": githubUserName + repositoryFullName }
+        if (fileName === "package.json") {
+            text = text.replace(/webmodule/, (githubUserName + "." + repositoryFullName).toLowerCase());
+        }
+
+        // Replace zzz to repository name.
+        text = text.replace(/Zzz/g, repositoryName).
+                    replace(/zzz/g, repositoryName.toLowerCase());
+
+        // Replace GitHub UserName.
+        //      "github.com/uupaa" -> "github.com/githubUserName"
+        if (githubUserName) {
+            text = text.replace(/github.com(.)uupaa/g, function(_, sep) {
+                return "github.com" + sep + githubUserName;
+            });
+        }
+        return text;
+    }
+}
+
+function _multiline(fn) { // @arg Function:
+                          // @ret String:
+    return (fn + "").split("\n").slice(1, -1).join("\n");
+}
 
