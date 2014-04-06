@@ -69,13 +69,13 @@ if (!githubUserName) {
 }
 
 _clone(fromDir, toDir, {
- // fileName                [scan, sourceFileName]
-    "alt": {
-        "Zzz.ts":           [true],
-    },
-    "bin": {
-        "Zzz.js":           [true],
-    },
+//  fileName                [scan, sourceFileName]
+//  "alt": {
+//      "Zzz.ts":           [true],
+//  },
+//  "bin": {
+//      "Zzz.js":           [true],
+//  },
     "lib": {
         "Zzz.js":           [true],
     },
@@ -95,7 +95,7 @@ _clone(fromDir, toDir, {
     ".gitignore":           [],
     ".jshintrc":            [],
     ".npmignore":           [],
-    "index.js":             [],
+    "index.js":             [true],
     "LICENSE":              [],
     "package.json":         [true],
     "README.md":            [true, "MODULE_README.md"]

@@ -1,7 +1,7 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.15",
-  "description":    "The WebModule is module template for Mobile Web Application.",
+  "version":        "0.0.16",
+  "description":    "Module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule"],
   "repository": {
@@ -23,6 +23,7 @@
   "dependencies": {
   },
   "devDependencies": {
+    "uupaa.console.js": "",
     "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
     "uupaa.task.js":    "",

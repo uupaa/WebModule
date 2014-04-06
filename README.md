@@ -1,7 +1,7 @@
 WebModule
 =========
 
-The WebModule is module template for Mobile Web Application.
+Module template for Mobile Web Application.
 
 # Document
 

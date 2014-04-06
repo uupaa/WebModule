@@ -5,6 +5,7 @@
 onmessage = function(event) {
     var baseDir = event.data.baseDir;
 
+    importScripts(baseDir + "../node_modules/uupaa.console.js/lib/Console.js");
     importScripts(baseDir + "../node_modules/uupaa.valid.js/lib/Valid.js");
     importScripts(baseDir + "../node_modules/uupaa.task.js/lib/Task.js");
     importScripts(baseDir + "../node_modules/uupaa.test.js/lib/Test.js");
