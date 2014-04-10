@@ -7,8 +7,8 @@ Zzz.js description.
 # Document
 
 - https://github.com/uupaa/Zzz.js/wiki/Zzz
-- https://github.com/uupaa/WebModule, [slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
-- https://github.com/uupaa/Help.js, [slide](http://uupaa.github.io/Slide/slide/Help.js/index.html)
+- https://github.com/uupaa/WebModule ([Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html))
+- https://github.com/uupaa/Help.js ([Slide](http://uupaa.github.io/Slide/slide/Help.js/index.html))
 
 # How to use
 
