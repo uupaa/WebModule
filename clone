@@ -95,6 +95,7 @@ _clone(fromDir, toDir, {
     ".gitignore":           [],
     ".jshintrc":            [],
     ".npmignore":           [],
+    ".travis.yml":          [],
     "index.js":             [true],
     "LICENSE":              [],
     "package.json":         [true],
