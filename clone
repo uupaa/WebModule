@@ -22,9 +22,8 @@ var _USAGE = _multiline(function() {/*
         3. Execute clone command.
 
             ```sh
-            $ node ../WebModule/clone GITHUB-USER-NAME
+            $ node ../WebModule/clone GITHUB-USER-NAME [--alt] [--bin]
             ```
-
 
         ```
         workspace/
@@ -35,6 +34,41 @@ var _USAGE = _multiline(function() {/*
         ```
 */});
 
+//  fileName                [scan, sourceFileName]
+
+var _CLONE_FILES = {
+    "alt": {
+        "Zzz.ts":           [true],
+    },
+    "bin": {
+        "Zzz.js":           [true],
+    },
+    "lib": {
+        "Zzz.js":           [true],
+    },
+    "lint": {
+        "plato": {
+            "README.md":    [],
+        }
+    },
+    "release": {
+        "README.md":        [],
+    },
+    "test": {
+//      "index.html":       [true],
+//      "index.node.js":    [true],
+        "test.js":          [true],
+    },
+    ".gitignore":           [],
+    ".jshintrc":            [],
+    ".npmignore":           [],
+    ".travis.yml":          [],
+    "index.js":             [true],
+    "LICENSE":              [],
+    "package.json":         [true],
+    "README.md":            [true, "MODULE_README.md"]
+};
+
 var _CONSOLE_COLOR = {
         RED:    "\u001b[31m",
         YELLOW: "\u001b[33m",
@@ -42,7 +76,6 @@ var _CONSOLE_COLOR = {
         CLEAR:  "\u001b[0m"
     };
 
-var rl                 = require("readline");
 var fs                 = require("fs");
 var readline           = require("readline");
 var Task               = require("uupaa.task.js");
@@ -63,45 +96,26 @@ var toDir              = process.cwd() + "/";
 // console.log( "toDir:              " + toDir               ); // "/Users/uupaa/oss/Foo.js"
 // return;
 
-if (!githubUserName) {
+var options = _parseCommandLineOptions({
+        help:       false,      // Boolean: true is show help.
+        verbose:    false,      // Boolean: true is verbose mode.
+        alt:        false,      // boolean: true is put alt/ dir.
+        bin:        false,      // boolean: true is put bin/ dir.
+    });
+
+if (options.verbose || !githubUserName) {
     console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
     return;
 }
 
-_clone(fromDir, toDir, {
-//  fileName                [scan, sourceFileName]
-//  "alt": {
-//      "Zzz.ts":           [true],
-//  },
-//  "bin": {
-//      "Zzz.js":           [true],
-//  },
-    "lib": {
-        "Zzz.js":           [true],
-    },
-    "lint": {
-        "plato": {
-            "README.md":    [],
-        }
-    },
-    "release": {
-        "README.md":        [],
-    },
-    "test": {
-        "index.html":       [true],
-        "index.node.js":    [true],
-        "test.js":          [true],
-    },
-    ".gitignore":           [],
-    ".jshintrc":            [],
-    ".npmignore":           [],
-    ".travis.yml":          [],
-    "index.js":             [true],
-    "LICENSE":              [],
-    "package.json":         [true],
-    "README.md":            [true, "MODULE_README.md"]
-});
-// rl.close();
+if (!options.alt) {
+    delete _CLONE_FILES.alt;
+}
+if (!options.bin) {
+    delete _CLONE_FILES.bin;
+}
+
+_clone(fromDir, toDir, _CLONE_FILES);
 
 // =========================================================
 
@@ -218,6 +232,22 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
         }
         return text;
     }
+}
+
+function _parseCommandLineOptions(options) { // @arg Object:
+                                             // @ret Object:
+    for (var i = 0, iz = argv.length; i < iz; ++i) {
+        switch (argv[i]) {
+        case "-h":
+        case "--help":      options.help = true; break;
+        case "-v":
+        case "--verbose":   options.verbose = true; break;
+        case "--alt":       options.alt = true; break;
+        case "--bin":       options.bin = true; break;
+        default:
+        }
+    }
+    return options;
 }
 
 function _multiline(fn) { // @arg Function:
