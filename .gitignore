@@ -5,4 +5,5 @@ lint/plato/*.html
 .Minify*
 lib/*.min.js
 release/*.min.js
+npm-debug.log
 

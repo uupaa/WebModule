@@ -7,4 +7,5 @@ lib/*.min.js
 release/*.min.js
 .vimrc*
 .git*
+npm-debug.log
 

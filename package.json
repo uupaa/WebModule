@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.23",
+  "version":        "0.0.24",
   "description":    "Module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule"],
@@ -14,7 +14,8 @@
     "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
     "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module",
     "test":         "npm run test-node; npm run test-browser",
-    "test-update":  "node node_modules/uupaa.test.js/bin/Test.js --browser --node",
+    "test-page":    "node node_modules/uupaa.test.js/bin/TestPage.js --verbose",
+    "test-debug":   "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
     "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "test-browser": "open test/index.html",
     "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
@@ -22,7 +23,11 @@
   "x-build": {
     "files":        ["lib/Zzz.js"],
     "output":       "release/Zzz.min.js",
-    "target":       ["Browser", "Worker", "Node"]
+    "target":       ["all"],
+    "module": {
+      "develop":    ["uupaa.valid.js"],
+      "release":    []
+    }
   },
   "dependencies": {
   },
