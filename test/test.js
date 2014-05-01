@@ -1,20 +1,23 @@
-new Test().add([
+var ModuleTest = (function(global) {
+
+var testParam = {
+        disable:    false,
+        node:       true,
+        browser:    true,
+        worker:     true,
+        button:     true,
+        both:       true,
+        primary:    global["Zzz"],
+        secondary:  global["Zzz_"],
+    };
+
+var items = [
         testZzz_value,
         testZzz_isNumber,
         testZzz_isInteger,
-    ]).run(function(err, test) {
-        if (1) {
-            err || test.worker(function(err, test) {
-                if (!err && typeof Zzz_ !== "undefined") {
-                    var name = Test.swap(Zzz, Zzz_);
+    ];
 
-                    new Test(test).run(function(err, test) {
-                        Test.undo(name);
-                    });
-                }
-            });
-        }
-    });
+new Test(testParam).add(items).run();
 
 function testZzz_value(next) {
 
@@ -60,4 +63,7 @@ function testZzz_isInteger(next) {
         next && next.miss();
     }
 }
+
+return items;
+})((this || 0).self || global);
 
