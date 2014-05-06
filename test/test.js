@@ -1,23 +1,21 @@
-var ModuleTest = (function(global) {
+var ModuleTestZzz = (function(global) {
 
-var testParam = {
+var _inNode    = "process"        in global;
+var _inWorker  = "WorkerLocation" in global;
+var _inBrowser = "document"       in global;
+
+return new Test("Zzz", {
         disable:    false,
-        node:       true,
         browser:    true,
         worker:     true,
+        node:       true,
         button:     true,
         both:       true,
-        primary:    global["Zzz"],
-        secondary:  global["Zzz_"],
-    };
-
-var items = [
+    }).add([
         testZzz_value,
         testZzz_isNumber,
         testZzz_isInteger,
-    ];
-
-new Test(testParam).add(items).run();
+    ]).run().clone();
 
 function testZzz_value(next) {
 
@@ -64,6 +62,5 @@ function testZzz_isInteger(next) {
     }
 }
 
-return items;
 })((this || 0).self || global);
 

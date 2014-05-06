@@ -4,4 +4,3 @@ require("uupaa.test.js");
 require("../lib/Zzz.js");
 require("../release/Zzz.min.js");
 require("./test.js");
-

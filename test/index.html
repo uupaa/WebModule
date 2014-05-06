@@ -1,17 +1,18 @@
 <!DOCTYPE html><html><head><title>test</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
 <meta charset="utf-8"></head><body>
 
 <script id="worker" type="javascript/worker">
 onmessage = function(event) {
-    var BASE_DIR = event.data.BASE_DIR;
+    self.MESSAGE = event.data;
 
-    importScripts(BASE_DIR + "../node_modules/uupaa.console.js/lib/Console.js");
-    importScripts(BASE_DIR + "../node_modules/uupaa.valid.js/lib/Valid.js");
-    importScripts(BASE_DIR + "../node_modules/uupaa.task.js/lib/Task.js");
-    importScripts(BASE_DIR + "../node_modules/uupaa.test.js/lib/Test.js");
-    importScripts(BASE_DIR + "../lib/Zzz.js");
-    importScripts(BASE_DIR + "../release/Zzz.min.js");
-    importScripts(BASE_DIR + "./test.js");
+    importScripts(MESSAGE.BASE_DIR + "../node_modules/uupaa.console.js/lib/Console.js");
+    importScripts(MESSAGE.BASE_DIR + "../node_modules/uupaa.valid.js/lib/Valid.js");
+    importScripts(MESSAGE.BASE_DIR + "../node_modules/uupaa.task.js/lib/Task.js");
+    importScripts(MESSAGE.BASE_DIR + "../node_modules/uupaa.test.js/lib/Test.js");
+    importScripts(MESSAGE.BASE_DIR + "../lib/Zzz.js");
+    importScripts(MESSAGE.BASE_DIR + "../release/Zzz.min.js");
+    importScripts(MESSAGE.BASE_DIR + "./test.js");
 
     self.postMessage({ error: self.errorMessage || "" });
 };
@@ -24,5 +25,5 @@ onmessage = function(event) {
 <script src="../lib/Zzz.js"></script>
 <script src="../release/Zzz.min.js"></script>
 <script src="./test.js"></script>
-</body></html>
 
+</body></html>
