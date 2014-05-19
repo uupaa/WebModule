@@ -10,7 +10,7 @@ return new Test("Zzz", {
         worker:     true,
         node:       true,
         button:     true,
-        both:       true,
+        both:       true, // test the primary module and secondary module
     }).add([
         testZzz_value,
         testZzz_isNumber,
@@ -22,10 +22,8 @@ function testZzz_value(next) {
     var result = new Zzz(123.4).value();
 
     if (result === 123.4) {
-        console.log("testZzz_value ok");
         next && next.pass();
     } else {
-        console.error("testZzz_value ng");
         next && next.miss();
     }
 }
@@ -38,10 +36,8 @@ function testZzz_isNumber(next) {
         ];
 
     if (!/false/.test(result.join())) {
-        console.log("testZzz_isNumber ok");
         next && next.pass();
     } else {
-        console.error("testZzz_isNumber ng");
         next && next.miss();
     }
 }
@@ -54,10 +50,8 @@ function testZzz_isInteger(next) {
         ];
 
     if (!/false/.test(result.join())) {
-        console.log("testZzz_isInteger ok");
         next && next.pass();
     } else {
-        console.error("testZzz_isInteger ng");
         next && next.miss();
     }
 }

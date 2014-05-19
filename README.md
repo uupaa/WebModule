@@ -5,7 +5,7 @@ Module template for Mobile Web Application.
 
 # Document
 
-- https://github.com/uupaa/WebModule/wiki/WebModule ([Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html))
+- [WebModule](https://github.com/uupaa/WebModule/wiki/WebModule) ([Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html))
 
 # How to use
 

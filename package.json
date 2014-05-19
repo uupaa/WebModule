@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.26",
+  "version":        "0.0.27",
   "description":    "Module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule"],
@@ -24,6 +24,7 @@
     "files":        ["lib/Zzz.js"],
     "output":       "release/Zzz.min.js",
     "target":       ["all"],
+    "labels":       ["@dev"],
     "module": {
       "develop":    ["uupaa.valid.js"],
       "release":    []
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "uupaa.nodemodule.js": "",
+    "uupaa.reflection.js": "",
     "uupaa.console.js": "",
     "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
