@@ -1,8 +1,8 @@
 var ModuleTestZzz = (function(global) {
 
-var _inNode    = "process"        in global;
-var _inWorker  = "WorkerLocation" in global;
-var _inBrowser = "document"       in global;
+var _runOnNode = "process" in global;
+var _runOnWorker = "WorkerLocation" in global;
+var _runOnBrowser = "document" in global;
 
 return new Test("Zzz", {
         disable:    false,
