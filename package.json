@@ -1,9 +1,9 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.28",
+  "version":        "0.0.29",
   "description":    "Module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
-  "keywords":       ["WebModule"],
+  "keywords":       ["WebModule", "Unstable"],
   "repository": {
     "type":         "git",
     "url":          "https://github.com/uupaa/Zzz.js.git"

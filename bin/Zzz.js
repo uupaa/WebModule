@@ -2,7 +2,7 @@
 
 (function(global) {
 
-var _USAGE = _multiline(function() {/*
+var USAGE = _multiline(function() {/*
     Usage:
         node bin/Zzz.js [--help]
                         [--verbose]
@@ -14,7 +14,7 @@ var _USAGE = _multiline(function() {/*
 */});
 
 
-var _CONSOLE_COLOR = {
+var CONSOLE_COLOR = {
         RED:    "\u001b[31m",
         YELLOW: "\u001b[33m",
         GREEN:  "\u001b[32m",
@@ -32,7 +32,7 @@ var options = _parseCommandLineOptions({
     });
 
 if (options.help) {
-    console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
+    console.log(CONSOLE_COLOR.YELLOW + USAGE + CONSOLE_COLOR.CLEAR);
     return;
 }
 
