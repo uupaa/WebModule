@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.30",
+  "version":        "0.0.31",
   "description":    "Module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule", "Unstable"],
@@ -21,10 +21,10 @@
     "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
   },
   "x-build": {
-    "files":        ["lib/Zzz.js"],
+    "source":       ["lib/Zzz.js"],
     "output":       "release/Zzz.min.js",
     "target":       ["all"],
-    "labels":       ["@dev"],
+    "label":        ["@dev"],
     "module": {
       "develop":    ["uupaa.valid.js"],
       "release":    []

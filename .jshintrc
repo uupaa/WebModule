@@ -13,6 +13,7 @@
     "maxerr":   10000,
     "proto":    true,
     "sub":      true,
+    "newcap":   false, // Require capitalization of all constructor functions e.g. `new F()`
 
     // --- Environments ---
     "browser":  true,
