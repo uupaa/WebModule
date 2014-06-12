@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.31",
+  "version":        "0.0.32",
   "description":    "Module template for Mobile Web Application.",
   "url":            "https://github.com/uupaa/Zzz.js",
   "keywords":       ["WebModule", "Unstable"],
@@ -36,7 +36,7 @@
   "devDependencies": {
     "uupaa.nodemodule.js": "",
     "uupaa.reflection.js": "",
-    "uupaa.iphonesimurator.js": "",
+    "uupaa.iphonesimulator.js": "",
     "uupaa.console.js": "",
     "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
