@@ -17,18 +17,18 @@ return new Test("Zzz", {
         testZzz_isInteger,
     ]).run().clone();
 
-function testZzz_value(next) {
+function testZzz_value(test, pass, miss) {
 
     var result = new Zzz(123.4).value();
 
     if (result === 123.4) {
-        next && next.pass();
+        test.done(pass());
     } else {
-        next && next.miss();
+        test.done(miss());
     }
 }
 
-function testZzz_isNumber(next) {
+function testZzz_isNumber(test, pass, miss) {
 
     var result = [
             new Zzz(123.4).isNumber(),  // true
@@ -36,13 +36,13 @@ function testZzz_isNumber(next) {
         ];
 
     if (!/false/.test(result.join())) {
-        next && next.pass();
+        test.done(pass());
     } else {
-        next && next.miss();
+        test.done(miss());
     }
 }
 
-function testZzz_isInteger(next) {
+function testZzz_isInteger(test, pass, miss) {
 
     var result = [
            !new Zzz(123.4).isInteger(), // !false -> true
@@ -50,9 +50,9 @@ function testZzz_isInteger(next) {
         ];
 
     if (!/false/.test(result.join())) {
-        next && next.pass();
+        test.done(pass());
     } else {
-        next && next.miss();
+        test.done(miss());
     }
 }
 

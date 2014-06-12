@@ -3,6 +3,7 @@ node_js:
     - "0.10"
 before_script:
     - "npm install -g plato"
+    - "npm install -g http-server"
     - "npm install"
     - "npm install uupaa.compile.js"
     - "npm run build"

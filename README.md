@@ -1,15 +1,16 @@
-WebModule
-=========
+# WebModule [![Build Status](https://travis-ci.org/uupaa/WebModule.js.png)](http://travis-ci.org/uupaa/WebModule.js)
+
+[![npm](https://nodei.co/npm/webmodule.png?downloads=true&stars=true)](https://nodei.co/npm/webmodule/)
 
 Module template for Mobile Web Application.
 
-# Document
+## Document
 
 - [WebModule wiki](https://github.com/uupaa/WebModule/wiki/WebModule) ([Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html))
 - [Development](https://github.com/uupaa/WebModule/wiki/Development)
 - [WebModuleList](https://github.com/uupaa/WebModule/wiki/WebModuleList)
 
-# How to use
+## How to use
 
 1. Clone WebModule to your work space.
 
