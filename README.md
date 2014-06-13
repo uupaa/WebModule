@@ -1,4 +1,4 @@
-# WebModule [![Build Status](https://travis-ci.org/uupaa/WebModule.js.png)](http://travis-ci.org/uupaa/WebModule.js)
+# WebModule [![Build Status](https://travis-ci.org/uupaa/WebModule.png)](http://travis-ci.org/uupaa/WebModule)
 
 [![npm](https://nodei.co/npm/webmodule.png?downloads=true&stars=true)](https://nodei.co/npm/webmodule/)
 
