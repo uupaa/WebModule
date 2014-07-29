@@ -25,8 +25,8 @@ var Zzz     = require("../lib/Zzz");
 var fs      = require("fs");
 var argv    = process.argv.slice(2);
 var options = _parseCommandLineOptions({
-        help:       false,      // Boolean: true is show help.
-        verbose:    false,      // Boolean: true is verbose mode.
+        help:       false,      // Boolean: show help.
+        verbose:    false,      // Boolean: verbose mode.
         output:     "a.out",    // String: output file.
         inputs:     []          // StringArray: input files. [file, ...]
     });
