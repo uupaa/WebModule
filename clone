@@ -215,8 +215,10 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
 
         // Replace module name in package.json.
         //      { "name": "webmodule" } -> { "name": githubUserName + repositoryFullName }
+        //      { "version": "*" } -> { "version": "0.0.0" }
         if (fileName === "package.json") {
             text = text.replace(/webmodule/, (githubUserName + "." + repositoryFullName).toLowerCase());
+            text = text.replace(/\"version\"\:(\s*)\"[^"]*\"/, "\"version\":$1\"0.0.0\"");
         }
 
         // Replace zzz to repository name.
@@ -254,4 +256,3 @@ function _multiline(fn) { // @arg Function:
                           // @ret String:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
-

@@ -16,7 +16,7 @@ Zzz.js description.
 ### Browser
 
 ```js
-<script src="lib/Zzz.js">
+<script src="lib/Zzz.js"></script>
 <script>
 console.log( Zzz() );
 </script>
@@ -37,4 +37,3 @@ var Zzz = require("lib/Zzz.js");
 
 console.log( Zzz() );
 ```
-
