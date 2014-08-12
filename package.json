@@ -2,11 +2,11 @@
   "name":           "webmodule",
   "version":        "0.0.36",
   "description":    "Module template for Mobile Web Application.",
-  "url":            "https://github.com/uupaa/Zzz.js",
+  "url":            "https://github.com/__GITHUB_USER_NAME__/Zzz.js",
   "keywords":       ["WebModule", "Unstable"],
   "repository": {
     "type":         "git",
-    "url":          "https://github.com/uupaa/Zzz.js.git"
+    "url":          "https://github.com/__GITHUB_USER_NAME__/Zzz.js.git"
   },
   "scripts": {
     "watch":        "node node_modules/uupaa.watch.js --verbose --action build",
@@ -52,7 +52,7 @@
   },
   "lib":            "./lib/",
   "main":           "./index.js",
-  "author":         "uupaa <uupaa.js@gmail.com>",
+  "author":         "__GITHUB_USER_NAME__ <__GITHUB_USER_NAME__.js@gmail.com>",
   "license":        "MIT",
   "contributors":   []
 }

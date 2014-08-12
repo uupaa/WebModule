@@ -226,11 +226,9 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
                     replace(/zzz/g, repositoryName.toLowerCase());
 
         // Replace GitHub UserName.
-        //      "github.com/uupaa" -> "github.com/githubUserName"
+        //      "__GITHUB_USER_NAME__" -> "githubUserName"
         if (githubUserName) {
-            text = text.replace(/github.com(.)uupaa/g, function(_, sep) {
-                return "github.com" + sep + githubUserName;
-            });
+            text = text.replace(/__GITHUB_USER_NAME__/g, githubUserName);
         }
         return text;
     }
