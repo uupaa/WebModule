@@ -220,12 +220,7 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
             text = text.replace(/webmodule/, (githubUserName + "." + repositoryFullName).toLowerCase());
             text = text.replace(/\"version\"\:(\s*)\"[^"]*\"/, "\"version\":$1\"0.0.0\"");
         }
-        /*
-        if (fileName === "README.md") {
-            text = text.replace(/webmodule/, (githubUserName + "." + repositoryFullName).toLowerCase());
-            text = text.replace(/\"version\"\:(\s*)\"[^"]*\"/, "\"version\":$1\"0.0.0\"");
-        }*/
-
+        
         // Replace zzz to repository name.
         text = text.replace(/Zzz/g, repositoryName).
                     replace(/zzz/g, repositoryName.toLowerCase());
