@@ -4,13 +4,13 @@
 
 var USAGE = _multiline(function() {/*
     Usage:
-        node bin/Zzz.js [--help]
+        node bin/REPOSITORY_NAME.js [--help]
                         [--verbose]
                         [--output output-file]
                         input-file [input-file ...]
 
     See:
-        https://github.com/uupaa/Zzz.js/wiki/Zzz.js
+        https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME/wiki/REPOSITORY_NAME
 */});
 
 
@@ -21,7 +21,7 @@ var CONSOLE_COLOR = {
         CLEAR:  "\u001b[0m"
     };
 
-var Zzz     = require("../lib/Zzz");
+var REPOSITORY_NAME     = require("../lib/REPOSITORY_NAME");
 var fs      = require("fs");
 var argv    = process.argv.slice(2);
 var options = _parseCommandLineOptions({
@@ -40,7 +40,7 @@ if (options.verbose) {
 }
 
 /*
-Zzz({
+REPOSITORY_NAME({
     "verbose":      options.verbose,
     "output":       options.output,
     "inputs":       options.inputs,
@@ -73,5 +73,5 @@ function _multiline(fn) { // @arg Function:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
 
-})((this || 0).self || global);
+})(WEBMODULE_IDIOM);
 

@@ -1,10 +1,10 @@
-var ModuleTestZzz = (function(global) {
+var ModuleTestREPOSITORY_NAME = (function(global) {
 
 var _runOnNode = "process" in global;
 var _runOnWorker = "WorkerLocation" in global;
 var _runOnBrowser = "document" in global;
 
-return new Test("Zzz", {
+return new Test("REPOSITORY_NAME", {
         disable:    false,
         browser:    true,
         worker:     true,
@@ -12,14 +12,14 @@ return new Test("Zzz", {
         button:     true,
         both:       true, // test the primary module and secondary module
     }).add([
-        testZzz_value,
-        testZzz_isNumber,
-        testZzz_isInteger,
+        testREPOSITORY_NAME_value,
+        testREPOSITORY_NAME_isNumber,
+        testREPOSITORY_NAME_isInteger,
     ]).run().clone();
 
-function testZzz_value(test, pass, miss) {
+function testREPOSITORY_NAME_value(test, pass, miss) {
 
-    var result = new Zzz(123.4).value();
+    var result = new REPOSITORY_NAME(123.4).value();
 
     if (result === 123.4) {
         test.done(pass());
@@ -28,11 +28,11 @@ function testZzz_value(test, pass, miss) {
     }
 }
 
-function testZzz_isNumber(test, pass, miss) {
+function testREPOSITORY_NAME_isNumber(test, pass, miss) {
 
     var result = [
-            new Zzz(123.4).isNumber(),  // true
-            new Zzz(123.0).isNumber()   // true
+            new REPOSITORY_NAME(123.4).isNumber(),  // true
+            new REPOSITORY_NAME(123.0).isNumber()   // true
         ];
 
     if (!/false/.test(result.join())) {
@@ -42,11 +42,11 @@ function testZzz_isNumber(test, pass, miss) {
     }
 }
 
-function testZzz_isInteger(test, pass, miss) {
+function testREPOSITORY_NAME_isInteger(test, pass, miss) {
 
     var result = [
-           !new Zzz(123.4).isInteger(), // !false -> true
-            new Zzz(123.0).isInteger()  // true
+           !new REPOSITORY_NAME(123.4).isInteger(), // !false -> true
+            new REPOSITORY_NAME(123.0).isInteger()  // true
         ];
 
     if (!/false/.test(result.join())) {
@@ -56,5 +56,5 @@ function testZzz_isInteger(test, pass, miss) {
     }
 }
 
-})((this || 0).self || global);
+})(WEBMODULE_IDIOM);
 

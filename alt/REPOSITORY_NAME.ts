@@ -1,8 +1,6 @@
-// @name: Zzz.js
-
-export class Zzz {
-    static name = "Zzz";
-    static repository = "https://github.com/uupaa/Zzz.js";
+export class REPOSITORY_NAME {
+    static name = "REPOSITORY_NAME";
+    static repository = "https://github.com/GITHUB_USER_NAME/REPOSITORY_NAME.js";
 
     _value: number;
 

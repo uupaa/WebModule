@@ -1,57 +1,13 @@
 {
   "name":           "webmodule",
-  "version":        "0.0.36",
-  "description":    "Module template for Mobile Web Application.",
-  "url":            "https://github.com/uupaa/Zzz.js",
-  "keywords":       ["WebModule", "Unstable"],
+  "version":        "0.1.0",
+  "description":    "Generate a JavaScript based module for Mobile Web Application.",
+  "url":            "https://github.com/uupaa/WebModule",
+  "keywords":       ["uupaa", "WebModule"],
   "repository": {
     "type":         "git",
     "url":          "https://github.com/uupaa/Zzz.js.git"
   },
-  "scripts": {
-    "watch":        "node node_modules/uupaa.watch.js --verbose --action build",
-    "build":        "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty",
-    "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
-    "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module",
-    "test":         "npm run test-node; npm run test-browser",
-    "test-page":    "node node_modules/uupaa.test.js/bin/TestPage.js --verbose",
-    "test-debug":   "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
-    "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
-    "test-browser": "open test/index.html",
-    "test-sim":     "node node_modules/uupaa.iphonesimulator.js --run --port 8585 --xcache --open test/index.html",
-    "server":       "http-server -c-1 -p 8585 &",
-    "server-stop":  "",
-    "server-kill":  "killall -- node /usr/local/bin/http-server -p 8585 ; exit 0",
-    "hint":         "jshint lib/*.js",
-    "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
-  },
-  "x-build": {
-    "source":       ["lib/Zzz.js"],
-    "output":       "release/Zzz.min.js",
-    "target":       ["all"],
-    "label":        ["@dev"],
-    "module": {
-      "develop":    ["uupaa.valid.js"],
-      "release":    []
-    }
-  },
-  "dependencies": {
-  },
-  "devDependencies": {
-    "uupaa.nodemodule.js": "",
-    "uupaa.reflection.js": "",
-    "uupaa.iphonesimulator.js": "",
-    "uupaa.console.js": "",
-    "uupaa.valid.js":   "",
-    "uupaa.help.js":    "",
-    "uupaa.task.js":    "",
-    "uupaa.test.js":    "",
-    "uupaa.watch.js":   "",
-    "uupaa.plato.js":   "",
-    "uupaa.minify.js":  ""
-  },
-  "lib":            "./lib/",
-  "main":           "./index.js",
   "author":         "uupaa <uupaa.js@gmail.com>",
   "license":        "MIT",
   "contributors":   []

@@ -1,72 +1,40 @@
 #!/usr/bin/env node
 
 var _USAGE = _multiline(function() {/*
-    Usage:
-
-        1. Clone WebModule to your work space.
-
-            ```sh
-            $ git clone git@github.com:uupaa/WebModule.git
-            $ cd WebModule
-            $ npm install
-            $ cd ..
-            ```
-
-        2. Create new repository 'MyModule.js' in the GitHub, and clone it.
-
-            ```sh
-            $ git clone git@github.com:uupaa/MyModule.js.git
-            $ cd MyModule.js
-            ```
-
-        3. Execute clone command.
-
-            ```sh
-            $ node ../WebModule/clone GITHUB-USER-NAME [--alt] [--bin]
-            ```
-
-        ```
-        workspace/
-            |
-            + WebModule/
-            |
-            + MyModule.js/
-        ```
+    See https://github.com/uupaa/WebModule/wiki/Development
 */});
 
-//  fileName                [scan, sourceFileName]
+//  fileName                    [scan, sourceFileName]
 
 var _CLONE_FILES = {
     "alt": {
-        "Zzz.ts":           [true],
+        "REPOSITORY_NAME.ts":   [true],
     },
     "bin": {
-        "Zzz.js":           [true],
+        "REPOSITORY_NAME.js":   [true],
     },
     "lib": {
-        "Zzz.js":           [true],
+        "REPOSITORY_NAME.js":   [true],
     },
     "lint": {
         "plato": {
-            "README.md":    [],
+            "README.md":        [],
         }
     },
     "release": {
-        "README.md":        [],
+        "README.md":            [],
     },
     "test": {
-//      "index.html":       [true],
-//      "index.node.js":    [true],
-        "test.js":          [true],
+        "test.js":              [true],
     },
-    ".gitignore":           [],
-    ".jshintrc":            [],
-    ".npmignore":           [],
-    ".travis.yml":          [],
-    "index.js":             [true],
-    "LICENSE":              [],
-    "package.json":         [true],
-    "README.md":            [true, "MODULE_README.md"]
+    ".gitignore":               [],
+    ".jshintrc":                [],
+    ".npmignore":               [],
+    ".travis.yml":              [],
+    "index.js":                 [true, "MODULE_index.js"],
+//  "LICENSE":                  [true, "MODULE_LICENSE"],
+    "package.json":             [true, "MODULE_package.json"],
+    "README.md":                [true, "MODULE_README.md"]
 };
 
 var _CONSOLE_COLOR = {
@@ -78,6 +46,7 @@ var _CONSOLE_COLOR = {
 
 var fs                 = require("fs");
 var readline           = require("readline");
+var childProcess       = require("child_process");
 var Task               = require("uupaa.task.js");
 var argv               = process.argv.slice(2);
 var githubUserName     = argv[0] || "";
@@ -103,7 +72,7 @@ var options = _parseCommandLineOptions({
         bin:        false,      // boolean: true is put bin/ dir.
     });
 
-if (options.verbose || !githubUserName) {
+if (options.verbose) {
     console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
     return;
 }
@@ -115,13 +84,40 @@ if (!options.bin) {
     delete _CLONE_FILES.bin;
 }
 
-_clone(fromDir, toDir, _CLONE_FILES);
+getGitHubUserName(function(stdout, stderr) {
+
+    githubUserName = stdout;
+    _clone(fromDir, toDir, _CLONE_FILES, function() {
+        console.log("  ");
+        console.log(_CONSOLE_COLOR.GREEN + "  finished." + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  Use the following command `npm run init`." + _CONSOLE_COLOR.CLEAR);
+    });
+
+}, function(err) {
+    console.error(_CONSOLE_COLOR.RED + "Error: git config --get user.name" + _CONSOLE_COLOR.CLEAR);
+});
 
 // =========================================================
+function getGitHubUserName(callback, errorCallback) {
+    if (githubUserName) {
+        callback(githubUserName);
+        return;
+    }
+    childProcess.exec("git config --get user.name 2> /dev/null", function(err, stdout, stderr) {
+        if (err) {
+            if (errorCallback) {
+                errorCallback(err);
+            }
+        } else {
+            callback(stdout.trim());
+        }
+    });
+}
 
-function _clone(fromDir,    // @arg String: copy from dir. has tail slash(/)
-                toDir,      // @arg String: copy to dir. has tail slash(/)
-                fileTree) { // @arg Object: source file tree.
+function _clone(fromDir,    // @arg String - copy from dir. has tail slash(/)
+                toDir,      // @arg String - copy to dir. has tail slash(/)
+                fileTree,   // @arg Object - source file tree.
+                callback) { // @arg Function - finished callback.
 
     var overwriteFiles = []; // [ [targetFile, sourceText], ... ]
 
@@ -131,6 +127,7 @@ function _clone(fromDir,    // @arg String: copy from dir. has tail slash(/)
         var rl = readline.createInterface(process.stdin, process.stdout);
         Task.loop(overwriteFiles, _tick, function() {
             rl.close();
+            callback();
         });
 
         function _tick(task, index, overwriteFiles) {
@@ -150,6 +147,8 @@ function _clone(fromDir,    // @arg String: copy from dir. has tail slash(/)
                 task.pass();
             });
         }
+    } else {
+        callback();
     }
 }
 
@@ -158,12 +157,15 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
         _loop(overwriteFiles, fileName, fileTree);
     }
 
-    function _loop(overwriteFiles, fileName, fileTree) {
+    function _loop(overwriteFiles, // @arg FileStringArray - ["file", ...]
+                   fileName,       // @arg FileNameString|DirNameString - "MODULE_README.md", "lib"
+                   fileTree) {     // @arg Object - _CLONE_FILES or _CLONE_FILES subtree.
         var options        = fileTree[fileName]; // [scan, sourceFileName]
         var scan           = options[0] || false;
         var sourceFileName = options[1] || "";
+        var isFileEntry    = Array.isArray(options);
 
-        if ( !Array.isArray(options) ) {
+        if ( !isFileEntry ) { // is directory entry
             if ( !fs.existsSync(toDir + fileName) ) {
                 console.log("  mkdir:     " + toDir + fileName + "/");
                 fs.mkdirSync(toDir + fileName);
@@ -178,15 +180,12 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
             var sourceFile = fromDir + (sourceFileName || fileName);
             var targetFile = toDir   + fileName;
 
-            if ( /zzz/i.test(targetFile) ) { // replace fileName. "dir/Zzz.js" -> "dir/MyModule.js"
-                targetFile = targetFile.replace(/Zzz/g, repositoryName).
-                                        replace(/zzz/g, repositoryName.toLowerCase());
-            }
+            // replace fileName. "lib/REPOSITORY_NAME.js" -> "lib/Foo.js"
+            targetFile = _repleaceText(targetFile);
 
             var targetFileAlreadyExists = fs.existsSync(targetFile);
             var sourceText = fs.readFileSync(sourceFile, "UTF-8");
-            var targetText = targetFileAlreadyExists ? fs.readFileSync(targetFile, "UTF-8")
-                                                     : "";
+            var targetText = targetFileAlreadyExists ? fs.readFileSync(targetFile, "UTF-8") : "";
 
             if (scan) {
                 sourceText = _repleaceText(sourceText);
@@ -205,33 +204,13 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
     }
 
     function _repleaceText(text) {
+        text = text.replace(/GITHUB_USER_NAME/g,          githubUserName);                   // "uupaa"
+        text = text.replace(/LOWER_REPOSITORY_FULLNAME/g, repositoryFullName.toLowerCase()); // "foo.js"
+        text = text.replace(/LOWER_REPOSITORY_NAME/g,     repositoryName.toLowerCase());     // "foo"
+        text = text.replace(/REPOSITORY_FULLNAME/g,       repositoryFullName);               // "Foo.js"
+        text = text.replace(/REPOSITORY_NAME/g,           repositoryName);                   // "Foo"
+        text = text.replace(/WEBMODULE_IDIOM/g,           "(this || 0).self || global");
 
-        // Replace JSPerf URL.
-        //      "http://jsperf.com/uupaa-zzz/" -> "http://jsperf.com/GITHUB-USERNAME-WebModule/"
-        text = text.replace(/jsperf.com.uupaa.zzz/, function(_) {
-            return "jsperf.com/" + githubUserName.toLowerCase() +
-                             "-" + repositoryName.replace("_", "-").toLowerCase();
-        });
-
-        // Replace module name in package.json.
-        //      { "name": "webmodule" } -> { "name": githubUserName + repositoryFullName }
-        //      { "version": "*" } -> { "version": "0.0.0" }
-        if (fileName === "package.json") {
-            text = text.replace(/webmodule/, (githubUserName + "." + repositoryFullName).toLowerCase());
-            text = text.replace(/\"version\"\:(\s*)\"[^"]*\"/, "\"version\":$1\"0.0.0\"");
-        }
-
-        // Replace zzz to repository name.
-        text = text.replace(/Zzz/g, repositoryName).
-                    replace(/zzz/g, repositoryName.toLowerCase());
-
-        // Replace GitHub UserName.
-        //      "github.com/uupaa" -> "github.com/githubUserName"
-        if (githubUserName) {
-            text = text.replace(/github.com(.)uupaa/g, function(_, sep) {
-                return "github.com" + sep + githubUserName;
-            });
-        }
         return text;
     }
 }
@@ -256,3 +235,4 @@ function _multiline(fn) { // @arg Function:
                           // @ret String:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
+

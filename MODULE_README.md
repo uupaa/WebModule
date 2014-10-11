@@ -1,39 +1,39 @@
-# Zzz.js [![Build Status](https://travis-ci.org/uupaa/Zzz.js.png)](http://travis-ci.org/uupaa/Zzz.js)
+# REPOSITORY_FULLNAME [![Build Status](https://travis-ci.org/GITHUB_USER_NAME/REPOSITORY_FULLNAME.png)](http://travis-ci.org/GITHUB_USER_NAME/REPOSITORY_FULLNAME)
 
-[![npm](https://nodei.co/npm/uupaa.zzz.js.png?downloads=true&stars=true)](https://nodei.co/npm/uupaa.zzz.js/)
+[![npm](https://nodei.co/npm/GITHUB_USER_NAME.LOWER_REPOSITORY_FULLNAME.png?downloads=true&stars=true)](https://nodei.co/npm/GITHUB_USER_NAME.LOWER_REPOSITORY_FULLNAME/)
 
-Zzz.js description.
+REPOSITORY_FULLNAME description.
 
 ## Document
 
-- [Zzz.js wiki](https://github.com/uupaa/Zzz.js/wiki/Zzz)
-- [Development](https://github.com/uupaa/WebModule/wiki/Development)
-- [WebModule](https://github.com/uupaa/WebModule) ([Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html))
-
+- [REPOSITORY_FULLNAME wiki](https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME/wiki/REPOSITORY_NAME)
+- [WebModule](https://github.com/uupaa/WebModule)
+    - [Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
+    - [Development](https://github.com/uupaa/WebModule/wiki/Development)
 
 ## How to use
 
 ### Browser
 
 ```js
-<script src="lib/Zzz.js"></script>
+<script src="lib/REPOSITORY_FULLNAME"></script>
 <script>
-console.log( Zzz() );
+console.log( REPOSITORY_NAME() );
 </script>
 ```
 
 ### WebWorkers
 
 ```js
-importScripts("lib/Zzz.js");
+importScripts("lib/REPOSITORY_FULLNAME");
 
-console.log( Zzz() );
+console.log( REPOSITORY_NAME() );
 ```
 
 ### Node.js
 
 ```js
-var Zzz = require("lib/Zzz.js");
+var REPOSITORY_NAME = require("lib/REPOSITORY_FULLNAME");
 
-console.log( Zzz() );
+console.log( REPOSITORY_NAME() );
 ```
