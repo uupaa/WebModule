@@ -103,13 +103,24 @@ function getGitHubUserName(callback, errorCallback) {
         callback(githubUserName);
         return;
     }
-    childProcess.exec("git config --get user.name 2> /dev/null", function(err, stdout, stderr) {
+    childProcess.exec("git config --get remote.origin.url", function(err, stdout, stderr) {
         if (err) {
             if (errorCallback) {
                 errorCallback(err);
             }
         } else {
-            callback(stdout.trim());
+            var value = stdout.trim();
+            var result = "";
+
+            // HTTPS format // "https://github.com/uupaa/WMExample.js.git"
+            // SSH   format //     "git@github.com:uupaa/WMExample.js.git"
+
+            if (/^https/.test(value)) {
+                result = value.split("github.com/"    )[1].split("/")[0];
+            } else if (/^git@github.com/.test(value)) {
+                result = value.split("git@github.com:")[1].split("/")[0];
+            }
+            callback(result);
         }
     });
 }
