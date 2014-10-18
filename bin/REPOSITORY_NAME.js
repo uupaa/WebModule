@@ -4,8 +4,8 @@
 
 var USAGE = _multiline(function() {/*
     Usage:
-        node bin/REPOSITORY_NAME.js [--help]
-                        [--verbose]
+        node bin/REPOSITORY_NAME.js [-h or --help]
+                        [-v or --verbose]
                         [--output output-file]
                         input-file [input-file ...]
 

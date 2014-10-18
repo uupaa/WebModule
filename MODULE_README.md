@@ -2,7 +2,7 @@
 
 [![npm](https://nodei.co/npm/GITHUB_USER_NAME.LOWER_REPOSITORY_FULLNAME.png?downloads=true&stars=true)](https://nodei.co/npm/GITHUB_USER_NAME.LOWER_REPOSITORY_FULLNAME/)
 
-REPOSITORY_FULLNAME description.
+DESCRIPTION
 
 ## Document
 

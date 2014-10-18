@@ -1,7 +1,7 @@
 {
   "name":           "GITHUB_USER_NAME.LOWER_REPOSITORY_FULLNAME",
   "version":        "0.0.0",
-  "description":    "My first WebModule.",
+  "description":    "DESCRIPTION",
   "url":            "https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME",
   "keywords":       ["GITHUB_USER_NAME", "WebModule", "Unstable"],
   "repository": {

@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 
 var _USAGE = _multiline(function() {/*
-    See https://github.com/uupaa/WebModule/wiki/Development
+    Usage:
+        WebModule/clone [-h or --help]
+                        [-v or --verbose]
+                        [--alt]
+                        [--bin]
 */});
 
+// ---------------------------------------------------------
 //  fileName                    [scan, sourceFileName]
-
 var _CLONE_FILES = {
     "alt": {
         "REPOSITORY_NAME.ts":   [true],
@@ -49,7 +53,6 @@ var readline           = require("readline");
 var childProcess       = require("child_process");
 var Task               = require("uupaa.task.js");
 var argv               = process.argv.slice(2);
-var githubUserName     = argv[0] || "";
 
 var repositoryFullName = process.cwd().split("/").pop();
 var repositoryName     = repositoryFullName.indexOf(".") >= 0
@@ -65,14 +68,17 @@ var toDir              = process.cwd() + "/";
 // console.log( "toDir:              " + toDir               ); // "/Users/uupaa/oss/Foo.js"
 // return;
 
+
+// -------------------------------------------------------------
 var options = _parseCommandLineOptions({
-        help:       false,      // Boolean: true is show help.
-        verbose:    false,      // Boolean: true is verbose mode.
-        alt:        false,      // boolean: true is put alt/ dir.
-        bin:        false,      // boolean: true is put bin/ dir.
+        help:       false,      // Boolean - show help.
+        verbose:    false,      // Boolean - verbose mode.
+        alt:        false,      // Boolean - create alt directory.
+        bin:        false,      // Boolean - create bin directory.
+        desc:       "Module description.", // String - Module description.
     });
 
-if (options.verbose) {
+if (options.help) {
     console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
     return;
 }
@@ -84,9 +90,13 @@ if (!options.bin) {
     delete _CLONE_FILES.bin;
 }
 
-getGitHubUserName(function(stdout, stderr) {
+if (fs.existsSync("README.md") ) {
+    options.desc = fs.readFileSync("README.md", "UTF-8").split("\n").slice(-2).join("").trim();
+}
 
-    githubUserName = stdout;
+getGitHubUserName(function(userName) {
+
+    options.userName = userName;
     _clone(fromDir, toDir, _CLONE_FILES, function() {
         console.log("  ");
         console.log(_CONSOLE_COLOR.GREEN + "  finished." + _CONSOLE_COLOR.CLEAR);
@@ -99,15 +109,9 @@ getGitHubUserName(function(stdout, stderr) {
 
 // =========================================================
 function getGitHubUserName(callback, errorCallback) {
-    if (githubUserName) {
-        callback(githubUserName);
-        return;
-    }
     childProcess.exec("git config --get remote.origin.url", function(err, stdout, stderr) {
         if (err) {
-            if (errorCallback) {
-                errorCallback(err);
-            }
+            errorCallback(err);
         } else {
             var value = stdout.trim();
             var result = "";
@@ -215,7 +219,8 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
     }
 
     function _repleaceText(text) {
-        text = text.replace(/GITHUB_USER_NAME/g,          githubUserName);                   // "uupaa"
+        text = text.replace(/DESCRIPTION/g,               options.desc);                     // "description"
+        text = text.replace(/GITHUB_USER_NAME/g,          options.userName);                 // "uupaa"
         text = text.replace(/LOWER_REPOSITORY_FULLNAME/g, repositoryFullName.toLowerCase()); // "foo.js"
         text = text.replace(/LOWER_REPOSITORY_NAME/g,     repositoryName.toLowerCase());     // "foo"
         text = text.replace(/REPOSITORY_FULLNAME/g,       repositoryFullName);               // "Foo.js"
@@ -236,7 +241,6 @@ function _parseCommandLineOptions(options) { // @arg Object:
         case "--verbose":   options.verbose = true; break;
         case "--alt":       options.alt = true; break;
         case "--bin":       options.bin = true; break;
-        default:
         }
     }
     return options;
