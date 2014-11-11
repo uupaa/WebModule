@@ -19,11 +19,8 @@
     "test-debug":   "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
     "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "test-browser": "open test/index.html",
-    "test-sim":     "node node_modules/uupaa.iphonesimulator.js --run --port 8585 --xcache --open test/index.html",
-    "server":       "http-server -c-1 -p 8585 &",
-    "server-stop":  "",
-    "server-kill":  "killall -- node /usr/local/bin/http-server -p 8585 ; exit 0",
-    "patch":        "node node_modules/uupaa.webmoduleutility.js/index.js --patched",
+    "test-sim":     "node node_modules/uupaa.webmoduleutility.js --test-sim --verbose",
+    "patch":        "node node_modules/uupaa.webmoduleutility.js --patched --verbose",
     "hint":         "jshint lib/*.js",
     "lint":         "npm run coverage",
     "coverage":     "node node_modules/uupaa.plato.js; open lint/plato/index.html"
@@ -43,7 +40,6 @@
   "devDependencies": {
     "uupaa.nodemodule.js": "",
     "uupaa.reflection.js": "",
-    "uupaa.iphonesimulator.js": "",
     "uupaa.console.js": "",
     "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
