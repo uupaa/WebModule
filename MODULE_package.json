@@ -20,6 +20,8 @@
     "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "test-browser": "open test/index.html",
     "test-sim":     "node node_modules/uupaa.webmoduleutility.js --test-sim --verbose",
+    "server":       "python -m SimpleHTTPServer 8000 &",
+    "stop":         "killall -- python -m SimpleHTTPServer; exit 0",
     "patch":        "node node_modules/uupaa.webmoduleutility.js --patched --verbose",
     "hint":         "jshint lib/*.js",
     "lint":         "npm run coverage",

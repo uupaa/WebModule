@@ -9,7 +9,7 @@ Generate a JavaScript based module for Mobile Web Application.
 - [WebModule](https://github.com/uupaa/WebModule/wiki/WebModule)
     - [Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
     - [Development](https://github.com/uupaa/WebModule/wiki/Development)
-    - [Module List](https://github.com/uupaa/WebModule/wiki/ModuleList)
+    - [Module List](https://github.com/uupaa/WebModule/wiki/List)
 
 ## How to use
 
