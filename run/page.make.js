@@ -13,6 +13,14 @@ var BROWSER_TEST_PAGE = _multiline(function() {/*
 
 <script id="worker" type="javascript/worker">
 onmessage = function(event) {
+
+    if (!global["console"]) { // polyfill WorkerConsole.
+        global["console"] = function() {};
+        global["console"]["log"] = function() {};
+        global["console"]["warn"] = function() {};
+        global["console"]["error"] = function() {};
+    }
+
     self.MESSAGE = event.data;
 
     __IMPORT_SCRIPTS__
