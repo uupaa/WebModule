@@ -1,12 +1,20 @@
 {
   "name":           "webmodule",
-  "version":        "0.1.5",
+  "version":        "0.2.0",
   "description":    "Generate a JavaScript based module for Mobile Web Application.",
   "url":            "https://github.com/uupaa/WebModule",
   "keywords":       ["uupaa", "WebModule"],
   "repository": {
     "type":         "git",
     "url":          "https://github.com/uupaa/Zzz.js.git"
+  },
+  "scripts": {
+    "page": "node run/module.js --verbose"
+  },
+  "dependencies": {
+    "uupaa.wmdevelop.js": ""
+  },
+  "devDependencies": {
   },
   "author":         "uupaa <uupaa.js@gmail.com>",
   "license":        "MIT",

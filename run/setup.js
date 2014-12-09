@@ -2,10 +2,10 @@
 
 var _USAGE = _multiline(function() {/*
     Usage:
-        WebModule/clone [-h or --help]
-                        [-v or --verbose]
-                        [--alt]
-                        [--bin]
+        WebModule/run/init.js [-h or --help]
+                              [-v or --verbose]
+                              [--alt]
+                              [--bin]
 */});
 
 // ---------------------------------------------------------
@@ -29,7 +29,7 @@ var _CLONE_FILES = {
         "README.md":            [],
     },
     "test": {
-        "test.js":              [true],
+        "testcase.js":          [true],
     },
     ".gitignore":               [],
     ".jshintrc":                [],
@@ -48,26 +48,26 @@ var _CONSOLE_COLOR = {
         CLEAR:  "\u001b[0m"
     };
 
-var fs                 = require("fs");
-var readline           = require("readline");
-var childProcess       = require("child_process");
-var Task               = require("uupaa.task.js");
-var argv               = process.argv.slice(2);
+var fs       = require("fs");
+var cp       = require("child_process");
+var readline = require("readline");
+var Task     = require("uupaa.task.js");
+var argv     = process.argv.slice(2);
 
 var repositoryFullName = process.cwd().split("/").pop();
 var repositoryName     = repositoryFullName.indexOf(".") >= 0
                        ? repositoryFullName.split(".").slice(0, -1).join(".")
                        : repositoryFullName;
 
-var fromDir            = process.argv[1].split("/").slice(0, -1).join("/") + "/";
+var fromDir            = process.argv[1].split("/").slice(0, -2).join("/") + "/";
 var toDir              = process.cwd() + "/";
 
-// console.log( "repositoryFullName: " + repositoryFullName  ); // "Foo.js"
-// console.log( "repositoryName:     " + repositoryName      ); // "Foo"
-// console.log( "fromDir:            " + fromDir             ); // "/Users/uupaa/oss/WebModule/"
-// console.log( "toDir:              " + toDir               ); // "/Users/uupaa/oss/Foo.js"
-// return;
+console.log( _CONSOLE_COLOR.GREEN + "  - repositoryFullName: " + repositoryFullName + _CONSOLE_COLOR.CLEAR ); // "Foo.js"
+console.log( _CONSOLE_COLOR.GREEN + "  - repositoryName:     " + repositoryName     + _CONSOLE_COLOR.CLEAR ); // "Foo"
+console.log( _CONSOLE_COLOR.GREEN + "  - copy source dir:    " + fromDir            + _CONSOLE_COLOR.CLEAR ); // "/Users/uupaa/oss/WebModule/"
+console.log( _CONSOLE_COLOR.GREEN + "  - copy target dir:    " + toDir              + _CONSOLE_COLOR.CLEAR + "\n" ); // "/Users/uupaa/oss/Foo.js"
 
+//return;
 
 // -------------------------------------------------------------
 var options = _parseCommandLineOptions({
@@ -99,8 +99,12 @@ getGitHubUserName(function(userName) {
     options.userName = userName;
     _clone(fromDir, toDir, _CLONE_FILES, function() {
         console.log("  ");
-        console.log(_CONSOLE_COLOR.GREEN + "  finished." + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  Use the following command `npm run init`." + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  done." + _CONSOLE_COLOR.CLEAR + "\n");
+        console.log(_CONSOLE_COLOR.GREEN + "  Available next actions," + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run`                         # list up npm run-script" + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm start`                       # start local httpd server" + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run update`                  # install/update node modules, update index.html, minify" + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run add module1 module2 ...` # add npm modules" + _CONSOLE_COLOR.CLEAR);
     });
 
 }, function(err) {
@@ -109,7 +113,7 @@ getGitHubUserName(function(userName) {
 
 // =========================================================
 function getGitHubUserName(callback, errorCallback) {
-    childProcess.exec("git config --get remote.origin.url", function(err, stdout, stderr) {
+    cp.exec("git config --get remote.origin.url", function(err, stdout, stderr) {
         if (err) {
             errorCallback(err);
         } else {

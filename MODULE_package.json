@@ -9,48 +9,44 @@
     "url":          "https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME.git"
   },
   "scripts": {
-    "init":         "npm update; npm run build; npm run test-page",
-    "watch":        "node node_modules/uupaa.watch.js --verbose --action build",
-    "build":        "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty",
-    "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
-    "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module",
-    "test":         "npm run test-node; npm run test-browser",
-    "test-page":    "node node_modules/uupaa.test.js/bin/TestPage.js --verbose",
-    "test-debug":   "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
-    "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
-    "test-browser": "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
-    "test-sim":     "node node_modules/uupaa.webmoduleutility.js --test-sim --verbose",
-    "start":        "cd ../; Python -m SimpleHTTPServer 8000 &",
-    "stop":         "killall -- Python -m SimpleHTTPServer 8000",
-    "patch":        "node node_modules/uupaa.webmoduleutility.js --patched --verbose",
+    "0":            "npm run setup",
+    "1":            "npm run ios.start; npm start",
+    "5":            "npm run test",
+    "9":            "npm run ios.stop; npm stop",
+
+    "setup":        "npm run sync; npm update; npm run page.make; npm run minify",
+    "sync":         "node ../WebModule/run/sync.package.scripts.js",
+    "watch":        "node ../WebModule/run/watch.js --verbose --action minify",
+    "module.add":   "node ../WebModule/run/module.add.js",
+    "module.remove":"node ../WebModule/run/module.remove.js",
+    "minify":       "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
+    "build":        "node ../WebModule/run/minify.js --verbose --strict --module",
+    "page.make":    "node ../WebModule/run/page.make.js --verbose",
+    "test":         "npm run minify; npm run test.node; npm run open; npm run ios.open",
+    "test.node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
+    "test.noded":   "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
     "hint":         "jshint lib/*.js",
-    "lint":         "npm run coverage",
-    "coverage":     "node node_modules/uupaa.plato.js; open lint/plato/index.html"
+    "score":        "node ../WebModule/run/score.js; open lint/plato/index.html",
+    "patch":        "node ../WebModule/run/patch.js",
+    "start":        "cd ../; Python -m SimpleHTTPServer 8000 &",
+    "open":         "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "stop":         "killall -- Python -m SimpleHTTPServer 8000; exit 0",
+    "ios.start":    "node ../WebModule/run/ios.start.js",
+    "ios.open":     "node ../WebModule/run/ios.open.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "ios.stop":     "node ../WebModule/run/ios.stop.js"
   },
-  "x-build": {
+  "webmodule": {
+    "develop":      false,
     "source":       ["lib/REPOSITORY_NAME.js"],
     "output":       "release/REPOSITORY_NAME.min.js",
     "target":       ["all"],
-    "label":        ["@dev"],
-    "module": {
-      "develop":    ["uupaa.valid.js"],
-      "release":    []
-    }
+    "label":        ["@dev"]
   },
   "dependencies": {
+    "uupaa.wmdevtools.js":  "",
+    "uupaa.task.js":        ""
   },
   "devDependencies": {
-    "uupaa.nodemodule.js": "",
-    "uupaa.reflection.js": "",
-    "uupaa.console.js": "",
-    "uupaa.valid.js":   "",
-    "uupaa.help.js":    "",
-    "uupaa.task.js":    "",
-    "uupaa.test.js":    "",
-    "uupaa.watch.js":   "",
-    "uupaa.plato.js":   "",
-    "uupaa.minify.js":  "",
-    "uupaa.webmoduleutility.js": ""
   },
   "lib":            "./lib/",
   "main":           "./index.js",
