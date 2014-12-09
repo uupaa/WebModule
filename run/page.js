@@ -14,11 +14,11 @@ var BROWSER_TEST_PAGE = _multiline(function() {/*
 <script id="worker" type="javascript/worker">
 onmessage = function(event) {
 
-    if (!global["console"]) { // polyfill WorkerConsole.
-        global["console"] = function() {};
-        global["console"]["log"] = function() {};
-        global["console"]["warn"] = function() {};
-        global["console"]["error"] = function() {};
+    if (!self.console) {
+        self.console = function() {};
+        self.console.log = function() {};
+        self.console.warn = function() {};
+        self.console.error = function() {};
     }
 
     self.MESSAGE = event.data;
@@ -48,6 +48,26 @@ function put() {
     var releaseBuild = false;
     var deps = Module.getDependencies(releaseBuild);
 
+    deps.files.node.push("../WebModule/lib/Console.js");
+    deps.files.browser.push("../WebModule/lib/Console.js");
+    deps.files.worker.push("../WebModule/lib/Console.js");
+
+    deps.files.node.push("../WebModule/lib/Help.js");
+    deps.files.browser.push("../WebModule/lib/Help.js");
+    deps.files.worker.push("../WebModule/lib/Help.js");
+
+    deps.files.node.push("../WebModule/lib/Valid.js");
+    deps.files.browser.push("../WebModule/lib/Valid.js");
+    deps.files.worker.push("../WebModule/lib/Valid.js");
+
+    deps.files.node.push("../WebModule/lib/TestTask.js");
+    deps.files.browser.push("../WebModule/lib/TestTask.js");
+    deps.files.worker.push("../WebModule/lib/TestTask.js");
+
+    deps.files.node.push("../WebModule/lib/Test.js");
+    deps.files.browser.push("../WebModule/lib/Test.js");
+    deps.files.worker.push("../WebModule/lib/Test.js");
+
     if (verbose) {
 //      console.log("\u001b[31m" + "packages: " + JSON.stringify(deps.packages, null, 2) + "\u001b[0m");
         console.log("\u001b[32m" + "tree: "     + JSON.stringify(deps.tree,     null, 2) + "\u001b[0m");
@@ -74,9 +94,9 @@ function _createTestPage(files,         // @arg Object - { all, node, worker, br
                                         // @ret String
 
     var webmodule = packagejson["webmodule"];
-    var requireFiles      = _uniqueArray(files.node.concat(webmodule["source"]).map(_node)).unique;
-    var scriptFiles       = _uniqueArray(files.browser.concat(webmodule["source"]).map(_browser)).unique;
-    var importScriptFiles = _uniqueArray(files.worker.concat(webmodule["source"]).map(_worker)).unique;
+    var requireFiles      = _toUniqueArray(files.node.concat(webmodule["source"]).map(_require));
+    var scriptFiles       = _toUniqueArray(files.browser.concat(webmodule["source"]).map(_script));
+    var importScriptFiles = _toUniqueArray(files.worker.concat(webmodule["source"]).map(_import));
 
     var browserPage = BROWSER_TEST_PAGE;
     var nodePage = NODE_TEST_PAGE;
@@ -104,23 +124,16 @@ function _createTestPage(files,         // @arg Object - { all, node, worker, br
     }
     return { browser: browserPage, node: nodePage };
 
-    function _node(file)    { return 'require("../' + file + '");'; }
-    function _worker(file)  { return 'importScripts(MESSAGE.BASE_DIR + "../' + file + '");'; }
-    function _browser(file) { return '<script src="../' + file + '"></script>'; }
+    function _require(file) { return 'require("../' + file + '");'; }
+    function _import(file)  { return 'importScripts(MESSAGE.BASE_DIR + "../' + file + '");'; }
+    function _script(file)  { return '<script src="../' + file + '"></script>'; }
 }
 
-function _uniqueArray(source) { // @arg Array
-                                // @ret Object - { unique:Array, dup:Array }
-    var unique = [], dup = [], i = 0, iz = source.length;
-
-    for (; i < iz; ++i) {
-        if (unique.indexOf(source[i]) >= 0) {
-            dup.push(source[i]);
-        } else {
-            unique.push(source[i]);
-        }
-    }
-    return { unique: unique, dup: dup };
+function _toUniqueArray(source) {
+    return source.reduce(function(result, value) {
+            if (result.indexOf(value) < 0) { result.push(value); }
+            return result;
+        }, []);
 }
 
 function _multiline(fn) { // @arg Function:

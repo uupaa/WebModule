@@ -21,8 +21,8 @@
     "module.remove":"node ../WebModule/run/module.remove.js",
     "minify":       "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
     "build":        "node ../WebModule/run/minify.js --verbose --strict --module",
-    "page.make":    "node ../WebModule/run/page.make.js --verbose",
-    "test":         "npm run minify; npm run test.node; npm run open; npm run ios.open",
+    "page":         "node ../WebModule/run/page.js --verbose",
+    "test":         "npm run minify; npm run test.node; npm run open",
     "test.node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "test.noded":   "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
     "hint":         "jshint lib/*.js",
@@ -42,12 +42,8 @@
     "target":       ["all"],
     "label":        ["@dev"]
   },
-  "dependencies": {
-    "uupaa.wmdevtools.js":  "",
-    "uupaa.task.js":        ""
-  },
-  "devDependencies": {
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "lib":            "./lib/",
   "main":           "./index.js",
   "author":         "GITHUB_USER_NAME",
