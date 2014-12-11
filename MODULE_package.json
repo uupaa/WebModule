@@ -9,12 +9,7 @@
     "url":          "https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME.git"
   },
   "scripts": {
-    "0":            "npm run sync; npm update; npm run page",
-    "1":            "npm run sim; npm start",
-    "5":            "npm run test",
-    "9":            "npm run simx; npm stop",
-
-    "sync":         "node ../WebModule/run/sync.package.scripts.js",
+    "sync":         "node ../WebModule/run/sync.js; npm update; node ../WebModule/run/page.js",
     "watch":        "node ../WebModule/run/watch.js --verbose --action minify",
     "minify":       "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
     "build":        "node ../WebModule/run/minify.js --verbose --strict --module",
@@ -23,14 +18,13 @@
     "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
     "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
-    "safari":       "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "simx":         "node ../WebModule/run/sim.js stop",
     "hint":         "jshint lib/*.js",
     "score":        "node ../WebModule/run/score.js; open lint/plato/index.html",
     "patch":        "node ../WebModule/run/patch.js",
     "start":        "cd ../; Python -m SimpleHTTPServer 8000 &",
-    "stop":         "killall -- Python -m SimpleHTTPServer 8000; exit 0",
-    "sim":          "node ../WebModule/run/sim.js start",
-    "simx":         "node ../WebModule/run/sim.js stop"
+    "stop":         "killall -- Python -m SimpleHTTPServer 8000; exit 0"
   },
   "webmodule": {
     "develop":      false,

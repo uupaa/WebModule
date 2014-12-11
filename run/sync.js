@@ -32,8 +32,11 @@ console.log( INFO + "  - copy target dir:     " + targetDir          + CLR );   
 console.log( INFO + "  - source package.json: " + sourcePacakgeJSON  + CLR );       // "/Users/uupaa/oss/my/WebModule/MODULE_package.json"
 console.log( INFO + "  - target package.json: " + targetPackageJSON  + CLR + LB );  // "/Users/uupaa/oss/my/Foo.js/package.json"
 sync();
+upgrade();
+sortKeys();
 console.log( INFO + "  done." + CLR);
 
+// WebModule/MODULE_package.json sync to YOURWebModule/package.json
 function sync() {
     var srcJSON = JSON.parse(fs.readFileSync(sourcePacakgeJSON, "UTF-8").replace(/REPOSITORY_FULLNAME/g, repositoryFullName));
     var tgtJSON = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
@@ -41,6 +44,54 @@ function sync() {
     tgtJSON.scripts = srcJSON.scripts;
 
     fs.writeFileSync(targetPackageJSON, JSON.stringify(tgtJSON, null, 2));
+}
+
+// package.json convert "x-build": { ... } to "webmodule": { ... }
+function upgrade() {
+    var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
+
+    if ("x-build" in json) {
+        console.log( INFO + "  upgrade..." + CLR);
+    } else {
+        return;
+    }
+
+    var build = json["x-build"];
+
+    json.webmodule = {
+        source: build.source,
+        output: build.output,
+        target: build.target,
+        label: build.label,
+    };
+    delete json["x-build"];
+
+    fs.writeFileSync(targetPackageJSON, JSON.stringify(json, null, 2));
+}
+
+function sortKeys() {
+    var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
+    var order = ["name", "version", "description", "url", "keywords",
+                 "repository", "scripts", "webmodule",
+                 "dependencies", "devDependencies", "lib", "main",
+                 "author", "license", "contributors"];
+
+    var keys = Object.keys(json).sort(function(a, b) {
+        var pos1 = order.indexOf(a);
+        var pos2 = order.indexOf(b);
+
+        if (pos1 < 0) { pos1 = 999; }
+        if (pos2 < 0) { pos2 = 999; }
+
+        return pos1 - pos2;
+    });
+
+    var result = {};
+    keys.forEach(function(key) {
+        result[key] = json[key];
+    });
+
+    fs.writeFileSync(targetPackageJSON, JSON.stringify(result, null, 2));
 }
 
 })((this || 0).self || global);

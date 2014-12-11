@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+// page --verbose
 
 var NODE_TEST_PAGE = _multiline(function() {/*
 __SCRIPT__
@@ -37,14 +38,14 @@ __SCRIPT__
 
 
 var fs   = require("fs");
-var argv = process.argv.slice(2);
 var WebModuleLib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
 var Module = require(WebModuleLib + "Module.js");
+var argv = process.argv.slice(2);
+var verbose = argv[0] === "--verbose" || argv[0] === "-v";
 
 put();
 
 function put() {
-    var verbose = true;
     var releaseBuild = false;
     var deps = Module.getDependencies(releaseBuild);
 

@@ -101,10 +101,9 @@ getGitHubUserName(function(userName) {
         console.log("  ");
         console.log(_CONSOLE_COLOR.GREEN + "  done." + _CONSOLE_COLOR.CLEAR + "\n");
         console.log(_CONSOLE_COLOR.GREEN + "  Available next actions," + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run`                         # list up npm run-script" + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm start`                       # start local httpd server" + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run update`                  # install/update node modules, update index.html, minify" + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run add module1 module2 ...` # add npm modules" + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run`        # list up npm run-script" + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm start`      # start local httpd server" + _CONSOLE_COLOR.CLEAR);
+        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run sync`   # sync scripts, install/update node modules, create test pages and minify" + _CONSOLE_COLOR.CLEAR);
     });
 
 }, function(err) {

@@ -20,14 +20,13 @@ var CONSOLE_COLOR = {
         CLEAR:  "\u001b[0m"
     };
 
-var fs      = require("fs");
-//var Watch   = require("../lib/Watch");
-var Process = require("child_process");
-var argv    = process.argv.slice(2);
-var pkg      = _loadCurrentDirectoryPackageJSON();
+var fs = require("fs");
+var cp = require("child_process");
+var argv = process.argv.slice(2);
+var pkg = JSON.parse(fs.readFileSync("./package.json"));
 var options = _parseCommandLineOptions(argv, {
         help:   false,               // show help
-        source: pkg.source,          // WatchTargetPathStringArray: [dir, file, ...]
+        source: pkg["webmodule"].source, // WatchTargetPathStringArray: [dir, file, ...]
         delay:  1000,                // delay time (unit ms)
         action: "",                  // npm run {{action}}
         verbose: false,              // verbose
@@ -52,23 +51,13 @@ Watch(options.source, {
     if (!err) {
         var command = "npm run " + options.action;
 
-        Process.exec(command, function(err, stdout, stderr) {
+        cp.exec(command, function(err, stdout, stderr) {
                         if (options.verbose) {
                             console.log(CONSOLE_COLOR.YELLOW + "  command: " + CONSOLE_COLOR.CLEAR + command);
                         }
                      });
     }
 });
-
-function _loadCurrentDirectoryPackageJSON() {
-    var path   = "./package.json";
-    var json   = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
-    var build  = json["x-build"] || json["build"] || {};
-    var source = build.source || build.inputs || build.files || [];
-    var output = build.output || "";
-
-    return { source: source, output: output };
-}
 
 function _parseCommandLineOptions(argv, options) {
     for (var i = 0, iz = argv.length; i < iz; ++i) {
