@@ -24,15 +24,16 @@ var _CONSOLE_COLOR = {
 
 //var Plato   = require("../lib/plato"); // WebModule/run/lib/plato.js
 var fs      = require("fs");
-var Process = require("child_process");
+var cp      = require("child_process");
 var argv    = process.argv.slice(2);
-var package = _loadCurrentDirectoryPackageJSON();
+var package = JSON.parse(fs.readFileSync("./package.json"));
+
 var options = _parseCommandLineOptions({
         help:       false,          // Boolean: true is show help.
         verbose:    false,          // Boolean: true is verbose mode.
-        title:      package.title,  // String: title.
+        title:      package.name,  // String: title.
         output:     "./lint/plato", // String: output dir.
-        files:      package.files   // StringArray: input files. [file, ...]
+        files:      package.webmodule.source  // StringArray: input files. [file, ...]
     });
 
 if (options.help) {
@@ -87,7 +88,7 @@ function _do(options, callback) {
     if (options.verbose) {
         console.log("command: " + command);
     }
-    Process.exec(command, function(err) {
+    cp.exec(command, function(err) {
         if (!err) {
             if (options.verbose) {
                 console.log(command);
@@ -188,17 +189,6 @@ function _if(value, fn, hint) {
 
 
 
-
-function _loadCurrentDirectoryPackageJSON() {
-    var path   = "./package.json";
-    var json   = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
-    var build  = json["x-build"] || json["build"] || {};
-    var files  = build["source"] || build["files"] || []; // inputs was deprecated.
-    var output = build["output"] || "";
-    var title  = json.name || "";
-
-    return { files: files, output: output, title: title };
-}
 
 function _parseCommandLineOptions(options) {
     for (var i = 0, iz = argv.length; i < iz; ++i) {
