@@ -38,13 +38,14 @@ var CONSOLE_COLOR = {
         CLEAR:  "\u001b[0m"
     };
 
-var fs      = require("fs");
+var fs = require("fs");
 var cp = require("child_process");
-//var Minify  = require("../lib/Minify");
-var argv    = process.argv.slice(2);
-var WebModuleLib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var Module  = require(WebModuleLib + "Module.js");
-var pkg     = _loadCurrentDirectoryPackageJSON();
+var argv = process.argv.slice(2);
+var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var Module = require(wmlib + "Module.js");
+var pkg = JSON.parse(fs.readFileSync("./package.json"));
+var wm = pkg.webmodule;
+
 var options = _parseCommandLineOptions({
         name:       pkg.name,       // Object       - { git:String, npm:String }. github repository name, npm package name.
         brew:       false,          // Boolean      - use brew installed closure-compiler.
@@ -60,9 +61,9 @@ var options = _parseCommandLineOptions({
         es6out:     false,          // Boolean      - output ES6 code.
         strict:     false,          // Boolean      - true -> add 'use strict'.
         pretty:     false,          // Boolean      - true -> pretty print.
-        source:     pkg.source,     // PathStringArray - package.json webmodule.source. ["source-file", ...]
-        target:     pkg.target,     // StringArray  - build target. ["Browser", "Worker", "Node"]
-        output:     pkg.output,     // PathString   - "output-file-name"
+        source:     wm.source,      // PathStringArray - package.json webmodule.source. ["source-file", ...]
+        target:     wm.target,      // StringArray  - build target. ["Browser", "Worker", "Node"]
+        output:     wm.output,      // PathString   - "output-file-name"
         option:     [],             // OptionStringArray - ["language_in ECMASCRIPT5_STRICT", ...]
         compile:    true,           // Boolean      - true -> compile.
         release:    false,          // Boolean      - true -> release build, use NodeModule.files().
@@ -142,24 +143,6 @@ Minify(mergedSource, {
             js) { // @arg String - minified JavaScript Expression string.
     fs.writeFileSync(options.output, js);
 });
-
-function _loadCurrentDirectoryPackageJSON() {
-    var path   = "./package.json";
-    var json   = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
-    var npm    = json["name"] || "";
-    var git    =(json["url"] || "").split("/").pop();
-    var wm     = json["webmodule"] || {};
-    var source = wm.source || [];
-    var output = wm.output || "";
-    var target = wm.target || ["all"];
-
-    return {
-        name: { git: git, npm: npm },
-        source: source,
-        output: output,
-        target: target
-    };
-}
 
 function _isFileExists(fileList) { // @arg Array
                                    // @ret Boolean
@@ -305,7 +288,7 @@ function Minify(sources, // @arg StringArray - JavaScript sources file path. [pa
                 // $ brew install closure-compiler
                 _offlineMinificationBrew(sources, options, optionsString, fn);
             } else {
-                // $ node install closure-compiler
+                // $ node install uupaa.compile.js
                 _offlineMinificationNode(sources, options, optionsString, fn);
             }
         });

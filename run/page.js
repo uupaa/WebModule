@@ -37,9 +37,9 @@ __SCRIPT__
 */});
 
 
-var fs   = require("fs");
-var WebModuleLib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var Module = require(WebModuleLib + "Module.js");
+var fs = require("fs");
+var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var Module = require(wmlib + "Module.js");
 var argv = process.argv.slice(2);
 var verbose = argv[0] === "--verbose" || argv[0] === "-v";
 
@@ -49,25 +49,16 @@ function put() {
     var releaseBuild = false;
     var deps = Module.getDependencies(releaseBuild);
 
-    deps.files.node.push("../WebModule/lib/Console.js");
-    deps.files.browser.push("../WebModule/lib/Console.js");
-    deps.files.worker.push("../WebModule/lib/Console.js");
-
-    deps.files.node.push("../WebModule/lib/Help.js");
-    deps.files.browser.push("../WebModule/lib/Help.js");
-    deps.files.worker.push("../WebModule/lib/Help.js");
-
-    deps.files.node.push("../WebModule/lib/Valid.js");
-    deps.files.browser.push("../WebModule/lib/Valid.js");
-    deps.files.worker.push("../WebModule/lib/Valid.js");
-
-    deps.files.node.push("../WebModule/lib/TestTask.js");
-    deps.files.browser.push("../WebModule/lib/TestTask.js");
-    deps.files.worker.push("../WebModule/lib/TestTask.js");
-
-    deps.files.node.push("../WebModule/lib/Test.js");
-    deps.files.browser.push("../WebModule/lib/Test.js");
-    deps.files.worker.push("../WebModule/lib/Test.js");
+    ["lib/Reflection.js",
+     "lib/Console.js",
+     "lib/Valid.js",
+     "lib/Help.js",
+     "lib/Task.js",
+     "lib/Test.js"].forEach(function(js) {
+        deps.files.node.push("../WebModule/" + js);
+        deps.files.worker.push("../WebModule/" + js);
+        deps.files.browser.push("../WebModule/" + js);
+    });
 
     if (verbose) {
 //      console.log("\u001b[31m" + "packages: " + JSON.stringify(deps.packages, null, 2) + "\u001b[0m");

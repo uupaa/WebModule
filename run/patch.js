@@ -10,7 +10,6 @@ var CONSOLE_COLOR = {
     };
 
 var fs = require("fs");
-var argv = process.argv.slice(2);
 
 patch(process.cwd() + "/" + "package.json");
 

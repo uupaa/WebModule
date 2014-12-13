@@ -23,6 +23,9 @@ var CONSOLE_COLOR = {
 
 var REPOSITORY_NAME     = require("../lib/REPOSITORY_NAME");
 var fs      = require("fs");
+var cp      = require("child_process");
+var wmlib   = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var Task    = require(wmlib + "Task.js");
 var argv    = process.argv.slice(2);
 var options = _parseCommandLineOptions({
         help:       false,      // Boolean: show help.
