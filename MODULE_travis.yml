@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+    - "0.10"
+before_script:
+    - "pwd"
+    - "cd .."
+    - "git clone https://github.com/GITHUB_USER_NAME/REPOSITORY_NAME.git"
+    - "cd -"
+    - "npm install"
+    - "npm install uupaa.closurecompiler.js"
+    - "node node_modules/uupaa.closurecompiler.js --package"
+script:
+    - "npm run node"
+

@@ -8,6 +8,11 @@ var _USAGE = _multiline(function() {/*
                               [--bin]
 */});
 
+var ERR  = "\u001b[31m";
+var WARN = "\u001b[33m";
+var INFO = "\u001b[32m";
+var CLR  = "\u001b[0m";
+
 // ---------------------------------------------------------
 //  fileName                    [scan, sourceFileName]
 var _CLONE_FILES = {
@@ -34,19 +39,12 @@ var _CLONE_FILES = {
     ".gitignore":               [],
     ".jshintrc":                [],
     ".npmignore":               [],
-    ".travis.yml":              [],
+    ".travis.yml":              [true, "MODULE_travis.yml"],
     "index.js":                 [true, "MODULE_index.js"],
 //  "LICENSE":                  [true, "MODULE_LICENSE"],
     "package.json":             [true, "MODULE_package.json"],
     "README.md":                [true, "MODULE_README.md"]
 };
-
-var _CONSOLE_COLOR = {
-        RED:    "\u001b[31m",
-        YELLOW: "\u001b[33m",
-        GREEN:  "\u001b[32m",
-        CLEAR:  "\u001b[0m"
-    };
 
 var fs       = require("fs");
 var cp       = require("child_process");
@@ -63,10 +61,10 @@ var repositoryName     = repositoryFullName.indexOf(".") >= 0
 var fromDir            = process.argv[1].split("/").slice(0, -2).join("/") + "/";
 var toDir              = process.cwd() + "/";
 
-console.log( _CONSOLE_COLOR.GREEN + "  - repositoryFullName: " + repositoryFullName + _CONSOLE_COLOR.CLEAR ); // "Foo.js"
-console.log( _CONSOLE_COLOR.GREEN + "  - repositoryName:     " + repositoryName     + _CONSOLE_COLOR.CLEAR ); // "Foo"
-console.log( _CONSOLE_COLOR.GREEN + "  - copy source dir:    " + fromDir            + _CONSOLE_COLOR.CLEAR ); // "/Users/uupaa/oss/WebModule/"
-console.log( _CONSOLE_COLOR.GREEN + "  - copy target dir:    " + toDir              + _CONSOLE_COLOR.CLEAR + "\n" ); // "/Users/uupaa/oss/Foo.js"
+console.log(INFO + "  - repositoryFullName: " + repositoryFullName + CLR); // "Foo.js"
+console.log(INFO + "  - repositoryName:     " + repositoryName     + CLR); // "Foo"
+console.log(INFO + "  - copy source dir:    " + fromDir            + CLR); // "/Users/uupaa/oss/WebModule/"
+console.log(INFO + "  - copy target dir:    " + toDir              + CLR + "\n"); // "/Users/uupaa/oss/Foo.js"
 
 //return;
 
@@ -80,7 +78,7 @@ var options = _parseCommandLineOptions({
     });
 
 if (options.help) {
-    console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
+    console.log(WARN + _USAGE + CLR);
     return;
 }
 
@@ -100,15 +98,15 @@ getGitHubUserName(function(userName) {
     options.userName = userName;
     _clone(fromDir, toDir, _CLONE_FILES, function() {
         console.log("  ");
-        console.log(_CONSOLE_COLOR.GREEN + "  done." + _CONSOLE_COLOR.CLEAR + "\n");
-        console.log(_CONSOLE_COLOR.GREEN + "  Available next actions," + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run`        # list up npm run-script" + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm start`      # start local httpd server" + _CONSOLE_COLOR.CLEAR);
-        console.log(_CONSOLE_COLOR.GREEN + "  `$ npm run sync`   # sync scripts, install/update node modules, create test pages and minify" + _CONSOLE_COLOR.CLEAR);
+        console.log(INFO + "  done." + CLR + "\n");
+        console.log(INFO + "  Available next actions," + CLR);
+        console.log(INFO + "  `$ npm run`        # list up npm run-script" + CLR);
+        console.log(INFO + "  `$ npm start`      # start local httpd server" + CLR);
+        console.log(INFO + "  `$ npm run sync`   # sync scripts, install/update node modules, create test pages and minify" + CLR);
     });
 
 }, function(err) {
-    console.error(_CONSOLE_COLOR.RED + "Error: git config --get user.name" + _CONSOLE_COLOR.CLEAR);
+    console.error(ERR + "Error: git config --get user.name" + CLR);
 });
 
 // =========================================================
@@ -158,7 +156,7 @@ function _clone(fromDir,    // @arg String - copy from dir. has tail slash(/)
                        function(answer) {
 
                 if (/^y$/i.test(answer)) {
-                    console.log(_CONSOLE_COLOR.YELLOW + "  overwrite: " + targetFile + _CONSOLE_COLOR.CLEAR);
+                    console.log(WARN + "  overwrite: " + targetFile + CLR);
                     fs.writeFileSync(targetFile, sourceText);
                 } else {
                     console.log("  skip:      " + targetFile);

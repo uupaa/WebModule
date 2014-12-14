@@ -12,36 +12,34 @@ var _USAGE = _multiline(function() {/*
         https://github.com/uupaa/Plato.js/wiki/Plato
 */});
 
-var _CONSOLE_COLOR = {
-        RED:    "\u001b[31m",
-        YELLOW: "\u001b[33m",
-        GREEN:  "\u001b[32m",
-        CLEAR:  "\u001b[0m"
-    };
+var ERR  = "\u001b[31m";
+var WARN = "\u001b[33m";
+var INFO = "\u001b[32m";
+var CLR  = "\u001b[0m";
 
 // require("../lib/plato.js") は、score.js を呼び出したスクリプトのディレクトリを基準としたパスになるため、WebModule/run/lib/xxx.js などを require できない
 // fs.read("../lib/plato.js") は、score.js を呼び出したスクリプトのディレクトリを記述としたパスになる
 
 //var Plato   = require("../lib/plato"); // WebModule/run/lib/plato.js
-var fs      = require("fs");
-var cp      = require("child_process");
-var argv    = process.argv.slice(2);
-var package = JSON.parse(fs.readFileSync("./package.json"));
+var fs   = require("fs");
+var cp   = require("child_process");
+var argv = process.argv.slice(2);
+var pkg  = JSON.parse(fs.readFileSync("./package.json"));
 
 var options = _parseCommandLineOptions({
         help:       false,          // Boolean: true is show help.
         verbose:    false,          // Boolean: true is verbose mode.
-        title:      package.name,  // String: title.
+        title:      pkg.name,       // String: title.
         output:     "./lint/plato", // String: output dir.
-        files:      package.webmodule.source  // StringArray: input files. [file, ...]
+        files:      pkg.webmodule.source  // StringArray: input files. [file, ...]
     });
 
 if (options.help) {
-    console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
+    console.log(WARN + _USAGE + CLR);
     return;
 }
 if (!options.files.length) {
-    console.log(_CONSOLE_COLOR.RED + "Input files are empty." + _CONSOLE_COLOR.CLEAR);
+    console.log(ERR + "Input files are empty." + CLR);
     return;
 }
 
@@ -51,12 +49,6 @@ Plato({
     "output":       options.output,
     "files":        options.files
 }, function() { });
-
-
-
-
-
-
 
 
 // --- class / interfaces ----------------------------------
@@ -175,21 +167,6 @@ function _if(value, fn, hint) {
 //}@dev
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function _parseCommandLineOptions(options) {
     for (var i = 0, iz = argv.length; i < iz; ++i) {
         switch (argv[i]) {
@@ -215,5 +192,4 @@ function _multiline(fn) { // @arg Function:
 }
 
 })((this || 0).self || global);
-
 
