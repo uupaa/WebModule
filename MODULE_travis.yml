@@ -4,7 +4,7 @@ node_js:
 before_script:
     - "pwd"
     - "cd .."
-    - "git clone https://github.com/GITHUB_USER_NAME/REPOSITORY_NAME.git"
+    - "git clone https://github.com/uupaa/WebModule.git"
     - "cd -"
     - "npm install"
     - "npm install uupaa.closurecompiler.js"
