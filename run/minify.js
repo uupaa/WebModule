@@ -42,7 +42,7 @@ var fs = require("fs");
 var cp = require("child_process");
 var argv = process.argv.slice(2);
 var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var Module = require(wmlib + "Module.js");
+var mod = require(wmlib + "Module.js");
 var pkg = JSON.parse(fs.readFileSync("./package.json"));
 var wm = pkg.webmodule;
 
@@ -96,13 +96,13 @@ var mergedSource = options.source;
 
 if (options.release) {
     // 依存関係にあるソース(deps.files.all)を取得する
-    var deps = Module.getDependencies(options.release);
+    var deps = mod.getDependencies(options.release);
 
     console.log("\u001b[33m" + "deps.files.all: " + JSON.stringify(deps.files.all, null, 2) + "\u001b[0m");
     console.log("\u001b[35m" + "source: "         + JSON.stringify(options.source, null, 2) + "\u001b[0m");
 
     // ソースコードのリストをマージし重複を取り除く
-    mergedSource = Module.toUniqueArray([].concat(deps.files.all, options.source));
+    mergedSource = mod.toUniqueArray([].concat(deps.files.all, options.source));
 
     if (options.verbose) {
         console.log("Release build source: " + JSON.stringify(mergedSource, null, 2));
