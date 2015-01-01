@@ -5,7 +5,6 @@
 var USAGE = _multiline(function() {/*
     Usage:
         node Minify.js [@label ...]
-                       [--brew]
                        [--help]
                        [--verbose]
                        [--nowrap]
@@ -22,8 +21,6 @@ var USAGE = _multiline(function() {/*
                        [--pretty]
                        [--option "compile option"]
                        [--extern file]
-                       [--output file]
-                       [--source file]
                        [--label @label]
                        [--release]
 
@@ -31,12 +28,10 @@ var USAGE = _multiline(function() {/*
         https://github.com/uupaa/Minify.js/wiki/Minify
 */});
 
-var CONSOLE_COLOR = {
-        RED:    "\u001b[31m",
-        YELLOW: "\u001b[33m",
-        GREEN:  "\u001b[32m",
-        CLEAR:  "\u001b[0m"
-    };
+var ERR  = "\u001b[31m"; // RED
+var WARN = "\u001b[33m"; // YELLOW
+var INFO = "\u001b[32m"; // GREEN
+var CLR  = "\u001b[0m";  // WHITE
 
 var fs = require("fs");
 var cp = require("child_process");
@@ -45,10 +40,11 @@ var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "Web
 var mod = require(wmlib + "Module.js");
 var pkg = JSON.parse(fs.readFileSync("./package.json"));
 var wm = pkg.webmodule;
+var Task = require(wmlib + "Task.js");
+var target = mod.collectBuildTarget(pkg);
 
 var options = _parseCommandLineOptions({
         name:       pkg.name,       // Object       - { git:String, npm:String }. github repository name, npm package name.
-        brew:       false,          // Boolean      - use brew installed closure-compiler.
         help:       false,          // Boolean      - true is show help.
         keep:       false,          // Boolean      - keep tmp file.
         label:      ["dev", "debug", "assert"], // LabelStringArray
@@ -61,67 +57,78 @@ var options = _parseCommandLineOptions({
         es6out:     false,          // Boolean      - output ES6 code.
         strict:     false,          // Boolean      - true -> add 'use strict'.
         pretty:     false,          // Boolean      - true -> pretty print.
-        source:     wm.source,      // PathStringArray - package.json webmodule.source. ["source-file", ...]
-        target:     wm.target,      // StringArray  - build target. ["Browser", "Worker", "Node"]
-        output:     wm.output,      // PathString   - "output-file-name"
         option:     [],             // OptionStringArray - ["language_in ECMASCRIPT5_STRICT", ...]
         compile:    true,           // Boolean      - true -> compile.
         release:    false,          // Boolean      - true -> release build, use NodeModule.files().
         externs:    [],             // FilePathArray- ["externs-file-name", ...]
         verbose:    false,          // Boolean      - true -> verbose mode.
-        workDir:    "",             // PathString   - work dir.
+        workDir:    "release/",     // PathString   - work dir.
         advanced:   true            // Boolean      - true -> ADVANCED_OPTIMIZATIONS MODE.
     });
 
 if (options.help) {
-    console.log(CONSOLE_COLOR.YELLOW + USAGE + CONSOLE_COLOR.CLEAR);
-    return;
-}
-if (!options.source.length) {
-    console.log(CONSOLE_COLOR.RED + "Input source are empty." + CONSOLE_COLOR.CLEAR);
-    return;
-}
-if (!options.output.length) {
-    console.log(CONSOLE_COLOR.RED + "Output file is empty." + CONSOLE_COLOR.CLEAR);
-    return;
-}
-if (!options.workDir.length) {
-    console.log(CONSOLE_COLOR.RED + "WorkDir is empty." + CONSOLE_COLOR.CLEAR);
+    console.log(WARN + USAGE + CLR);
     return;
 }
 
-// $ npm run build は、package.json の webmodule.source( options.source ) 以下をビルドします
-// $ npm run build.release は、webmodule.source に加え、依存関係にあるファイルもビルドします
-var mergedSource = options.source;
+// --- detect work dir ---
+if (!target.all.output) {
+    console.log(ERR + "package.json - webmodule.{browser|worker|node|all}.output are empty." + CLR);
+    return;
+}
+if (target.all.output.indexOf("/") > 0) {
+    // "release/Zzz.min.js" -> "release/";
+    options.workDir = (target.all.output.split("/").slice(0, -1)).join("/") + "/";
+}
+
+// $ npm run build は、package.json の webmodule.{browser|worker|node|all}.source をビルドします
+// $ npm run build.release は、webmodule.{browser|worker|node|all}.source に加え node_modules 以下の依存ファイルもビルドします
+var browserSource = target.browser.source;
+var workerSource  = target.worker.source;
+var nodeSource    = target.node.source;
+var allSource     = target.all.source;
 
 if (options.release) {
-    // 依存関係にあるソース(deps.files.all)を取得する
+    // 依存関係にあるソース(deps.files.{browser|worker|node|all})を取得する
     var deps = mod.getDependencies(options.release);
 
-    console.log("\u001b[33m" + "deps.files.all: " + JSON.stringify(deps.files.all, null, 2) + "\u001b[0m");
-    console.log("\u001b[35m" + "source: "         + JSON.stringify(options.source, null, 2) + "\u001b[0m");
+    if (options.verbose) {
+        console.log("\u001b[33m" + "deps.files.browser: " + JSON.stringify(deps.files.browser, null, 2) + "\u001b[0m");
+        console.log("\u001b[33m" + "deps.files.worker: "  + JSON.stringify(deps.files.worker, null, 2) + "\u001b[0m");
+        console.log("\u001b[33m" + "deps.files.node: "    + JSON.stringify(deps.files.node, null, 2) + "\u001b[0m");
+        console.log("\u001b[33m" + "deps.files.all: "     + JSON.stringify(deps.files.all, null, 2) + "\u001b[0m");
+    }
 
-    // ソースコードのリストをマージし重複を取り除く
-    mergedSource = mod.toUniqueArray([].concat(deps.files.all, options.source));
+    // ソースコードをマージし重複を取り除く
+    browserSource = mod.toUniqueArray([].concat(deps.files.browser, browserSource));
+    workerSource  = mod.toUniqueArray([].concat(deps.files.worker,  workerSource));
+    nodeSource    = mod.toUniqueArray([].concat(deps.files.node,    nodeSource));
+    allSource     = mod.toUniqueArray([].concat(deps.files.all,     allSource));
 
     if (options.verbose) {
-        console.log("Release build source: " + JSON.stringify(mergedSource, null, 2));
+        console.log("Release build source: " + JSON.stringify(browserSource, null, 2));
+        console.log("Release build source: " + JSON.stringify(workerSource, null, 2));
+        console.log("Release build source: " + JSON.stringify(nodeSource, null, 2));
+        console.log("Release build source: " + JSON.stringify(allSource, null, 2));
     }
-} else {
-    //
 }
 
-if (!_isFileExists(options.externs)) {
-    console.log(CONSOLE_COLOR.YELLOW + USAGE + CONSOLE_COLOR.CLEAR);
+if (!_isFileExists(options.externs) ||
+    !_isFileExists(browserSource) ||
+    !_isFileExists(workerSource) ||
+    !_isFileExists(nodeSource) ||
+    !_isFileExists(allSource)) {
+    console.log(WARN + USAGE + CLR);
     return;
 }
-if (!_isFileExists(mergedSource)) {
-    console.log(CONSOLE_COLOR.YELLOW + USAGE + CONSOLE_COLOR.CLEAR);
-    return;
+if (options.verbose) {
+    console.log("browserSource = " + browserSource);
+    console.log("workerSource = " + workerSource);
+    console.log("nodeSource = " + nodeSource);
+    console.log("allSource = " + allSource);
 }
 
-Minify(mergedSource, {
-    "brew":         options.brew,
+var minifyOptions = {
     "keep":         options.keep,
     "label":        options.label,
     "nowrap":       options.nowrap,
@@ -139,16 +146,119 @@ Minify(mergedSource, {
     "verbose":      options.verbose,
     "workDir":      options.workDir,
     "advanced":     options.advanced
-}, function(err,  // @arg Error
-            js) { // @arg String - minified JavaScript Expression string.
-    fs.writeFileSync(options.output, js);
+};
+
+// --- コンパイル対象を決定する ---
+// できるだけ無駄なコンパイルは避ける
+// コンパイル対象のソースコードがbrowser,worker,node,allで同じ場合は一度だけ(allだけを)コンパイルする
+// allとbrowser,worker,node が異なる場合は、それぞれの環境に向けて特殊化したビルドを行う
+// browserとworkerが同じ場合は、browser用のファイルをworkerにコピーして使用する
+// browserとnodeが同じ場合は、browser用のファイルをnodeにコピーして使用する
+var taskPlan = [];
+var copyBrowserFileToWorkerFile = false; // browser用のビルドをコピーしworkerとしても使用する
+var copyBrowserFileToNodeFile   = false; // browser用のビルドをコピーしnodeとしても使用する
+
+if (allSource.length) { taskPlan.push("all"); }
+// all と {browser|worker|node} のファイル構成が異なる場合は個別にビルドを行う
+if (browserSource.length && allSource.join() !== browserSource.join()) { taskPlan.push("browser"); }
+if (workerSource.length  && allSource.join() !== workerSource.join())  { taskPlan.push("worker");  }
+if (nodeSource.length    && allSource.join() !== nodeSource.join())    { taskPlan.push("node");    }
+// browserとworkerのファイル構成が一緒の場合はまとめてしまい、workerのビルドを省略する
+if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("worker") >= 0) {
+    if (browserSource.join() === workerSource.join()) {
+        copyBrowserFileToWorkerFile = true;
+        taskPlan = taskPlan.filter(function(target) { return target !== "worker"; });
+    }
+}
+// browserとnodeのファイル構成が一緒の場合はまとめてしまい、nodeのビルドを省略する
+if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("node") >= 0) {
+    if (browserSource.join() === nodeSource.join()) {
+        copyBrowserFileToNodeFile = true;
+        taskPlan = taskPlan.filter(function(target) { return target !== "node"; });
+    }
+}
+
+if (options.verbose) {
+    console.log("Compile task planning: " + taskPlan.join(" and "));
+}
+
+Task.run(taskPlan.join(" > "), {
+    "all": function(task) {
+        Minify(browserSource, minifyOptions, function(err, js) {
+            if (err) {
+                task.miss();
+            } else {
+                fs.writeFileSync(wm.all.output, js);
+                fs.writeFileSync(wm.browser.output, js);
+                fs.writeFileSync(wm.worker.output, js);
+                fs.writeFileSync(wm.node.output, js);
+                task.pass();
+            }
+        });
+    },
+    "browser": function(task) {
+        if (options.verbose) {
+            console.log("begin browser task...");
+        }
+        Minify(browserSource, minifyOptions, function(err, js) {
+            if (err) {
+                task.miss();
+            } else {
+                fs.writeFileSync(wm.browser.output, js);
+                if (copyBrowserFileToWorkerFile) {
+                    fs.writeFileSync(wm.worker.output, js);
+                }
+                if (copyBrowserFileToNodeFile) {
+                    fs.writeFileSync(wm.node.output, js);
+                }
+                task.pass();
+            }
+        });
+    },
+    "worker": function(task) {
+        if (options.verbose) {
+            console.log("begin worker task...");
+        }
+        Minify(workerSource, minifyOptions, function(err, js) {
+            if (err) {
+                task.miss();
+            } else {
+                fs.writeFileSync(wm.worker.output, js);
+                task.pass();
+            }
+        });
+    },
+    "node": function(task) {
+        if (options.verbose) {
+            console.log("begin node task...");
+        }
+        Minify(nodeSource, minifyOptions, function(err, js) {
+            if (err) {
+                task.miss();
+            } else {
+                fs.writeFileSync(wm.node.output, js);
+                task.pass();
+            }
+        });
+    }
+}, function(err) {
+    if (err) {
+        if (options.verbose) {
+            console.log(ERR + "failed." + CLR);
+            process.exit(1);
+        }
+    } else {
+        if (options.verbose) {
+            console.log("All compilation task has ended.");
+        }
+    }
 });
 
 function _isFileExists(fileList) { // @arg Array
                                    // @ret Boolean
     return fileList.every(function(file) {
         if (!fs.existsSync(file)) {
-            console.log(CONSOLE_COLOR.RED + "File not found: " + file + CONSOLE_COLOR.CLEAR);
+            console.log(ERR + "File not found: " + file + CLR);
             return false;
         }
         return true;
@@ -161,7 +271,6 @@ function _parseCommandLineOptions(options) {
         case "-h":
         case "--help":      options.help = true; break;
         case "-v":
-        case "--brew":      options.brew = true; break;
         case "--verbose":   options.verbose = true; break;
         case "--nowrap":    options.nowrap = true; break;
         case "--nocompile": options.compile = false; break;
@@ -175,29 +284,18 @@ function _parseCommandLineOptions(options) {
         case "--pretty":    options.pretty = true; break;
         case "--keep":      options.keep = true; break;
         case "--simple":    options.advanced = false; break;
-        case "--output":    options.output = argv[++i]; break;
         case "--extern":
         case "--externs":   _pushif(options.externs, argv[++i]); break;
         case "--option":    _pushif(options.option, argv[++i]); break;
         case "--module":
         case "--release":   options.release = true; break;
         case "--label":     _pushif(options.label, argv[++i].replace(/^@/, "")); break;
-        case "--source":    _pushif(options.source, argv[++i]); break;
         default:
             if ( /^@/.test(argv[i]) ) { // @label
                 _pushif(options.label, argv[i].replace(/^@/, ""));
             } else {
                 throw new Error("Unknown option: " + argv[i]);
             }
-        }
-    }
-    // work dir
-    if (options.output) {
-        if (options.output.indexOf("/") <= 0) {
-            options.workDir = "";
-        } else {
-            // "release/Zzz.min.js" -> "release/";
-            options.workDir = (options.output.split("/").slice(0, -1)).join("/") + "/";
         }
     }
     return options;
@@ -243,8 +341,7 @@ var TMP_FILE      = "./.Minify.tmp.js";
 
 // --- class / interfaces ----------------------------------
 function Minify(sources, // @arg StringArray - JavaScript sources file path. [path, ...]
-                options, // @arg Object = null - { brew, keep, label, nowrap, header, footer, es5in, es6in, es5out, es6out, strict, pretty, option, compile, externs, verbose, workDir, advanced }
-                         // @options.brew       Boolean = false  - force global installed closure-compiler.
+                options, // @arg Object = null - { keep, label, nowrap, header, footer, es5in, es6in, es5out, es6out, strict, pretty, option, compile, externs, verbose, workDir, advanced }
                          // @options.keep       Boolean = false  - keep temporary file.
                          // @options.label      LabelStringArray = null - ["@label", ...]
                          // @options.nowrap     Boolean = false  - false is wrap WebModule idiom.
@@ -267,7 +364,7 @@ function Minify(sources, // @arg StringArray - JavaScript sources file path. [pa
     _if(!Array.isArray(sources), Minify, "sources");
     if (options) {
         _if(options.constructor !== ({}).constructor, Minify, "options");
-        _if(!_keys(options, "brew,keep,label,nowrap,header,footer,es5in,es6in,es5out,es6out,strict,pretty,option,compile,externs,verbose,workDir,advanced"), Minify, "options");
+        _if(!_keys(options, "keep,label,nowrap,header,footer,es5in,es6in,es5out,es6out,strict,pretty,option,compile,externs,verbose,workDir,advanced"), Minify, "options");
     }
     if (fn) {
         _if(typeof fn !== "function", Minify, "fn");
@@ -278,27 +375,14 @@ function Minify(sources, // @arg StringArray - JavaScript sources file path. [pa
 
     if (options.compile) {
         cp.exec("which -s closure-compiler", function(err) {
-            var brew = options.brew || false;
-
-            if (err) {
-                brew = false;
-            }
-
-            if (brew) {
-                // $ brew install closure-compiler
-                _offlineMinificationBrew(sources, options, optionsString, fn);
-            } else {
                 // $ node install uupaa.compile.js
                 _offlineMinificationNode(sources, options, optionsString, fn);
-            }
         });
     } else {
         // debug build, concat and preprocess only.
         _noMinification(sources, options, fn);
     }
 }
-
-Minify["preprocess"] = Minify_preprocess; // Minify.preprocess(js:JavaScriptExpressionString, labels):String
 
 // --- implements ------------------------------------------
 function _makeClouserCompilerOptions(options) { // @arg Object - { keep, nowrap, ... }. see Minify()
@@ -356,46 +440,6 @@ function _makeClouserCompilerOptions(options) { // @arg Object - { keep, nowrap,
     return result.join(" ");
 }
 
-function _offlineMinificationBrew(sources,       // @arg StringArray - JavaScript SourceCode file path. [path, ...]
-                                  options,       // @arg Object - { keep, nowrap, ... }. see Minify()
-                                  optionsString, // @arg String
-                                  callback) {    // @arg Function = null - callback(err:Error, result:String)
-
-    var js = (options.header || "") + _concatFiles(sources) + (options.footer || "");
-
-    if (options.label && options.label.length) {
-        js = Minify_preprocess(js, options.label);
-    }
-    fs.writeFileSync(options.workDir + TMP_FILE, js);
-
-    var command = "closure-compiler "  + optionsString +
-                  " --js_output_file " + options.workDir + OUTPUT_FILE +
-                  " --js "             + options.workDir + TMP_FILE;
-
-    if (options.verbose) {
-        console.log(CONSOLE_COLOR.GREEN + command + CONSOLE_COLOR.CLEAR);
-    }
-
-    cp.exec(command, function(err, stdout, stderr) {
-        if (err || stderr) {
-            console.log(stderr);
-            if (callback) {
-                callback(new Error(stderr), "");
-            }
-        } else {
-            var minifiedCode = fs.readFileSync(options.workDir + OUTPUT_FILE, "utf8");
-
-            fs.unlinkSync(options.workDir + OUTPUT_FILE);
-            if (!options.keep) {
-                fs.unlinkSync(options.workDir + TMP_FILE);
-            }
-            if (callback) {
-                callback(null, minifiedCode);
-            }
-        }
-    });
-}
-
 function _offlineMinificationNode(sources,       // @arg StringArray - JavaScript SourceCode file path. [path, ...]
                                   options,       // @arg Object - { keep, nowrap, ... }. see Minify()
                                   optionsString, // @arg String
@@ -409,7 +453,7 @@ function _offlineMinificationNode(sources,       // @arg StringArray - JavaScrip
     fs.writeFileSync(options.workDir + TMP_FILE, js);
 
     if (options.verbose) {
-        console.log(CONSOLE_COLOR.GREEN + "\nCompile options: \n  " + optionsString.replace(/\n/g, "") + CONSOLE_COLOR.CLEAR);
+        console.log(INFO + "Compile options: \n  " + optionsString.replace(/\n/g, "") + CLR);
     }
 
     // `npm install -g uupaa.compile.js`
@@ -520,9 +564,5 @@ function _if(value, fn, hint) {
 }
 //}@def
 
-
-
-
 })((this || 0).self || global);
-
 

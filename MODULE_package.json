@@ -10,11 +10,11 @@
   },
   "scripts": {
     "sync":         "node ../WebModule/run/sync.js; npm update; node ../WebModule/run/page.js",
-    "watch":        "node ../WebModule/run/watch.js --verbose --action minify",
-    "minify":       "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
-    "build":        "node ../WebModule/run/minify.js --verbose --strict --module",
+    "min":          "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
+    "build":        "node ../WebModule/run/minify.js --verbose --strict --keep --module",
+    "watch":        "node ../WebModule/run/watch.js --verbose --run hint",
     "page":         "node ../WebModule/run/page.js --verbose",
-    "test":         "npm run minify; npm run node; npm run browser",
+    "test":         "npm run min; npm run node; npm run browser",
     "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
     "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
@@ -29,10 +29,23 @@
   },
   "webmodule": {
     "develop":      false,
-    "source":       ["lib/REPOSITORY_NAME.js"],
-    "output":       "release/REPOSITORY_NAME.min.js",
-    "target":       ["all"],
-    "label":        ["@dev"]
+    "label":        ["@dev"],
+    "all": {
+      "source":     ["lib/REPOSITORY_NAME.js"],
+      "output":     "release/REPOSITORY_NAME.min.js"
+    },
+    "browser": {
+      "source":     ["lib/REPOSITORY_NAME.js"],
+      "output":     "release/REPOSITORY_NAME.min.b.js"
+    },
+    "worker": {
+      "source":     ["lib/REPOSITORY_NAME.js"],
+      "output":     "release/REPOSITORY_NAME.min.w.js"
+    },
+    "node": {
+      "source":     ["lib/REPOSITORY_NAME.js"],
+      "output":     "release/REPOSITORY_NAME.min.n.js"
+    }
   },
   "dependencies": {},
   "devDependencies": {},

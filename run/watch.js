@@ -6,7 +6,8 @@ var USAGE = _multiline(function() {/*
     Usage:
         node bin/Watch.js [--help]
                           [--verbose]
-                          [--action script]
+                          [--run script][--action script]
+                          [--command script]
                           [--delay n]
                           watch-target-file [watch-target-file ...]
 
@@ -14,46 +15,65 @@ var USAGE = _multiline(function() {/*
         https://github.com/uupaa/Watch.js/wiki/Watch
 */});
 
-var CONSOLE_COLOR = {
-        RED:    "\u001b[31m",
-        YELLOW: "\u001b[33m",
-        CLEAR:  "\u001b[0m"
-    };
+var ERR  = "\u001b[31m"; // RED
+var WARN = "\u001b[33m"; // YELLOW
+var INFO = "\u001b[32m"; // GREEN
+var CLR  = "\u001b[0m";  // WHITE
 
 var fs = require("fs");
 var cp = require("child_process");
 var argv = process.argv.slice(2);
 var pkg = JSON.parse(fs.readFileSync("./package.json"));
+var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var mod = require(wmlib + "Module.js");
+var target = mod.collectBuildTarget(pkg);
+
 var options = _parseCommandLineOptions(argv, {
         help:   false,               // show help
-        source: pkg["webmodule"].source, // WatchTargetPathStringArray: [dir, file, ...]
+        source: target.sources,      // WatchTargetPathStringArray: [dir, file, ...]
         delay:  1000,                // delay time (unit ms)
-        action: "",                  // npm run {{action}}
+        runScript: "",               // $ npm run {{script}}
+        command: "",                 // $ command
         verbose: false,              // verbose
         ignoreDir: [".watchignore"]  // ignore dir name
     });
 
 if (options.help) {
-    console.log(CONSOLE_COLOR.YELLOW + USAGE + CONSOLE_COLOR.CLEAR);
+    console.log(WARN + USAGE + CLR);
     return;
 }
 if (!options.source.length) {
-    console.log(CONSOLE_COLOR.RED + "Input files are empty." + CONSOLE_COLOR.CLEAR);
+    console.log(ERR + "Input files are empty." + CLR);
     return;
 }
 
 Watch(options.source, {
     "delay":     options.delay,
-    "action":    options.action,
     "verbose":   options.verbose,
     "ignoreDir": options.ignoreDir
-}, function(err) { // @arg Error:
+}, function(err, path) { // @arg Error:
     if (!err) {
-        var command = "npm run " + options.action;
+        var command = options.runScript ? ("npm run " + options.runScript) :
+                      options.command   ? options.command : "";
 
+        if (options.verbose) {
+            var stat = fs.statSync(path);
+
+            console.log(INFO + "|﹏o )з !? " + CLR + path + " (size:" + stat.size + ")");
+            console.log(INFO + "|﹏・)っ   "  + CLR + command);
+        }
         cp.exec(command, function(err, stdout, stderr) {
-                        if (options.verbose) {
-                            console.log(CONSOLE_COLOR.YELLOW + "  command: " + CONSOLE_COLOR.CLEAR + command);
+                        if (err) {
+                            if (options.verbose) {
+                                console.log(ERR + "|﹏<)з  error. " + CLR);
+                                console.log(stdout.split("\n").map(function(line) {
+                                    return ERR + "| " + CLR + line;
+                                }).join("\n"));
+                            }
+                        } else {
+                            if (options.verbose) {
+                                console.log(INFO + "|◇・ミ)  done. " + CLR);
+                            }
                         }
                      });
     }
@@ -67,7 +87,9 @@ function _parseCommandLineOptions(argv, options) {
         case "-v":
         case "--verbose":   options.verbose = true; break;
         case "--delay":     options.delay = argv[++i]; break;
-        case "--action":    options.action = argv[++i]; break;
+        case "--run":
+        case "--action":    options.runScript = argv[++i]; break;
+        case "--command":   options.command = argv[++i]; break;
         default:
             var path = argv[i];
 
@@ -82,7 +104,7 @@ function _parseCommandLineOptions(argv, options) {
                     options.source.push(path);
                 }
             } else {
-                console.log(CONSOLE_COLOR.RED + "invalid path: " + path + CONSOLE_COLOR.CLEAR);
+                console.log(ERR + "invalid path: " + path + CLR);
             }
         }
     }
@@ -125,18 +147,25 @@ function Watch(paths,      // @arg PathArray
 
     this._options = options || {};
 
-    if (this._options.verbose) {
-        console.log("  --- watch ---");
-    }
     paths.forEach(function(path) {
         if (_isFile(path)) {
-            Watch_file(that, path, function(diff) { // { path: { dir, size, mtime }, ... }
-                callback(null, diff);
+            if (this._options.verbose) {
+                var stat = fs.statSync(path);
+                console.log(INFO + "|◇・)з   " + CLR + "start watch...");
+                console.log(INFO + "|◇・)з   " + CLR + path + " (size:" + stat.size + ")");
+            }
+            Watch_file(that, path, function() {
+                callback(null, path);
             });
+/*
         } else if (_isDir(path)) {
+            if (this._options.verbose) {
+                console.log("|◇・)зstart watch...");
+            }
             Watch_dir(that, path, function(diff) { // { path: { dir, size, mtime }, ... }
                 callback(null, diff);
             }, options);
+ */
         }
     });
 }
@@ -147,13 +176,10 @@ function Watch_file(that,          // @arg this
                     callback) {    // @arg Function - callback(null):void
     var timerID = 0;
 
-    if (this._options.verbose) {
-        console.log("  file: " + watchFilePath);
-    }
-
     fs.watchFile(watchFilePath, _watchdogCallback);
 
     function _watchdogCallback() {
+        // event throttling
         if (timerID) {
             clearTimeout(timerID); timerID = 0;
         }
@@ -165,6 +191,7 @@ function Watch_file(that,          // @arg this
     }
 }
 
+/*
 function Watch_dir(that,         // @arg this
                    watchRoorDir, // @arg String   - watch root dir
                    callback,     // @arg Function - callback(diff:Object):void
@@ -175,7 +202,7 @@ function Watch_dir(that,         // @arg this
 
     for (var path in keepDirTrees.dirs) {
         if (that._options.verbose) {
-            console.log("  dir: " + path);
+            console.log(INFO + "  watch target: " + CLR + path + "/");
         }
         fs.watch(path, _watchdogCallback);
     }
@@ -228,13 +255,15 @@ function Watch_dir(that,         // @arg this
                 }
             }
             if (that._options.verbose) {
-                console.log(CONSOLE_COLOR.YELLOW + "  changed: " + CONSOLE_COLOR.CLEAR + path);
+                console.log(WARN + "  changed: " + CLR + path);
             }
         }
         return false;
     }
 }
+ */
 
+/*
 function Watch_scanDir(scanRootDir, // @arg String - scan root dir
                        options) {   // @arg Object - { ... }
                                     // @ret Object - { dirs: {}, files: {} }
@@ -265,7 +294,9 @@ function Watch_scanDir(scanRootDir, // @arg String - scan root dir
     }
     return result;
 }
+ */
 
+/*
 function _readDir(result,    // @arg Object    - { dirs: {}, files: {} }
                   dir,       // @arg DirString
                   options) { // @arg Object    - { ... }
@@ -308,18 +339,21 @@ function _readDir(result,    // @arg Object    - { dirs: {}, files: {} }
         }
     });
 }
+ */
 
 function _isFile(path) { // @arg String
                          // @ret Boolean
     return fs.existsSync(path) && fs.statSync(path).isFile();
 }
 
+/*
 function _isDir(path) { // @arg String
                         // @ret Boolean
     return fs.existsSync(path) && fs.statSync(path).isDirectory();
 }
+ */
 
-
+/*
 // copy from Sort.js
 function Sort_nat(source,       // @arg StringArray     - source. ["abc100", "abc1", "abc10"]
                   ignoreCase) { // @arg Boolean = false - true is case-insensitive
@@ -373,6 +407,7 @@ function Sort_nat(source,       // @arg StringArray     - source. ["abc100", "ab
         return a.length - b.length;
     });
 }
+ */
 
 // --- validate / assertions -------------------------------
 //{@dev

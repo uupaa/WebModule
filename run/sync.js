@@ -32,10 +32,26 @@ console.log( INFO + "  - copy source dir:     " + sourceDir          + CLR );   
 console.log( INFO + "  - copy target dir:     " + targetDir          + CLR );       // "/Users/uupaa/oss/Foo.js/"
 console.log( INFO + "  - source package.json: " + sourcePacakgeJSON  + CLR );       // "/Users/uupaa/oss/my/WebModule/MODULE_package.json"
 console.log( INFO + "  - target package.json: " + targetPackageJSON  + CLR + LB );  // "/Users/uupaa/oss/my/Foo.js/package.json"
+
 sync();
 upgrade();
 sortKeys();
+prettyPrint();
+
 console.log( INFO + "  done." + CLR);
+
+function prettyPrint() {
+    var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
+    var txt = JSON.stringify(json, null, 2);
+
+    // Array Element to pretty
+    txt = txt.replace(/: \[([^\]]*)\],/g, function(_, items) {
+//console.log("items!" + items + "!");
+        return ': [' + items.trim().replace(/\s*\n+\s*/g, " ") + '],';
+    });
+
+    fs.writeFileSync(targetPackageJSON, txt);
+}
 
 // WebModule/MODULE_package.json sync to YOURWebModule/package.json
 function sync() {
@@ -51,11 +67,16 @@ function sync() {
 function upgrade() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
 
-    if ("x-build" in json) {
-        console.log( INFO + "  upgrade..." + CLR);
-    } else {
-        return;
-    }
+    json = upgradeXBuild(json);
+    json = upgradeTarget(json);
+
+    fs.writeFileSync(targetPackageJSON, JSON.stringify(json, null, 2));
+}
+
+function upgradeXBuild(json) {
+    if (!("x-build" in json)) { return json; }
+
+    console.log( INFO + "  upgrade x-build to webmodule..." + CLR);
 
     var build = json["x-build"];
 
@@ -66,8 +87,80 @@ function upgrade() {
         label: build.label,
     };
     delete json["x-build"];
+    return json;
+}
 
-    fs.writeFileSync(targetPackageJSON, JSON.stringify(json, null, 2));
+function upgradeTarget(json) {
+// Before
+//
+//  "webmodule": {
+//    "develop":      false,
+//    "source":       ["lib/REPOSITORY_NAME.js"],       <- sprit this
+//    "output":       "release/REPOSITORY_NAME.min.js", <- sprit this
+//    "target":       ["all"],                          <- remove this
+//    "label":        ["@dev"]
+//  },
+//
+// After
+//
+//  "webmodule": {
+//    "develop":      false,                            <- stay
+//    "label":        ["@dev"],                         <- stay
+//    "all": {                                          <- add if target.has.browser
+//      "source":     ["lib/REPOSITORY_NAME.js"],
+//      "output":     "release/REPOSITORY_NAME.min.js",
+//    },
+//    "browser": {                                      <- add if target.has.browser
+//      "source":     ["lib/REPOSITORY_NAME.js"],
+//      "output":     "release/REPOSITORY_NAME.b.min.js",
+//    },
+//    "worker": {                                       <- add if target.has.worker
+//      "source":     ["lib/REPOSITORY_NAME.js"],
+//      "output":     "release/REPOSITORY_NAME.w.min.js",
+//    },
+//    "node": {                                         <- add if target.has.node
+//      "source":     ["lib/REPOSITORY_NAME.js"],
+//      "output":     "release/REPOSITORY_NAME.b.min.js",
+//    }
+//  },
+//
+    var wm = json["webmodule"];
+
+    if (!("target" in wm)) { return json; }
+    console.log( INFO + "  upgrade webmodule.target..." + CLR);
+
+    var result = JSON.parse(JSON.stringify(json));
+
+    result.webmodule = {
+        develop: json.webmodule.develop || false,
+        label:   json.webmodule.label   || ["@dev"]
+    };
+
+    var target = json.webmodule.target.join("");
+
+    result.webmodule.all = {
+        source: json.webmodule.source,
+        output: json.webmodule.output
+    };
+    if ( /(all|browser)/i.test(target) ) {
+        result.webmodule.browser = {
+            source: json.webmodule.source,
+            output: json.webmodule.output.replace(/.js$/, ".b.js")
+        };
+    }
+    if ( /(all|worker)/i.test(target) ) {
+        result.webmodule.worker = {
+            source: json.webmodule.source,
+            output: json.webmodule.output.replace(/.js$/, ".w.js")
+        };
+    }
+    if ( /(all|node)/i.test(target) ) {
+        result.webmodule.node = {
+            source: json.webmodule.source,
+            output: json.webmodule.output.replace(/.js$/, ".n.js")
+        };
+    }
+    return result;
 }
 
 function sortKeys() {

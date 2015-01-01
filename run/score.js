@@ -25,13 +25,16 @@ var fs   = require("fs");
 var cp   = require("child_process");
 var argv = process.argv.slice(2);
 var pkg  = JSON.parse(fs.readFileSync("./package.json"));
+var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var mod = require(wmlib + "Module.js");
+var target = mod.collectBuildTarget(pkg);
 
 var options = _parseCommandLineOptions({
         help:       false,          // Boolean: true is show help.
         verbose:    false,          // Boolean: true is verbose mode.
         title:      pkg.name,       // String: title.
         output:     "./lint/plato", // String: output dir.
-        files:      pkg.webmodule.source  // StringArray: input files. [file, ...]
+        files:      target.sources  // StringArray: input files. [file, ...]
     });
 
 if (options.help) {

@@ -12,8 +12,16 @@ var BROWSER_TEST_PAGE = _multiline(function() {/*
 <meta name="viewport" content="width=device-width, user-scalable=no">
 <meta charset="utf-8"></head><body>
 
-<script id="worker" type="javascript/worker">
+__SCRIPT__
+
+</body></html>
+
+*/});
+
+var WORKER_TEST_PAGE = _multiline(function() {/*
 onmessage = function(event) {
+    self.TEST_DATA = event.data; // WebModule/lib/Test.js
+    self.TEST_ERROR_MESSAGE = "";
 
     if (!self.console) {
         self.console = function() {};
@@ -22,24 +30,17 @@ onmessage = function(event) {
         self.console.error = function() {};
     }
 
-    self.MESSAGE = event.data;
-
     __IMPORT_SCRIPTS__
 
-    self.postMessage({ error: self.errorMessage || "" });
+    self.postMessage({ TEST_ERROR_MESSAGE: self.TEST_ERROR_MESSAGE || "" });
 };
-</script>
-
-__SCRIPT__
-
-</body></html>
 
 */});
 
 
 var fs = require("fs");
 var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var Module = require(wmlib + "Module.js");
+var mod = require(wmlib + "Module.js");
 var argv = process.argv.slice(2);
 var verbose = argv[0] === "--verbose" || argv[0] === "-v";
 
@@ -47,7 +48,7 @@ put();
 
 function put() {
     var releaseBuild = false;
-    var deps = Module.getDependencies(releaseBuild);
+    var deps = mod.getDependencies(releaseBuild);
 
     ["lib/Reflection.js",
      "lib/Console.js",
@@ -73,51 +74,57 @@ function put() {
         console.error("\u001b[31m" + "ERROR. test/ directory not found." + "\u001b[0m");
     } else {
         if (verbose) {
-            console.log( "update test/index.html: \n    "    + pages.browser.replace(/\n/g, "\n    " ) );
-            console.log( "update test/index.node.js: \n    " + pages.node.replace(/\n/g, "\n    " ) );
+            console.log( "update test/index.html: \n    "      + pages.browser.replace(/\n/g, "\n    " ) );
+            console.log( "update test/index.node.js: \n    "   + pages.node.replace(/\n/g, "\n    " ) );
+            console.log( "update test/index.worker.js: \n    " + pages.worker.replace(/\n/g, "\n    " ) );
         }
         fs.writeFileSync("test/index.html", pages.browser);
         fs.writeFileSync("test/index.node.js", pages.node);
+        fs.writeFileSync("test/index.worker.js", pages.worker);
     }
 }
 
 function _createTestPage(files,         // @arg Object - { all, node, worker, browser, label }
                          packagejson) { // @arg Object - package.json
-                                        // @ret String
+                                        // @ret Object - { browser:String, worker:String, node:String }
+    var wm = packagejson["webmodule"];
+    var target = mod.collectBuildTarget(packagejson);
 
-    var webmodule = packagejson["webmodule"];
-    var requireFiles      = _toUniqueArray(files.node.concat(webmodule["source"]).map(_require));
-    var scriptFiles       = _toUniqueArray(files.browser.concat(webmodule["source"]).map(_script));
-    var importScriptFiles = _toUniqueArray(files.worker.concat(webmodule["source"]).map(_import));
+    var scriptFiles       = _toUniqueArray(files.browser.concat(target.browser.source).map(_script));
+    var importScriptFiles = _toUniqueArray(files.worker.concat(target.worker.source).map(_import));
+    var requireFiles      = _toUniqueArray(files.node.concat(target.node.source).map(_require));
 
     var browserPage = BROWSER_TEST_PAGE;
+    var workerPage = WORKER_TEST_PAGE;
     var nodePage = NODE_TEST_PAGE;
 
-    if ( /(all|worker)/i.test( webmodule.target.join(" ") ) ) {
-        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "../' + webmodule.output + '");');
-        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./testcase.js");');
-        browserPage = browserPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
+    if ("worker" in wm) {
+        importScriptFiles.push('importScripts("../' + target.worker.output + '");');
+        importScriptFiles.push('importScripts("./testcase.js");');
+        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
-        browserPage = browserPage.replace("__IMPORT_SCRIPTS__", "");
+        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", "");
     }
-    if ( /(all|browser)/i.test( webmodule.target.join(" ") ) ) { // browser ready module
-        scriptFiles.push('<script src="../' + webmodule.output + '"></script>');
+
+    if ("browser" in wm) {
+        scriptFiles.push('<script src="../' + target.browser.output + '"></script>');
         scriptFiles.push('<script src="./testcase.js"></script>');
         browserPage = browserPage.replace("__SCRIPT__", scriptFiles.join("\n"));
     } else {
         browserPage = browserPage.replace("__SCRIPT__", "");
     }
-    if ( /(all|node)/i.test( webmodule.target.join(" ") ) ) { // node ready module
-        requireFiles.push('require("../' + webmodule.output + '");');
+
+    if ("node" in wm) {
+        requireFiles.push('require("../' + target.node.output + '");');
         requireFiles.push('require("./testcase.js");');
         nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", requireFiles.join("\n"));
     } else {
         nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", "");
     }
-    return { browser: browserPage, node: nodePage };
+    return { browser: browserPage, worker: workerPage, node: nodePage };
 
     function _require(file) { return 'require("../' + file + '");'; }
-    function _import(file)  { return 'importScripts(MESSAGE.BASE_DIR + "../' + file + '");'; }
+    function _import(file)  { return 'importScripts("../' + file + '");'; }
     function _script(file)  { return '<script src="../' + file + '"></script>'; }
 }
 
