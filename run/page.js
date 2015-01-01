@@ -56,9 +56,9 @@ function put() {
      "lib/Help.js",
      "lib/Task.js",
      "lib/Test.js"].forEach(function(js) {
-        deps.files.node.push("../WebModule/" + js);
-        deps.files.worker.push("../WebModule/" + js);
         deps.files.browser.push("../WebModule/" + js);
+        deps.files.worker.push("../WebModule/" + js);
+        deps.files.node.push("../WebModule/" + js);
     });
 
     if (verbose) {
@@ -74,24 +74,25 @@ function put() {
         console.error("\u001b[31m" + "ERROR. test/ directory not found." + "\u001b[0m");
     } else {
         if (verbose) {
-            console.log( "update test/index.html: \n    "      + pages.browser.replace(/\n/g, "\n    " ) );
-            console.log( "update test/index.node.js: \n    "   + pages.node.replace(/\n/g, "\n    " ) );
-            console.log( "update test/index.worker.js: \n    " + pages.worker.replace(/\n/g, "\n    " ) );
+            console.log( "update test/index.html: \n    " + pages.browser.replace(/\n/g, "\n    " ) );
+            console.log( "update test/worker.js: \n    "  + pages.worker.replace(/\n/g, "\n    " ) );
+            console.log( "update test/node.js: \n    "    + pages.node.replace(/\n/g, "\n    " ) );
         }
         fs.writeFileSync("test/index.html", pages.browser);
-        fs.writeFileSync("test/index.node.js", pages.node);
-        fs.writeFileSync("test/index.worker.js", pages.worker);
+        fs.writeFileSync("test/worker.js", pages.worker);
+        fs.writeFileSync("test/node.js", pages.node);
     }
 }
 
-function _createTestPage(files,         // @arg Object - { all, node, worker, browser, label }
+function _createTestPage(files,         // @arg Object - { node, worker, browser, label }
                          packagejson) { // @arg Object - package.json
                                         // @ret Object - { browser:String, worker:String, node:String }
     var target = mod.collectBuildTarget(packagejson);
+    var wm = packagejson["webmodule"];
 
-    var scriptFiles       = _toUniqueArray(files.browser.concat(target.browser.source).map(_script));
-    var importScriptFiles = _toUniqueArray(files.worker.concat(target.worker.source).map(_import));
-    var requireFiles      = _toUniqueArray(files.node.concat(target.node.source).map(_require));
+    var scriptFiles       = mod.toUniqueArray(files.browser.concat(target.browser.source).map(_script));
+    var importScriptFiles = mod.toUniqueArray(files.worker.concat(target.worker.source).map(_import));
+    var requireFiles      = mod.toUniqueArray(files.node.concat(target.node.source).map(_require));
 
     var browserPage = BROWSER_TEST_PAGE;
     var workerPage = WORKER_TEST_PAGE;
@@ -99,33 +100,35 @@ function _createTestPage(files,         // @arg Object - { all, node, worker, br
 
     // package.json に webmodule{browser|worker|node} が無い場合でも、
     // テスト用のページをそれぞれ生成します。
-    // webmodule.all しか存在しない場合は、
-    // 生成されるそれぞれのページの output は、
-    // release/{{module}}.min.js で共通のファイルになります。
-    importScriptFiles.push('importScripts("../' + target.worker.output + '");');
-    importScriptFiles.push('importScripts("./testcase.js");');
-    workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
+    if (wm.worker) {
+        importScriptFiles.push('importScripts("../' + target.worker.output + '");');
+        importScriptFiles.push('importScripts("./testcase.js");');
+        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
+    } else {
+        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", "");
+    }
 
-    scriptFiles.push('<script src="../' + target.browser.output + '"></script>');
-    scriptFiles.push('<script src="./testcase.js"></script>');
-    browserPage = browserPage.replace("__SCRIPT__", scriptFiles.join("\n"));
+    if (wm.browser) {
+        scriptFiles.push('<script src="../' + target.browser.output + '"></script>');
+        scriptFiles.push('<script src="./testcase.js"></script>');
+        browserPage = browserPage.replace("__SCRIPT__", scriptFiles.join("\n"));
+    } else {
+        browserPage = browserPage.replace("__SCRIPT__", "");
+    }
 
-    requireFiles.push('require("../' + target.node.output + '");');
-    requireFiles.push('require("./testcase.js");');
-    nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", requireFiles.join("\n"));
+    if (wm.node) {
+        requireFiles.push('require("../' + target.node.output + '");');
+        requireFiles.push('require("./testcase.js");');
+        nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", requireFiles.join("\n"));
+    } else {
+        nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", "");
+    }
 
     return { browser: browserPage, worker: workerPage, node: nodePage };
 
     function _require(file) { return 'require("../' + file + '");'; }
     function _import(file)  { return 'importScripts("../' + file + '");'; }
     function _script(file)  { return '<script src="../' + file + '"></script>'; }
-}
-
-function _toUniqueArray(source) {
-    return source.reduce(function(result, value) {
-            if (result.indexOf(value) < 0) { result.push(value); }
-            return result;
-        }, []);
 }
 
 function _multiline(fn) { // @arg Function:

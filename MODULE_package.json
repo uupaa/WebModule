@@ -15,8 +15,8 @@
     "watch":        "node ../WebModule/run/watch.js --verbose --run hint",
     "page":         "node ../WebModule/run/page.js --verbose",
     "test":         "npm run min; npm run node; npm run browser",
-    "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
-    "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/index.node.js",
+    "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/node.js",
+    "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/node.js",
     "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
     "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
     "simx":         "node ../WebModule/run/sim.js stop",
@@ -30,10 +30,6 @@
   "webmodule": {
     "develop":      false,
     "label":        ["@dev"],
-    "all": {
-      "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.min.js"
-    },
     "browser": {
       "source":     ["lib/REPOSITORY_NAME.js"],
       "output":     "release/REPOSITORY_NAME.min.b.js"

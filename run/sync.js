@@ -44,9 +44,7 @@ function prettyPrint() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
     var txt = JSON.stringify(json, null, 2);
 
-    // Array Element to pretty
     txt = txt.replace(/: \[([^\]]*)\],/g, function(_, items) {
-//console.log("items!" + items + "!");
         return ': [' + items.trim().replace(/\s*\n+\s*/g, " ") + '],';
     });
 
@@ -106,10 +104,6 @@ function upgradeTarget(json) {
 //  "webmodule": {
 //    "develop":      false,                            <- stay
 //    "label":        ["@dev"],                         <- stay
-//    "all": {                                          <- add if target.has.browser
-//      "source":     ["lib/REPOSITORY_NAME.js"],
-//      "output":     "release/REPOSITORY_NAME.min.js",
-//    },
 //    "browser": {                                      <- add if target.has.browser
 //      "source":     ["lib/REPOSITORY_NAME.js"],
 //      "output":     "release/REPOSITORY_NAME.b.min.js",
@@ -138,10 +132,6 @@ function upgradeTarget(json) {
 
     var target = json.webmodule.target.join("");
 
-    result.webmodule.all = {
-        source: json.webmodule.source,
-        output: json.webmodule.output
-    };
     if ( /(all|browser)/i.test(target) ) {
         result.webmodule.browser = {
             source: json.webmodule.source,

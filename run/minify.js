@@ -72,13 +72,9 @@ if (options.help) {
 }
 
 // --- detect work dir ---
-if (!target.all.output) {
-    console.log(ERR + "package.json - webmodule.{browser|worker|node|all}.output are empty." + CLR);
+if (!target.workDir) {
+    console.log(ERR + "package.json - webmodule.{browser|worker|node}.output are empty." + CLR);
     return;
-}
-if (target.all.output.indexOf("/") > 0) {
-    // "release/Zzz.min.js" -> "release/";
-    options.workDir = (target.all.output.split("/").slice(0, -1)).join("/") + "/";
 }
 
 // $ npm run build は、package.json の webmodule.{browser|worker|node|all}.source をビルドします
@@ -86,7 +82,6 @@ if (target.all.output.indexOf("/") > 0) {
 var browserSource = target.browser.source;
 var workerSource  = target.worker.source;
 var nodeSource    = target.node.source;
-var allSource     = target.all.source;
 
 if (options.release) {
     // 依存関係にあるソース(deps.files.{browser|worker|node|all})を取得する
@@ -96,28 +91,24 @@ if (options.release) {
         console.log("\u001b[33m" + "deps.files.browser: " + JSON.stringify(deps.files.browser, null, 2) + "\u001b[0m");
         console.log("\u001b[33m" + "deps.files.worker: "  + JSON.stringify(deps.files.worker, null, 2) + "\u001b[0m");
         console.log("\u001b[33m" + "deps.files.node: "    + JSON.stringify(deps.files.node, null, 2) + "\u001b[0m");
-        console.log("\u001b[33m" + "deps.files.all: "     + JSON.stringify(deps.files.all, null, 2) + "\u001b[0m");
     }
 
     // ソースコードをマージし重複を取り除く
     browserSource = mod.toUniqueArray([].concat(deps.files.browser, browserSource));
     workerSource  = mod.toUniqueArray([].concat(deps.files.worker,  workerSource));
     nodeSource    = mod.toUniqueArray([].concat(deps.files.node,    nodeSource));
-    allSource     = mod.toUniqueArray([].concat(deps.files.all,     allSource));
 
     if (options.verbose) {
         console.log("Release build source: " + JSON.stringify(browserSource, null, 2));
         console.log("Release build source: " + JSON.stringify(workerSource, null, 2));
         console.log("Release build source: " + JSON.stringify(nodeSource, null, 2));
-        console.log("Release build source: " + JSON.stringify(allSource, null, 2));
     }
 }
 
 if (!_isFileExists(options.externs) ||
     !_isFileExists(browserSource) ||
     !_isFileExists(workerSource) ||
-    !_isFileExists(nodeSource) ||
-    !_isFileExists(allSource)) {
+    !_isFileExists(nodeSource)) {
     console.log(WARN + USAGE + CLR);
     return;
 }
@@ -125,7 +116,6 @@ if (options.verbose) {
     console.log("browserSource = " + browserSource);
     console.log("workerSource = " + workerSource);
     console.log("nodeSource = " + nodeSource);
-    console.log("allSource = " + allSource);
 }
 
 var minifyOptions = {
@@ -150,19 +140,18 @@ var minifyOptions = {
 
 // --- コンパイル対象を決定する ---
 // できるだけ無駄なコンパイルは避ける
-// コンパイル対象のソースコードがbrowser,worker,node,allで同じ場合は一度だけ(allだけを)コンパイルする
-// allとbrowser,worker,node が異なる場合は、それぞれの環境に向けて特殊化したビルドを行う
-// browserとworkerが同じ場合は、browser用のファイルをworkerにコピーして使用する
-// browserとnodeが同じ場合は、browser用のファイルをnodeにコピーして使用する
+// コンパイル対象のソースコードがbrowser,worker,nodeで同じ場合は一度だけ(browserだけを)コンパイルする
+// browser,worker,nodeが異なる場合は、それぞれの環境に向けて特殊化したビルドを行う
+// browserとworkerが同じ場合は、browser用のファイルをworkerにコピーする
+// browserとnodeが同じ場合は、browser用のファイルをnodeにコピーする
 var taskPlan = [];
 var copyBrowserFileToWorkerFile = false; // browser用のビルドをコピーしworkerとしても使用する
 var copyBrowserFileToNodeFile   = false; // browser用のビルドをコピーしnodeとしても使用する
 
-if (allSource.length) { taskPlan.push("all"); }
-// all と {browser|worker|node} のファイル構成が異なる場合は個別にビルドを行う
-if (browserSource.length && allSource.join() !== browserSource.join()) { taskPlan.push("browser"); }
-if (workerSource.length  && allSource.join() !== workerSource.join())  { taskPlan.push("worker");  }
-if (nodeSource.length    && allSource.join() !== nodeSource.join())    { taskPlan.push("node");    }
+if (wm.browser && browserSource.length) { taskPlan.push("browser"); }
+if (wm.worker  && workerSource.length)  { taskPlan.push("worker");  }
+if (wm.node    && nodeSource.length)    { taskPlan.push("node");    }
+
 // browserとworkerのファイル構成が一緒の場合はまとめてしまい、workerのビルドを省略する
 if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("worker") >= 0) {
     if (browserSource.join() === workerSource.join()) {
@@ -183,19 +172,6 @@ if (options.verbose) {
 }
 
 Task.run(taskPlan.join(" > "), {
-    "all": function(task) {
-        Minify(browserSource, minifyOptions, function(err, js) {
-            if (err) {
-                task.miss();
-            } else {
-                fs.writeFileSync(target.all.output, js);
-                fs.writeFileSync(target.browser.output, js);
-                fs.writeFileSync(target.worker.output, js);
-                fs.writeFileSync(target.node.output, js);
-                task.pass();
-            }
-        });
-    },
     "browser": function(task) {
         if (options.verbose) {
             console.log("begin browser task...");
