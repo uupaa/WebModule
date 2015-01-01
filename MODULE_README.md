@@ -33,7 +33,7 @@ console.log( REPOSITORY_NAME() );
 ### Node.js
 
 ```js
-var REPOSITORY_NAME = require("lib/REPOSITORY_FULLNAME");
+require("lib/REPOSITORY_FULLNAME");
 
 console.log( REPOSITORY_NAME() );
 ```
