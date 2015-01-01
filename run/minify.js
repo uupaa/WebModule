@@ -188,10 +188,10 @@ Task.run(taskPlan.join(" > "), {
             if (err) {
                 task.miss();
             } else {
-                fs.writeFileSync(wm.all.output, js);
-                fs.writeFileSync(wm.browser.output, js);
-                fs.writeFileSync(wm.worker.output, js);
-                fs.writeFileSync(wm.node.output, js);
+                fs.writeFileSync(target.all.output, js);
+                fs.writeFileSync(target.browser.output, js);
+                fs.writeFileSync(target.worker.output, js);
+                fs.writeFileSync(target.node.output, js);
                 task.pass();
             }
         });
@@ -204,12 +204,12 @@ Task.run(taskPlan.join(" > "), {
             if (err) {
                 task.miss();
             } else {
-                fs.writeFileSync(wm.browser.output, js);
+                fs.writeFileSync(target.browser.output, js);
                 if (copyBrowserFileToWorkerFile) {
-                    fs.writeFileSync(wm.worker.output, js);
+                    fs.writeFileSync(target.worker.output, js);
                 }
                 if (copyBrowserFileToNodeFile) {
-                    fs.writeFileSync(wm.node.output, js);
+                    fs.writeFileSync(target.node.output, js);
                 }
                 task.pass();
             }
@@ -223,7 +223,7 @@ Task.run(taskPlan.join(" > "), {
             if (err) {
                 task.miss();
             } else {
-                fs.writeFileSync(wm.worker.output, js);
+                fs.writeFileSync(target.worker.output, js);
                 task.pass();
             }
         });
@@ -236,7 +236,7 @@ Task.run(taskPlan.join(" > "), {
             if (err) {
                 task.miss();
             } else {
-                fs.writeFileSync(wm.node.output, js);
+                fs.writeFileSync(target.node.output, js);
                 task.pass();
             }
         });

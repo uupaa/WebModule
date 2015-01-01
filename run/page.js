@@ -87,7 +87,6 @@ function put() {
 function _createTestPage(files,         // @arg Object - { all, node, worker, browser, label }
                          packagejson) { // @arg Object - package.json
                                         // @ret Object - { browser:String, worker:String, node:String }
-    var wm = packagejson["webmodule"];
     var target = mod.collectBuildTarget(packagejson);
 
     var scriptFiles       = _toUniqueArray(files.browser.concat(target.browser.source).map(_script));
@@ -98,29 +97,23 @@ function _createTestPage(files,         // @arg Object - { all, node, worker, br
     var workerPage = WORKER_TEST_PAGE;
     var nodePage = NODE_TEST_PAGE;
 
-    if ("worker" in wm) {
-        importScriptFiles.push('importScripts("../' + target.worker.output + '");');
-        importScriptFiles.push('importScripts("./testcase.js");');
-        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
-    } else {
-        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", "");
-    }
+    // package.json に webmodule{browser|worker|node} が無い場合でも、
+    // テスト用のページをそれぞれ生成します。
+    // webmodule.all しか存在しない場合は、
+    // 生成されるそれぞれのページの output は、
+    // release/{{module}}.min.js で共通のファイルになります。
+    importScriptFiles.push('importScripts("../' + target.worker.output + '");');
+    importScriptFiles.push('importScripts("./testcase.js");');
+    workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
 
-    if ("browser" in wm) {
-        scriptFiles.push('<script src="../' + target.browser.output + '"></script>');
-        scriptFiles.push('<script src="./testcase.js"></script>');
-        browserPage = browserPage.replace("__SCRIPT__", scriptFiles.join("\n"));
-    } else {
-        browserPage = browserPage.replace("__SCRIPT__", "");
-    }
+    scriptFiles.push('<script src="../' + target.browser.output + '"></script>');
+    scriptFiles.push('<script src="./testcase.js"></script>');
+    browserPage = browserPage.replace("__SCRIPT__", scriptFiles.join("\n"));
 
-    if ("node" in wm) {
-        requireFiles.push('require("../' + target.node.output + '");');
-        requireFiles.push('require("./testcase.js");');
-        nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", requireFiles.join("\n"));
-    } else {
-        nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", "");
-    }
+    requireFiles.push('require("../' + target.node.output + '");');
+    requireFiles.push('require("./testcase.js");');
+    nodePage = NODE_TEST_PAGE.replace("__SCRIPT__", requireFiles.join("\n"));
+
     return { browser: browserPage, worker: workerPage, node: nodePage };
 
     function _require(file) { return 'require("../' + file + '");'; }
