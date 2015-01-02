@@ -13,6 +13,7 @@ var fs       = require("fs");
 var cp       = require("child_process");
 var readline = require("readline");
 var wmlib    = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var mod      = require(wmlib + "Module.js");
 var Task     = require(wmlib + "Task.js");
 var argv     = process.argv.slice(2);
 
@@ -65,92 +66,9 @@ function sync() {
 function upgrade() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
 
-    json = upgradeXBuild(json);
-    json = upgradeTarget(json);
+    json = mod.upgradePackageJSON(json);
 
     fs.writeFileSync(targetPackageJSON, JSON.stringify(json, null, 2));
-}
-
-function upgradeXBuild(json) {
-    if (!("x-build" in json)) { return json; }
-
-    console.log( INFO + "  upgrade x-build to webmodule..." + CLR);
-
-    var build = json["x-build"];
-
-    json.webmodule = {
-        source: build.source,
-        output: build.output,
-        target: build.target,
-        label: build.label,
-    };
-    delete json["x-build"];
-    return json;
-}
-
-function upgradeTarget(json) {
-// Before
-//
-//  "webmodule": {
-//    "develop":      false,
-//    "source":       ["lib/REPOSITORY_NAME.js"],       <- sprit this
-//    "output":       "release/REPOSITORY_NAME.min.js", <- sprit this
-//    "target":       ["all"],                          <- remove this
-//    "label":        ["@dev"]
-//  },
-//
-// After
-//
-//  "webmodule": {
-//    "develop":      false,                            <- stay
-//    "label":        ["@dev"],                         <- stay
-//    "browser": {                                      <- add if target.has.browser
-//      "source":     ["lib/REPOSITORY_NAME.js"],
-//      "output":     "release/REPOSITORY_NAME.b.min.js",
-//    },
-//    "worker": {                                       <- add if target.has.worker
-//      "source":     ["lib/REPOSITORY_NAME.js"],
-//      "output":     "release/REPOSITORY_NAME.w.min.js",
-//    },
-//    "node": {                                         <- add if target.has.node
-//      "source":     ["lib/REPOSITORY_NAME.js"],
-//      "output":     "release/REPOSITORY_NAME.b.min.js",
-//    }
-//  },
-//
-    var wm = json["webmodule"];
-
-    if (!("target" in wm)) { return json; }
-    console.log( INFO + "  upgrade webmodule.target..." + CLR);
-
-    var result = JSON.parse(JSON.stringify(json));
-
-    result.webmodule = {
-        develop: json.webmodule.develop || false,
-        label:   json.webmodule.label   || ["@dev"]
-    };
-
-    var target = json.webmodule.target.join("");
-
-    if ( /(all|browser)/i.test(target) ) {
-        result.webmodule.browser = {
-            source: json.webmodule.source,
-            output: json.webmodule.output.replace(/.js$/, ".b.js")
-        };
-    }
-    if ( /(all|worker)/i.test(target) ) {
-        result.webmodule.worker = {
-            source: json.webmodule.source,
-            output: json.webmodule.output.replace(/.js$/, ".w.js")
-        };
-    }
-    if ( /(all|node)/i.test(target) ) {
-        result.webmodule.node = {
-            source: json.webmodule.source,
-            output: json.webmodule.output.replace(/.js$/, ".n.js")
-        };
-    }
-    return result;
 }
 
 function sortKeys() {

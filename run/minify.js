@@ -77,31 +77,39 @@ if (!target.workDir) {
     return;
 }
 
-// $ npm run build は、package.json の webmodule.{browser|worker|node|all}.source をビルドします
-// $ npm run build.release は、webmodule.{browser|worker|node|all}.source に加え node_modules 以下の依存ファイルもビルドします
+// $ npm run build は、package.json の webmodule.{browser|worker|node}.source をビルドします
+// $ npm run build.release は、webmodule.{browser|worker|node}.source に加え node_modules 以下の依存ファイルもビルドします
 var browserSource = target.browser.source;
 var workerSource  = target.worker.source;
 var nodeSource    = target.node.source;
 
 if (options.release) {
-    // 依存関係にあるソース(deps.files.{browser|worker|node|all})を取得する
+    // 依存関係にあるソース(deps.files.{browser|worker|node})を取得する
     var deps = mod.getDependencies(options.release);
 
-    if (options.verbose) {
-        console.log("\u001b[33m" + "deps.files.browser: " + JSON.stringify(deps.files.browser, null, 2) + "\u001b[0m");
-        console.log("\u001b[33m" + "deps.files.worker: "  + JSON.stringify(deps.files.worker, null, 2) + "\u001b[0m");
-        console.log("\u001b[33m" + "deps.files.node: "    + JSON.stringify(deps.files.node, null, 2) + "\u001b[0m");
-    }
-
-    // ソースコードをマージし重複を取り除く
+    // コードをマージし重複を取り除く
     browserSource = mod.toUniqueArray([].concat(deps.files.browser, browserSource));
     workerSource  = mod.toUniqueArray([].concat(deps.files.worker,  workerSource));
     nodeSource    = mod.toUniqueArray([].concat(deps.files.node,    nodeSource));
 
     if (options.verbose) {
-        console.log("Release build source: " + JSON.stringify(browserSource, null, 2));
-        console.log("Release build source: " + JSON.stringify(workerSource, null, 2));
-        console.log("Release build source: " + JSON.stringify(nodeSource, null, 2));
+        var buildFiles = {
+            "browser": browserSource,
+            "worker":  workerSource,
+            "node":    nodeSource,
+            "label":   deps.files.label
+        };
+        console.log("\u001b[33m" + "Release build: " + JSON.stringify(buildFiles, null, 2) + "\u001b[0m");
+    }
+} else {
+    if (options.verbose) {
+        var buildFiles = {
+            "browser": browserSource,
+            "worker":  workerSource,
+            "node":    nodeSource,
+            "label":   wm.label
+        };
+        console.log("\u001b[33m" + "Debug build: " + JSON.stringify(buildFiles, null, 2) + "\u001b[0m");
     }
 }
 
@@ -111,11 +119,6 @@ if (!_isFileExists(options.externs) ||
     !_isFileExists(nodeSource)) {
     console.log(WARN + USAGE + CLR);
     return;
-}
-if (options.verbose) {
-    console.log("browserSource = " + browserSource);
-    console.log("workerSource = " + workerSource);
-    console.log("nodeSource = " + nodeSource);
 }
 
 var minifyOptions = {

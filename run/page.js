@@ -90,9 +90,9 @@ function _createTestPage(files,         // @arg Object - { node, worker, browser
     var target = mod.collectBuildTarget(packagejson);
     var wm = packagejson["webmodule"];
 
-    var scriptFiles       = mod.toUniqueArray(files.browser.concat(target.browser.source).map(_script));
-    var importScriptFiles = mod.toUniqueArray(files.worker.concat(target.worker.source).map(_import));
-    var requireFiles      = mod.toUniqueArray(files.node.concat(target.node.source).map(_require));
+    var scriptFiles  = mod.toUniqueArray(files.browser.concat(target.browser.source).map(_script));
+    var importFiles  = mod.toUniqueArray(files.worker.concat(target.worker.source).map(_import));
+    var requireFiles = mod.toUniqueArray(files.node.concat(target.node.source).map(_require));
 
     var browserPage = BROWSER_TEST_PAGE;
     var workerPage = WORKER_TEST_PAGE;
@@ -101,9 +101,9 @@ function _createTestPage(files,         // @arg Object - { node, worker, browser
     // package.json に webmodule{browser|worker|node} が無い場合でも、
     // テスト用のページをそれぞれ生成します。
     if (wm.worker) {
-        importScriptFiles.push('importScripts("../' + target.worker.output + '");');
-        importScriptFiles.push('importScripts("./testcase.js");');
-        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
+        importFiles.push('importScripts("../' + target.worker.output + '");');
+        importFiles.push('importScripts("./testcase.js");');
+        workerPage = workerPage.replace("__IMPORT_SCRIPTS__", importFiles.join("\n    "));
     } else {
         workerPage = workerPage.replace("__IMPORT_SCRIPTS__", "");
     }

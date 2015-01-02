@@ -32,15 +32,15 @@
     "label":        ["@dev"],
     "browser": {
       "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.min.b.js"
+      "output":     "release/REPOSITORY_NAME.b.min.js"
     },
     "worker": {
       "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.min.w.js"
+      "output":     "release/REPOSITORY_NAME.w.min.js"
     },
     "node": {
       "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.min.n.js"
+      "output":     "release/REPOSITORY_NAME.n.min.js"
     }
   },
   "dependencies": {},
