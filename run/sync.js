@@ -39,7 +39,7 @@ upgrade();
 sortKeys();
 prettyPrint();
 
-console.log( INFO + "  done." + CLR);
+console.log("  done.");
 
 function prettyPrint() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));

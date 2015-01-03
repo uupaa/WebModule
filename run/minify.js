@@ -99,7 +99,7 @@ if (options.release) {
             "node":    nodeSource,
             "label":   deps.files.label
         };
-        console.log("\u001b[33m" + "Release build: " + JSON.stringify(buildFiles, null, 2) + "\u001b[0m");
+        console.log(INFO + "Release build: " + JSON.stringify(buildFiles, null, 2) + CLR);
     }
 } else {
     if (options.verbose) {
@@ -109,7 +109,7 @@ if (options.release) {
             "node":    nodeSource,
             "label":   wm.label
         };
-        console.log("\u001b[33m" + "Debug build: " + JSON.stringify(buildFiles, null, 2) + "\u001b[0m");
+        console.log(INFO + "Debug build: " + JSON.stringify(buildFiles, null, 2) + CLR);
     }
 }
 
@@ -117,7 +117,6 @@ if (!_isFileExists(options.externs) ||
     !_isFileExists(browserSource) ||
     !_isFileExists(workerSource) ||
     !_isFileExists(nodeSource)) {
-    console.log(WARN + USAGE + CLR);
     return;
 }
 
@@ -170,17 +169,13 @@ if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("node") >= 0) {
     }
 }
 
-if (options.verbose) {
-    console.log("Compile task planning: " + taskPlan.join(" and "));
-}
-
 Task.run(taskPlan.join(" > "), {
     "browser": function(task) {
         if (options.verbose) {
-            console.log("begin browser task...");
+            console.log("Build for the browser...");
         }
         Minify(browserSource, minifyOptions, function(err, js) {
-            if (err) {
+            if (err || !js) {
                 task.miss();
             } else {
                 fs.writeFileSync(target.browser.output, js);
@@ -196,10 +191,10 @@ Task.run(taskPlan.join(" > "), {
     },
     "worker": function(task) {
         if (options.verbose) {
-            console.log("begin worker task...");
+            console.log("Build for the worker...");
         }
         Minify(workerSource, minifyOptions, function(err, js) {
-            if (err) {
+            if (err || !js) {
                 task.miss();
             } else {
                 fs.writeFileSync(target.worker.output, js);
@@ -209,10 +204,10 @@ Task.run(taskPlan.join(" > "), {
     },
     "node": function(task) {
         if (options.verbose) {
-            console.log("begin node task...");
+            console.log("Build for the node...");
         }
         Minify(nodeSource, minifyOptions, function(err, js) {
-            if (err) {
+            if (err || !js) {
                 task.miss();
             } else {
                 fs.writeFileSync(target.node.output, js);
@@ -223,12 +218,12 @@ Task.run(taskPlan.join(" > "), {
 }, function(err) {
     if (err) {
         if (options.verbose) {
-            console.log(ERR + "failed." + CLR);
+            console.log(ERR + "Build error." + CLR);
             process.exit(1);
         }
     } else {
         if (options.verbose) {
-            console.log("All compilation task has ended.");
+            console.log("done.");
         }
     }
 });
