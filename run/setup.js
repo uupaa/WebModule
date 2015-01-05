@@ -34,6 +34,13 @@ var _CLONE_FILES = {
         "README.md":            [],
     },
     "test": {
+        "template": {
+            "browser.html":     [true],
+            "node.js":          [true],
+            "nw.html":          [true],
+            "nw.package.json":  [true],
+            "worker.js":        [true],
+        },
         "testcase.js":          [true],
     },
     ".gitignore":               [],

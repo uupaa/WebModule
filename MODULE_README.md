@@ -11,7 +11,7 @@ DESCRIPTION
     - [Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
     - [Development](https://github.com/uupaa/WebModule/wiki/Development)
 
-## How to use
+## Run on
 
 ### Browser
 
@@ -37,3 +37,13 @@ require("lib/REPOSITORY_FULLNAME");
 
 console.log( REPOSITORY_NAME() );
 ```
+
+### node-webkit
+
+```js
+<script src="lib/REPOSITORY_FULLNAME"></script>
+<script>
+console.log( REPOSITORY_NAME() );
+</script>
+```
+

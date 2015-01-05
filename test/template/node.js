@@ -1,0 +1,4 @@
+// REPOSITORY_NAME test
+
+__SCRIPT__
+

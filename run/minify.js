@@ -77,26 +77,29 @@ if (!target.workDir) {
     return;
 }
 
-// $ npm run build は、package.json の webmodule.{browser|worker|node}.source をビルドします
-// $ npm run build.release は、webmodule.{browser|worker|node}.source に加え node_modules 以下の依存ファイルもビルドします
+// $ npm run build は、package.json の webmodule.{browser|worker|node|nw}.source をビルドします
+// $ npm run build.release は、webmodule.{browser|worker|node|nw}.source に加え node_modules 以下の依存ファイルもビルドします
 var browserSource = target.browser.source;
 var workerSource  = target.worker.source;
 var nodeSource    = target.node.source;
+var nwSource      = target.nw.source;
 
 if (options.release) {
-    // 依存関係にあるソース(deps.files.{browser|worker|node})を取得する
+    // 依存関係にあるソース(deps.files.{browser|worker|node|nw})を取得する
     var deps = mod.getDependencies(options.release);
 
     // コードをマージし重複を取り除く
     browserSource = mod.toUniqueArray([].concat(deps.files.browser, browserSource));
     workerSource  = mod.toUniqueArray([].concat(deps.files.worker,  workerSource));
     nodeSource    = mod.toUniqueArray([].concat(deps.files.node,    nodeSource));
+    nwSource      = mod.toUniqueArray([].concat(deps.files.nw,      nwSource));
 
     if (options.verbose) {
         var buildFiles = {
             "browser": browserSource,
             "worker":  workerSource,
             "node":    nodeSource,
+            "nw":      nwSource,
             "label":   deps.files.label
         };
         console.log(INFO + "Release build: " + JSON.stringify(buildFiles, null, 2) + CLR);
@@ -107,6 +110,7 @@ if (options.release) {
             "browser": browserSource,
             "worker":  workerSource,
             "node":    nodeSource,
+            "nw":      nwSource,
             "label":   wm.label
         };
         console.log(INFO + "Debug build: " + JSON.stringify(buildFiles, null, 2) + CLR);
@@ -116,7 +120,8 @@ if (options.release) {
 if (!_isFileExists(options.externs) ||
     !_isFileExists(browserSource) ||
     !_isFileExists(workerSource) ||
-    !_isFileExists(nodeSource)) {
+    !_isFileExists(nodeSource) ||
+    !_isFileExists(nwSource)) {
     return;
 }
 
@@ -142,17 +147,20 @@ var minifyOptions = {
 
 // --- コンパイル対象を決定する ---
 // できるだけ無駄なコンパイルは避ける
-// コンパイル対象のソースコードがbrowser,worker,nodeで同じ場合は一度だけ(browserだけを)コンパイルする
-// browser,worker,nodeが異なる場合は、それぞれの環境に向けて特殊化したビルドを行う
+// コンパイル対象のソースコードがbrowser,worker,node,nwで同じ場合は一度だけ(browserだけを)コンパイルする
+// browser,worker,node,nwが異なる場合は、それぞれの環境に向けて特殊化したビルドを行う
 // browserとworkerが同じ場合は、browser用のファイルをworkerにコピーする
 // browserとnodeが同じ場合は、browser用のファイルをnodeにコピーする
+// browserとnwが同じ場合は、browser用のファイルをnwにコピーする
 var taskPlan = [];
 var copyBrowserFileToWorkerFile = false; // browser用のビルドをコピーしworkerとしても使用する
 var copyBrowserFileToNodeFile   = false; // browser用のビルドをコピーしnodeとしても使用する
+var copyBrowserFileToNWFile     = false; // browser用のビルドをコピーしnwとしても使用する
 
 if (wm.browser && browserSource.length) { taskPlan.push("browser"); }
 if (wm.worker  && workerSource.length)  { taskPlan.push("worker");  }
 if (wm.node    && nodeSource.length)    { taskPlan.push("node");    }
+if (wm.nw      && nwSource.length)      { taskPlan.push("nw");      }
 
 // browserとworkerのファイル構成が一緒の場合はまとめてしまい、workerのビルドを省略する
 if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("worker") >= 0) {
@@ -166,6 +174,13 @@ if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("node") >= 0) {
     if (browserSource.join() === nodeSource.join()) {
         copyBrowserFileToNodeFile = true;
         taskPlan = taskPlan.filter(function(target) { return target !== "node"; });
+    }
+}
+// browserとnwのファイル構成が一緒の場合はまとめてしまい、nwのビルドを省略する
+if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("nw") >= 0) {
+    if (browserSource.join() === nwSource.join()) {
+        copyBrowserFileToNWFile = true;
+        taskPlan = taskPlan.filter(function(target) { return target !== "nw"; });
     }
 }
 
@@ -184,6 +199,9 @@ Task.run(taskPlan.join(" > "), {
                 }
                 if (copyBrowserFileToNodeFile) {
                     fs.writeFileSync(target.node.output, js);
+                }
+                if (copyBrowserFileToNWFile) {
+                    fs.writeFileSync(target.nw.output, js);
                 }
                 task.pass();
             }
@@ -211,6 +229,19 @@ Task.run(taskPlan.join(" > "), {
                 task.miss();
             } else {
                 fs.writeFileSync(target.node.output, js);
+                task.pass();
+            }
+        });
+    },
+    "nw": function(task) {
+        if (options.verbose) {
+            console.log("Build for the node-webkit...");
+        }
+        Minify(nwSource, minifyOptions, function(err, js) {
+            if (err || !js) {
+                task.miss();
+            } else {
+                fs.writeFileSync(target.nw.output, js);
                 task.pass();
             }
         });
