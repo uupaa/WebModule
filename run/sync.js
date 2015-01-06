@@ -39,6 +39,7 @@ upgrade();
 sortKeys();
 prettyPrint();
 buildWMTools("./test/wmtools.js");
+migrateSourceCode();
 
 console.log("  done.");
 
@@ -107,6 +108,52 @@ function sortKeys() {
     });
 
     fs.writeFileSync(targetPackageJSON, JSON.stringify(result, null, 2));
+}
+
+function migrateSourceCode() {
+    var DEPRECATED_CODES = {
+            "NODE":     /_runOnNode\s*\=\s*"process" in global/,
+            "WORKER":   /_runOnWorker\s*\=\s*"WorkerLocation" in global/,
+            "BROWSER":  /_runOnBrowser\s*\=\s*"document" in global/,
+            "EXPORTS":  /if\s*\("process" in global\)\s*\{/
+        };
+
+    var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
+    var sources = [];
+
+    for (var key in json.webmodule) { // develop, label, browser, worker, node, nw, ...
+        switch (key) {
+        case "browser":
+        case "worker":
+        case "node":
+        case "nw":
+            sources = sources.concat(json.webmodule[key].source);
+            break;
+        }
+    }
+    sources = mod.toUniqueArray(sources);
+    if (sources.length) {
+        sources.forEach(function(file) {
+            var js = fs.readFileSync(file, "UTF-8");
+
+            dumpDeprecatedCode(file, js, DEPRECATED_CODES.NODE);
+            dumpDeprecatedCode(file, js, DEPRECATED_CODES.WORKER);
+            dumpDeprecatedCode(file, js, DEPRECATED_CODES.BROWSER);
+            dumpDeprecatedCode(file, js, DEPRECATED_CODES.EXPORTS);
+        });
+    }
+
+    function dumpDeprecatedCode(file, js, rex) {
+        if (rex.test(js)) {
+            js.split("\n").forEach(function(line, index) {
+                if (rex.test(line)) {
+                    console.log(WARN + "  Found deprecated code( " + file + ":" + index + " )" +
+                                "\t" + rex.source.replace(/\\s\*/g, " ").replace(/\\/g, "") + CLR);
+
+                }
+            });
+        }
+    }
 }
 
 })((this || 0).self || global);
