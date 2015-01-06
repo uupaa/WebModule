@@ -15,7 +15,6 @@
     "watch":        "node ../WebModule/run/watch.js --verbose --run hint",
     "page":         "node ../WebModule/run/page.js --verbose",
     "test":         "npm run min; npm run node; npm run browser",
-    "nw":           "nw ./test",
     "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/node.js",
     "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/node.js",
     "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",

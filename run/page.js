@@ -11,7 +11,7 @@ var fs    = require("fs");
 var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
 var mod   = require(wmlib + "Module.js");
 var argv  = process.argv.slice(2);
-var pkg   = JSON.parse(fs.readFileSync("package.json"));
+var pkg   = JSON.parse(fs.readFileSync("package.json", "utf8"));
 var verbose = argv[0] === "--verbose" || argv[0] === "-v";
 
 _createTestPages();
@@ -20,16 +20,11 @@ function _createTestPages() {
     var releaseBuild = false;
     var deps = mod.getDependencies(releaseBuild);
 
-    ["lib/Reflection.js",
-     "lib/Console.js",
-     "lib/Valid.js",
-     "lib/Help.js",
-     "lib/Task.js",
-     "lib/Test.js"].forEach(function(js) {
-        deps.files.browser.push("../WebModule/" + js);
-        deps.files.worker.push("../WebModule/" + js);
-        deps.files.node.push("../WebModule/" + js);
-        deps.files.nw.push("../WebModule/" + js);
+    ["./test/wmtools.js"].forEach(function(js) {
+        deps.files.browser.push(js);
+        deps.files.worker.push(js);
+        deps.files.node.push(js);
+        deps.files.nw.push(js);
     });
 
     if (verbose) {
@@ -49,7 +44,7 @@ function _createTestPages() {
         console.log( "update test/index.html: \n    " + files.browser.replace(/\n/g, "\n    " ) );
         console.log( "update test/worker.js: \n    "  + files.worker.replace(/\n/g, "\n    " ) );
         console.log( "update test/node.js: \n    "    + files.node.replace(/\n/g, "\n    " ) );
-        console.log( "update test/nw.js: \n    "      + files.nw.replace(/\n/g, "\n    " ) );
+        console.log( "update test/nw.html: \n    "    + files.nw.replace(/\n/g, "\n    " ) );
     }
     // package.json に webmodule{browser|worker|node|nw} プロパティが無い場合でも、
     // テスト用のページはそれぞれ生成します。
@@ -59,7 +54,7 @@ function _createTestPages() {
     fs.writeFileSync("test/nw.html",    files.nw);
 
     // copy test/template/nw.package.json to test/package.json
-    var nwpkg = fs.readFileSync("test/template/nw.package.json");
+    var nwpkg = fs.readFileSync("test/template/nw.package.json", "utf8");
 
     fs.writeFileSync("test/package.json", nwpkg);
 }
@@ -84,10 +79,10 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
     nwScripts.push('<script src="../' + target.nw.output + '"></script>');
     nwScripts.push('<script src="./testcase.js"></script>');
 
-    var browserTemplate = fs.readFileSync("test/template/browser.html");
-    var workerTemplate  = fs.readFileSync("test/template/worker.js");
-    var nodeTemplate    = fs.readFileSync("test/template/node.js");
-    var nwTemplate      = fs.readFileSync("test/template/nw.html");
+    var browserTemplate = fs.readFileSync("test/template/browser.html", "utf8");
+    var workerTemplate  = fs.readFileSync("test/template/worker.js", "utf8");
+    var nodeTemplate    = fs.readFileSync("test/template/node.js", "utf8");
+    var nwTemplate      = fs.readFileSync("test/template/nw.html", "utf8");
 
     browserTemplate = browserTemplate.replace("__SCRIPT__", wm.browser ? browserScripts.join("\n") : "");
     workerTemplate  = workerTemplate.replace("__SCRIPT__", wm.worker ? workerScripts.join("\n    ") : "");

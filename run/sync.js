@@ -38,8 +38,21 @@ sync();
 upgrade();
 sortKeys();
 prettyPrint();
+buildWMTools("./test/wmtools.js");
 
 console.log("  done.");
+
+function buildWMTools(output) { // @arg PathString
+    var libs = ["Reflection.js", "Console.js", "Valid.js", "Help.js", "Task.js", "Test.js"];
+    var dir = "../WebModule/lib/";
+    var js = libs.map(function(lib) {
+            return fs.readFileSync(dir + lib, "UTF-8")
+        }).join("\n");
+
+    js = "// Create at: " + (new Date()) + "\n" +
+         "// Source codes: " + libs.join(", ") + "\n\n" + js;
+    fs.writeFileSync(output, js);
+}
 
 function prettyPrint() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
