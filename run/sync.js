@@ -119,7 +119,7 @@ function migrateSourceCode() {
         };
 
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
-    var sources = [];
+    var sources = ["test/testcase.js"];
 
     for (var key in json.webmodule) { // develop, label, browser, worker, node, nw, ...
         switch (key) {
