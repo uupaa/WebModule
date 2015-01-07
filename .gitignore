@@ -7,12 +7,12 @@ lint/plato/files
 lint/plato/*.html
 .Minify*
 release/*.min.js
-test/index.html
+#test/index.html
 #test/node.js
-test/nw.html
-test/package.json
-test/wmtools.js
-test/worker.js
+#test/nw.html
+#test/package.json
+#test/wmtools.js
+#test/worker.js
 
 ## ignore the setting files
 
