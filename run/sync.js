@@ -50,9 +50,18 @@ function buildWMTools(output) { // @arg PathString
             return fs.readFileSync(dir + lib, "UTF-8")
         }).join("\n");
 
-    js = "// Create at: " + (new Date()) + "\n" +
-         "// Source codes: " + libs.join(", ") + "\n\n" + js;
-    fs.writeFileSync(output, js);
+    js = "// ['" + libs.join("', '") + "'].join()\n\n" + js;
+
+    // overwrite if there is a difference in the old file.
+    if (fs.existsSync(output)) {
+        var oldjs = fs.readFileSync(output, "UTF-8");
+
+        if (oldjs !== js) {
+            fs.writeFileSync(output, js); // overwrite
+        }
+    } else {
+        fs.writeFileSync(output, js);
+    }
 }
 
 function prettyPrint() {
