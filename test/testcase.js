@@ -13,6 +13,7 @@ return new Test("REPOSITORY_NAME", {
         node:       true,
         button:     true,
         both:       true, // test the primary module and secondary module
+        ignoreError:false,
     }).add([
         testREPOSITORY_NAME_value,
         testREPOSITORY_NAME_isNumber,
