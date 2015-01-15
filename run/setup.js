@@ -22,6 +22,9 @@ var _CLONE_FILES = {
     "bin": {
         "REPOSITORY_NAME.js":   [true],
     },
+//  "es6": {
+//      "REPOSITORY_NAME.js":   [true],
+//  },
     "lib": {
         "REPOSITORY_NAME.js":   [true],
     },
