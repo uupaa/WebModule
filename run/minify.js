@@ -28,20 +28,20 @@ var USAGE = _multiline(function() {/*
         https://github.com/uupaa/Minify.js/wiki/Minify
 */});
 
-var ERR  = "\u001b[31m"; // RED
-var WARN = "\u001b[33m"; // YELLOW
-var INFO = "\u001b[32m"; // GREEN
-var CLR  = "\u001b[0m";  // WHITE
+var ERR     = "\u001b[31m"; // RED
+var WARN    = "\u001b[33m"; // YELLOW
+var INFO    = "\u001b[32m"; // GREEN
+var CLR     = "\u001b[0m";  // WHITE
 
-var fs = require("fs");
-var cp = require("child_process");
-var argv = process.argv.slice(2);
-var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod = require(wmlib + "Module.js");
-var pkg = JSON.parse(fs.readFileSync("./package.json", "utf8"));
-var wm = pkg.webmodule;
-var Task = require(wmlib + "Task.js");
-var target = mod.collectBuildTarget(pkg);
+var fs      = require("fs");
+var cp      = require("child_process");
+var argv    = process.argv.slice(2);
+var wmlib   = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var mod     = require(wmlib + "Module.js");
+var pkg     = JSON.parse(fs.readFileSync("./package.json", "utf8"));
+var wm      = pkg.webmodule;
+var Task    = require(wmlib + "Task.js");
+var target  = mod.collectBuildTarget(pkg);
 
 var options = _parseCommandLineOptions({
         name:       pkg.name,       // Object       - { git:String, npm:String }. github repository name, npm package name.
@@ -147,15 +147,17 @@ var minifyOptions = {
 
 // --- コンパイル対象を決定する ---
 // できるだけ無駄なコンパイルは避ける
-// コンパイル対象のソースコードがbrowser,worker,node,nwで同じ場合は一度だけ(browserだけを)コンパイルする
-// browser,worker,node,nwが異なる場合は、それぞれの環境に向けて特殊化したビルドを行う
-// browserとworkerが同じ場合は、browser用のファイルをworkerにコピーする
-// browserとnodeが同じ場合は、browser用のファイルをnodeにコピーする
-// browserとnwが同じ場合は、browser用のファイルをnwにコピーする
+// コンパイル対象のソースコードがbrowser,worker,node,nw の全てで同じ場合は一度だけ(browserだけを)コンパイルする
+// - browser,worker,node,nw が全て異なる場合は、それぞれの環境に向けて特殊化したビルドを行う。4回ビルドすることになる
+// - browserとworkerが同じ場合は、browser用のファイルをworkerにコピーする
+// - browserとnodeが同じ場合は、browser用のファイルをnodeにコピーする
+// - browserとnwが同じ場合は、browser用のファイルをnwにコピーする
+// - workerとnodeが同じ場合は、worker用のファイルをnodeにコピーする
 var taskPlan = [];
 var copyBrowserFileToWorkerFile = false; // browser用のビルドをコピーしworkerとしても使用する
 var copyBrowserFileToNodeFile   = false; // browser用のビルドをコピーしnodeとしても使用する
 var copyBrowserFileToNWFile     = false; // browser用のビルドをコピーしnwとしても使用する
+var copyWorkerFileToNodeFile    = false; // worker用のビルドをコピーしnodeとしても使用する
 
 if (wm.browser && browserSource.length) { taskPlan.push("browser"); }
 if (wm.worker  && workerSource.length)  { taskPlan.push("worker");  }
@@ -181,6 +183,13 @@ if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("nw") >= 0) {
     if (browserSource.join() === nwSource.join()) {
         copyBrowserFileToNWFile = true;
         taskPlan = taskPlan.filter(function(target) { return target !== "nw"; });
+    }
+}
+// workerとnodeのファイル構成が一緒の場合はまとめてしまい、nodeのビルドを省略する
+if (taskPlan.indexOf("worker") >= 0 && taskPlan.indexOf("node") >= 0) {
+    if (workerSource.join() === nodeSource.join()) {
+        copyWorkerFileToNodeFile = true;
+        taskPlan = taskPlan.filter(function(target) { return target !== "node"; });
     }
 }
 
@@ -216,6 +225,9 @@ Task.run(taskPlan.join(" > "), {
                 task.miss();
             } else {
                 fs.writeFileSync(target.worker.output, js);
+                if (copyWorkerFileToNodeFile) {
+                    fs.writeFileSync(target.node.output, js);
+                }
                 task.pass();
             }
         });
