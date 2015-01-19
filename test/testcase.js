@@ -7,18 +7,18 @@ var _runOnWorker     = !_isNodeOrNodeWebKit && "WorkerLocation" in global;
 var _runOnBrowser    = !_isNodeOrNodeWebKit && "document" in global;
 
 var test = new Test("REPOSITORY_NAME", {
-        disable:    false,
-        browser:    true,
-        worker:     true,
-        node:       true,
-        nw:         true,
-        button:     true,
-        both:       true, // test the primary module and secondary module
-        ignoreError:false,
+        disable:    false, // disable all tests.
+        browser:    true,  // enable browser test.
+        worker:     true,  // enable worker test.
+        node:       true,  // enable node test.
+        nw:         true,  // enable nw.js test.
+        button:     true,  // show button.
+        both:       true,  // test the primary and secondary modules.
+        ignoreError:false, // ignore error.
     }).add([
         testREPOSITORY_NAME_value,
-        testREPOSITORY_NAME_isNumber,
-        testREPOSITORY_NAME_isInteger,
+        testREPOSITORY_NAME_concat,
+        testREPOSITORY_NAME_concat$,
     ]);
 
 if (_runOnBrowser || _runOnNodeWebKit) {
@@ -33,20 +33,24 @@ return test.run().clone();
 
 function testREPOSITORY_NAME_value(test, pass, miss) {
 
-    var result = new REPOSITORY_NAME(123.4).value();
+    var instance = new REPOSITORY_NAME("a");
 
-    if (result === 123.4) {
-        test.done(pass());
-    } else {
-        test.done(miss());
+    if (instance.value === "a") {
+        instance.value = "b";
+
+        if (instance.value === "b") {
+            test.done(pass());
+            return;
+        }
     }
+    test.done(miss());
 }
 
-function testREPOSITORY_NAME_isNumber(test, pass, miss) {
+function testREPOSITORY_NAME_concat(test, pass, miss) {
 
     var result = {
-            0: new REPOSITORY_NAME(123.4).isNumber(),  // true
-            1: new REPOSITORY_NAME(123.0).isNumber()   // true
+            0: new REPOSITORY_NAME(   ).concat("a") === "a", // true
+            1: new REPOSITORY_NAME("b").concat("b") === "bb" // true
         };
 
     if (/false/.test(JSON.stringify(result, null, 2))) {
@@ -56,11 +60,11 @@ function testREPOSITORY_NAME_isNumber(test, pass, miss) {
     }
 }
 
-function testREPOSITORY_NAME_isInteger(test, pass, miss) {
+function testREPOSITORY_NAME_concat$(test, pass, miss) {
 
     var result = {
-            0: !new REPOSITORY_NAME(123.4).isInteger(), // (!false) -> true
-            1:  new REPOSITORY_NAME(123.0).isInteger()  // true
+            0: new REPOSITORY_NAME(   ).concat$("a").value === "a", // true
+            1: new REPOSITORY_NAME("b").concat$("b").value === "bb" // true
         };
 
     if (/false/.test(JSON.stringify(result, null, 2))) {
