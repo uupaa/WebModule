@@ -29,8 +29,7 @@ if (_runOnBrowser || _runOnNodeWebKit) {
     //test.add([]);
 }
 
-return test.run().clone();
-
+// --- test cases ------------------------------------------
 function testREPOSITORY_NAME_value(test, pass, miss) {
 
     var instance = new REPOSITORY_NAME("a");
@@ -73,6 +72,8 @@ function testREPOSITORY_NAME_concat$(test, pass, miss) {
         test.done(pass());
     }
 }
+
+return test.run().clone();
 
 })(WEBMODULE_IDIOM);
 
