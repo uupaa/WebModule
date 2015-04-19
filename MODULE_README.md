@@ -13,7 +13,7 @@ DESCRIPTION
 
 ## Run on
 
-### Browser
+### Browser and node-webkit
 
 ```js
 <script src="lib/REPOSITORY_FULLNAME"></script>
@@ -36,14 +36,5 @@ console.log( REPOSITORY_NAME() );
 require("lib/REPOSITORY_FULLNAME");
 
 console.log( REPOSITORY_NAME() );
-```
-
-### node-webkit
-
-```js
-<script src="lib/REPOSITORY_FULLNAME"></script>
-<script>
-console.log( REPOSITORY_NAME() );
-</script>
 ```
 
