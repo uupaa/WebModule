@@ -1,6 +1,13 @@
 language: node_js
 node_js:
     - "0.10"
+    - "0.12"
+    - "io.js"
+# http://docs.travis-ci.com/user/workers/container-based-infrastructure/
+sudo: false
+cache:
+    directories:
+        - node_modules
 before_script:
     - "pwd"
     - "cd .."
