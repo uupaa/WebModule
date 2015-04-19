@@ -20,3 +20,7 @@ release/*.min.js
 lib/*.min.js
 npm-debug.log
 
+## ignore gh-pages dir
+## $ git-new-workdir . gh-pages gh-pages
+gh-pages
+
