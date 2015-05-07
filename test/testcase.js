@@ -6,6 +6,14 @@ var _runOnNode       =  _isNodeOrNodeWebKit && !/native/.test(setTimeout);
 var _runOnWorker     = !_isNodeOrNodeWebKit && "WorkerLocation" in global;
 var _runOnBrowser    = !_isNodeOrNodeWebKit && "document" in global;
 
+global["BENCHMARK"] = false;
+
+if (console) {
+    if (!console.table) {
+        console.table = console.dir;
+    }
+}
+
 var test = new Test("REPOSITORY_NAME", {
         disable:    false, // disable all tests.
         browser:    true,  // enable browser test.
