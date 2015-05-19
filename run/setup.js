@@ -2,10 +2,10 @@
 
 var _USAGE = _multiline(function() {/*
     Usage:
-        WebModule/run/init.js [-h or --help]
-                              [-v or --verbose]
-                              [--alt]
-                              [--bin]
+        WebModule/run/setup.js [-h or --help]
+                               [-v or --verbose]
+                               [--alt]
+                               [--bin]
 */});
 
 var ERR  = "\u001b[31m";
@@ -110,9 +110,10 @@ getGitHubUserName(function(userName) {
         console.log("  ");
         console.log(INFO + "  done." + CLR + "\n");
         console.log(INFO + "  Available next actions," + CLR);
-        console.log(INFO + "  `$ npm run`        # list up npm run-script" + CLR);
+        console.log(INFO + "  `$ npm run`        # dump WebModule commands" + CLR);
         console.log(INFO + "  `$ npm start`      # start local httpd server" + CLR);
         console.log(INFO + "  `$ npm run sync`   # sync scripts, install/update node modules, create test pages and minify" + CLR);
+        console.log(INFO + "  `$ npm t`          # do test" + CLR);
     });
 
 }, function(err) {
@@ -162,8 +163,7 @@ function _clone(fromDir,    // @arg String - copy from dir. has tail slash(/)
             var targetFile = ary[0];
             var sourceText = ary[1];
 
-            rl.question("  exists:    " + targetFile + " - overwrite it? (y/n): ",
-                       function(answer) {
+            rl.question("  exists:    " + targetFile + " - overwrite it? (y/n): ", function(answer) {
 
                 if (/^y$/i.test(answer)) {
                     console.log(WARN + "  overwrite: " + targetFile + CLR);
