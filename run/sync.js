@@ -26,6 +26,7 @@ var sourceDir          = process.argv[1].split("/").slice(0, -2).join("/") + "/"
 var targetDir          = process.cwd() + "/";
 var sourcePacakgeJSON  = sourceDir + "MODULE_package.json";
 var targetPackageJSON  = targetDir + "package.json";
+var wmPackageJSON      = sourceDir + "package.json";
 
 console.log( INFO + "  - repositoryFullName:  " + repositoryFullName + CLR );       // "Foo.js"
 console.log( INFO + "  - repositoryName:      " + repositoryName     + CLR );       // "Foo"
@@ -77,10 +78,35 @@ function prettyPrint() {
 
 // WebModule/MODULE_package.json sync to YOURWebModule/package.json
 function sync() {
+    // srcJSON = WebMdule/MODULE_package.json
+    // tgtJSON = YOURWebModule/package.json
     var srcJSON = JSON.parse(fs.readFileSync(sourcePacakgeJSON, "UTF-8").replace(/REPOSITORY_FULLNAME/g, repositoryFullName));
     var tgtJSON = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
+    var wmJSON  = JSON.parse(fs.readFileSync(wmPackageJSON, "UTF-8"));
+    var wmVersion = wmJSON.version;
 
-    tgtJSON.scripts = srcJSON.scripts;
+    if (!tgtJSON.scripts) {
+        tgtJSON.scripts = srcJSON.scripts;
+    } else {
+        for (var command in srcJSON.scripts) { // command = "sync", "min", "build", ...
+            var src = srcJSON.scripts[command];
+            var tgt = tgtJSON.scripts[command] || "";
+
+            if (!tgt || tgt === src) {
+                // tgt にコマンドAが無いか
+                // tgt と src が同じならそのまま上書きする
+                tgtJSON.scripts[command] = src;
+            } else if (tgt && tgt !== src) {
+                // tgt の package.json にコマンドAが存在し src の package.json にもコマンドAがあるが、内容が異なる場合は、
+                // tgt のコマンドAを優先し、src のコマンドA を
+                // { "A_${wmversion}": srcJSON.scripts[command] } の形で追加する。
+                // tgt のコマンドAは上書きしない。
+                tgtJSON.scripts[command + "_" + wmVersion] = src;
+
+                console.log(INFO + "  - add run-script: " + CLR + '     { "' + command + "_" + wmVersion + '": "' + src + '" }');
+            }
+        }
+    }
 
     fs.writeFileSync(targetPackageJSON, JSON.stringify(tgtJSON, null, 2));
 }
