@@ -1,4 +1,8 @@
 // REPOSITORY_NAME test
 
-__SCRIPT__
+__MODULES__
+__WMTOOLS__
+__SOURCES__
+__OUTPUT__
+__TEST_CASE__
 
