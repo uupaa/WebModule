@@ -549,6 +549,24 @@ function _trimCodeBlock(js,       // @arg String - JavaScript expression string.
         var lines = RegExp("\\{@" + label + "\\b(?:[^\\n]*)\n(?:[\\S\\s]*?)?\\}@" +
                                     label + "\\b", "g");
 
+
+        // trim:
+        //
+        // [@label ... ]@label
+        //
+        var line  = RegExp("\\[@" + label + "\\b(?:[^\\n]*)\\]@" +
+                                    label + "\\b", "g");
+
+        // trim:
+        //
+        // [@label
+        //   ...
+        // ]@label
+        //
+        var lines = RegExp("\\[@" + label + "\\b(?:[^\\n]*)\n(?:[\\S\\s]*?)?\\]@" +
+                                    label + "\\b", "g");
+
+
         return js.replace(line, " ").replace(lines, " ");
     }, js);
 }
