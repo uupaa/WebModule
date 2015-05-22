@@ -1,17 +1,9 @@
 var ModuleTestREPOSITORY_NAME = (function(global) {
 
-var _isNodeOrNodeWebKit = !!global.global;
-var _runOnNodeWebKit =  _isNodeOrNodeWebKit &&  /native/.test(setTimeout);
-var _runOnNode       =  _isNodeOrNodeWebKit && !/native/.test(setTimeout);
-var _runOnWorker     = !_isNodeOrNodeWebKit && "WorkerLocation" in global;
-var _runOnBrowser    = !_isNodeOrNodeWebKit && "document" in global;
-
 global["BENCHMARK"] = false;
 
-if (console) {
-    if (!console.table) {
-        console.table = console.dir;
-    }
+if (console && !console.table) {
+    console.table = console.dir;
 }
 
 var test = new Test("REPOSITORY_NAME", {
@@ -29,11 +21,11 @@ var test = new Test("REPOSITORY_NAME", {
         testREPOSITORY_NAME_concat$,
     ]);
 
-if (_runOnBrowser || _runOnNodeWebKit) {
+if (IS_BROWSER || IS_NW) {
     //test.add([]);
-} else if (_runOnWorker) {
+} else if (IS_WORKER) {
     //test.add([]);
-} else if (_runOnNode) {
+} else if (IS_NODE) {
     //test.add([]);
 }
 
@@ -83,5 +75,5 @@ function testREPOSITORY_NAME_concat$(test, pass, miss) {
 
 return test.run().clone();
 
-})(WEBMODULE_IDIOM);
+})(GLOBAL);
 
