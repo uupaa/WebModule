@@ -21,11 +21,11 @@ var test = new Test("REPOSITORY_NAME", {
         testREPOSITORY_NAME_concat$,
     ]);
 
-if (IS_BROWSER || IS_NW) {
+if (IN_BROWSER || IN_NW) {
     //test.add([]);
-} else if (IS_WORKER) {
+} else if (IN_WORKER) {
     //test.add([]);
-} else if (IS_NODE) {
+} else if (IN_NODE) {
     //test.add([]);
 }
 
