@@ -20,7 +20,7 @@
     "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
     "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
     "simx":         "node ../WebModule/run/sim.js stop",
-    "hint":         "jshint lib/*.js",
+    "hint":         "eslint lib/*.js",
     "score":        "node ../WebModule/run/score.js; open lint/plato/index.html",
     "patch":        "node ../WebModule/run/patch.js",
     "setup":        "node ../WebModule/run/setup.js",
@@ -47,7 +47,9 @@
       "output":     "release/REPOSITORY_NAME.nw.min.js"
     }
   },
-  "dependencies": {},
+  "dependencies": {
+    "uupaa.hash.js": ""
+  },
   "devDependencies": {},
   "lib":            "./lib/",
   "main":           "./index.js",

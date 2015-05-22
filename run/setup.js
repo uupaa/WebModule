@@ -26,6 +26,7 @@ var _CLONE_FILES = {
 //      "REPOSITORY_NAME.js":   [true],
 //  },
     "lib": {
+        "WebModuleGlobal.js":   [true],
         "REPOSITORY_NAME.js":   [true],
     },
     "lint": {
@@ -47,7 +48,9 @@ var _CLONE_FILES = {
         "testcase.js":          [true],
     },
     ".gitignore":               [],
-    ".jshintrc":                [],
+//  ".jshintrc":                [],
+    ".eslintrc":                [],
+    ".eslintignore":            [],
     ".npmignore":               [],
     ".travis.yml":              [true, "MODULE_travis.yml"],
     "index.js":                 [true, "MODULE_index.js"],
