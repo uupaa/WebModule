@@ -11,6 +11,8 @@ onmessage = function(event) {
         self.console.error = function() {};
     }
 
+    importScripts("../lib/WebModuleGlobal.js");
+
     __MODULES__
     __WMTOOLS__
     __SOURCES__

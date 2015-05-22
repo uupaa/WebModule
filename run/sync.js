@@ -88,6 +88,10 @@ function sync() {
     if (!tgtJSON.scripts) {
         tgtJSON.scripts = srcJSON.scripts;
     } else {
+        // tgtJSON.script の順番を維持しつつ、コマンドを差し込めるように key と value の状態を保存する
+        var tgtKeys   = Object.keys(tgtJSON.scripts);
+        var tgtValues = _Object_values(tgtJSON.scripts);
+
         for (var command in srcJSON.scripts) { // command = "sync", "min", "build", ...
             var src = srcJSON.scripts[command];
             var tgt = tgtJSON.scripts[command] || "";
@@ -96,19 +100,46 @@ function sync() {
                 // tgt にコマンドAが無いか
                 // tgt と src が同じならそのまま上書きする
                 tgtJSON.scripts[command] = src;
+
+                tgtKeys.push(command);
+                tgtValues.push(src);
             } else if (tgt && tgt !== src) {
                 // tgt の package.json にコマンドAが存在し src の package.json にもコマンドAがあるが、内容が異なる場合は、
                 // tgt のコマンドAを優先し、src のコマンドA を
-                // { "A_${wmversion}": srcJSON.scripts[command] } の形で追加する。
+                // { "A_${wmversion}": srcJSON.scripts[command] } の形で挿入する。
                 // tgt のコマンドAは上書きしない。
-                tgtJSON.scripts[command + "_" + wmVersion] = src;
+                var pos = tgtKeys.indexOf(command);
 
-                console.log(INFO + "  - add run-script: " + CLR + '     { "' + command + "_" + wmVersion + '": "' + src + '" }');
+                tgtKeys.splice( pos, 0, command + "_" + wmVersion);
+                tgtValues.splice( pos, 0, src);
+
+                console.log(INFO + "  - inject run-script: " + CLR + '     { "' + command + "_" + wmVersion + '": "' + src + '" }');
             }
         }
+        tgtJSON.scripts = _buildNewObjectByKeyOrder(tgtKeys, tgtValues); // rebuild
     }
 
     fs.writeFileSync(targetPackageJSON, JSON.stringify(tgtJSON, null, 2));
+}
+
+function _Object_values(object) {
+    var result = [];
+    var keys = Object.keys(object);
+
+    for (var i = 0, iz = keys.length; i < iz; ++i) {
+        var key = keys[i];
+        result.push( object[key] );
+    }
+    return result;
+}
+
+function _buildNewObjectByKeyOrder(keys, values) {
+    var result = {};
+
+    for (var i = 0, iz = keys.length; i < iz; ++i) {
+        result[keys[i]] = values[i];
+    }
+    return result;
 }
 
 // package.json convert "x-build": { ... } to "webmodule": { ... }

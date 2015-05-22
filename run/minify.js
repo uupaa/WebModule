@@ -418,7 +418,8 @@ function _makeClouserCompilerOptions(options) { // @arg Object - { keep, nowrap,
         result.push("--compilation_level SIMPLE_OPTIMIZATIONS");
     }
     if (!options.nowrap) { // wrap WebModule idiom
-        result.push("--output_wrapper '(function(global){\n%output%\n})((this||0).self||global);'");
+      //result.push("--output_wrapper '(function(global){\n%output%\n})((this||0).self||global);'");
+        result.push("--output_wrapper '(function(global){\n%output%\n})(GLOBAL);'"); // WebModule Idiom v2
     }
 
     if (options.strict) {
@@ -547,23 +548,6 @@ function _trimCodeBlock(js,       // @arg String - JavaScript expression string.
         // }@label
         //
         var lines = RegExp("\\{@" + label + "\\b(?:[^\\n]*)\n(?:[\\S\\s]*?)?\\}@" +
-                                    label + "\\b", "g");
-
-
-        // trim:
-        //
-        // [@label ... ]@label
-        //
-        var line  = RegExp("\\[@" + label + "\\b(?:[^\\n]*)\\]@" +
-                                    label + "\\b", "g");
-
-        // trim:
-        //
-        // [@label
-        //   ...
-        // ]@label
-        //
-        var lines = RegExp("\\[@" + label + "\\b(?:[^\\n]*)\n(?:[\\S\\s]*?)?\\]@" +
                                     label + "\\b", "g");
 
 

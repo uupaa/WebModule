@@ -1,0 +1,26 @@
+{
+    "env": {
+        "browser":          true,
+        "node":             true
+    },
+    "globals": {
+        "IN_NODE_OR_NW":    false,
+        "IN_BROWSER":       false,
+        "IN_WORKER":        false,
+        "IN_NODE":          false,
+        "IN_NW":            false
+    },
+    "rules": {
+        "strict":           [0],
+        "new-cap":          [0],
+        "camelcase":        [0],
+        "key-spacing":      [0],
+        "dot-notation":     [0],
+        "comma-dangle":     [0],
+        "no-multi-spaces":  [0],
+        "no-unused-vars":   [1, { "vars": "all", "args": "after-used"} ],
+        "no-underscore-dangle": [0],
+        "no-use-before-define": [0]
+    }
+}
+
