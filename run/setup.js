@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+(function(global) {
+
 var _USAGE = _multiline(function() {/*
     Usage:
         WebModule/run/setup.js [-h or --help]
@@ -115,8 +117,8 @@ getGitHubUserName(function(userName) {
         console.log(INFO + "  Available next actions," + CLR);
         console.log(INFO + "  `$ npm run`        # dump WebModule commands" + CLR);
         console.log(INFO + "  `$ npm start`      # start local httpd server" + CLR);
-        console.log(INFO + "  `$ npm run sync`   # sync scripts, install/update node modules, create test pages and minify" + CLR);
-        console.log(INFO + "  `$ npm t`          # do test" + CLR);
+        console.log(INFO + "  `$ npm run sync`   # sync scripts, install/update modules" + CLR);
+        console.log(INFO + "  `$ npm t`          # create test pages, minify and test" + CLR);
     });
 
 }, function(err) {
@@ -234,13 +236,15 @@ function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
     }
 
     function _repleaceText(text) {
-        text = text.replace(/DESCRIPTION/g,               options.desc);                     // "description"
-        text = text.replace(/GITHUB_USER_NAME/g,          options.userName);                 // "uupaa"
-        text = text.replace(/LOWER_REPOSITORY_FULLNAME/g, repositoryFullName.toLowerCase()); // "foo.js"
-        text = text.replace(/LOWER_REPOSITORY_NAME/g,     repositoryName.toLowerCase());     // "foo"
-        text = text.replace(/REPOSITORY_FULLNAME/g,       repositoryFullName);               // "Foo.js"
-        text = text.replace(/REPOSITORY_NAME/g,           repositoryName);                   // "Foo"
-        text = text.replace(/WEBMODULE_IDIOM/g,           "(this || 0).self || global");
+        text = text.replace(/<<DESCRIPTION>>/g,               options.desc);                     // "description"
+        text = text.replace(/<<GITHUB_USER_NAME>>/g,          options.userName);                 // "uupaa"
+        text = text.replace(/<<LOWER_REPOSITORY_FULLNAME>>/g, repositoryFullName.toLowerCase()); // "foo.js"
+        text = text.replace(/<<LOWER_REPOSITORY_NAME>>/g,     repositoryName.toLowerCase());     // "foo"
+        text = text.replace(/<<REPOSITORY_FULLNAME>>/g,       repositoryFullName);               // "Foo.js"
+        text = text.replace(/REPOSITORY_FULLNAME/g,           repositoryFullName);               // "Foo.js"
+        text = text.replace(/<<REPOSITORY_NAME>>/g,           repositoryName);                   // "Foo"
+        text = text.replace(/__REPOSITORY_NAME__/g,           _spacer(repositoryName.length));   // "Foo"
+        text = text.replace(/REPOSITORY_NAME/g,               repositoryName);                   // "Foo"
 
         return text;
     }
@@ -261,8 +265,15 @@ function _parseCommandLineOptions(options) { // @arg Object:
     return options;
 }
 
+function _spacer(n) { // @arg Integer
+                      // @ret String
+    return "                                  ".slice(0, n);
+}
+
 function _multiline(fn) { // @arg Function:
                           // @ret String:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
+
+})(GLOBAL);
 

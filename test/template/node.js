@@ -1,4 +1,4 @@
-// REPOSITORY_NAME test
+// <<REPOSITORY_NAME>> test
 
 require("../lib/WebModuleGlobal.js");
 

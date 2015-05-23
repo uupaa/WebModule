@@ -93,5 +93,5 @@ function _enumDevieceList(callback) {
     });
 }
 
-})((this || 0).self || global);
+})(GLOBAL);
 

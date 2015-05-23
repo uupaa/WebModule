@@ -26,5 +26,5 @@ function patch(file) {
     }
 }
 
-})((this || 0).self || global);
+})(GLOBAL);
 

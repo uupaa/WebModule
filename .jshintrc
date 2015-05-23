@@ -1,5 +1,24 @@
 {
 // http://www.jshint.com/docs/options/
+    "globals": [
+        // --- node.js ---
+        "GLOBAL",
+        "exports",
+        "module",
+        // --- WebModule ---
+        "modules",
+        "BENCHMARK",
+        "IN_NODE_OR_NW",
+        "IN_BROWSER",
+        "IN_WORKER",
+        "IN_NODE",
+        "IN_NW",
+        "$type",
+        "$keys",
+        "$some",
+        "$args",
+        "$valid"
+    ],
 
     // --- Enforcing options ---
     "bitwise":  false, // true is prohibits the use of bitwise operators.

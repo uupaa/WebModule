@@ -20,22 +20,22 @@ var WARN = "\u001b[33m"; // YELLOW
 var INFO = "\u001b[32m"; // GREEN
 var CLR  = "\u001b[0m";  // WHITE
 
-var fs = require("fs");
-var cp = require("child_process");
-var argv = process.argv.slice(2);
-var pkg = JSON.parse(fs.readFileSync("./package.json", "utf8"));
-var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod = require(wmlib + "Module.js");
+var fs     = require("fs");
+var cp     = require("child_process");
+var argv   = process.argv.slice(2);
+var pkg    = JSON.parse(fs.readFileSync("./package.json", "utf8"));
+var wmlib  = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var mod    = require(wmlib + "ModuleSystem.js");
 var target = mod.collectBuildTarget(pkg);
 
 var options = _parseCommandLineOptions(argv, {
-        help:   false,               // show help
-        source: target.sources,      // WatchTargetPathStringArray: [dir, file, ...]
-        delay:  1000,                // delay time (unit ms)
-        runScript: "",               // $ npm run {{script}}
-        command: "",                 // $ command
-        verbose: false,              // verbose
-        ignoreDir: [".watchignore"]  // ignore dir name
+        help:       false,              // show help
+        source:     target.sources,     // WatchTargetPathStringArray: [dir, file, ...]
+        delay:      1000,               // delay time (unit ms)
+        runScript:  "",                 // $ npm run {{script}}
+        command:    "",                 // $ command
+        verbose:    false,              // verbose
+        ignoreDir:  [".watchignore"]    // ignore dir name
     });
 
 if (options.help) {
@@ -43,7 +43,7 @@ if (options.help) {
     return;
 }
 if (!options.source.length) {
-    console.log(ERR + "Input files are empty." + CLR);
+    console.log(ERR + "Input file is empty." + CLR);
     return;
 }
 
@@ -65,14 +65,14 @@ Watch(options.source, {
         cp.exec(command, function(err, stdout, stderr) {
                         if (err) {
                             if (options.verbose) {
-                                console.log(ERR + "|﹏<)з  error. " + CLR);
+                                console.log(ERR + "|﹏<)з     error. " + CLR);
                                 console.log(stdout.split("\n").map(function(line) {
                                     return ERR + "| " + CLR + line;
                                 }).join("\n"));
                             }
                         } else {
                             if (options.verbose) {
-                                console.log(INFO + "|◇・ミ)  done. " + CLR);
+                                console.log(INFO + "|◇・ミ)    ok! " + CLR);
                             }
                         }
                      });
@@ -151,8 +151,7 @@ function Watch(paths,      // @arg PathArray
         if (_isFile(path)) {
             if (this._options.verbose) {
                 var stat = fs.statSync(path);
-                console.log(INFO + "|◇・)з   " + CLR + "start watch...");
-                console.log(INFO + "|◇・)з   " + CLR + path + " (size:" + stat.size + ")");
+                console.log(INFO + "|◇・)з     " + CLR + "I'm watching " + path + " (size:" + stat.size + ")");
             }
             Watch_file(that, path, function() {
                 callback(null, path);

@@ -2,7 +2,7 @@
 
 (function(global) {
 
-// Module/es6/ ディレクトリ以下のファイルを検索し、
+// alt/ ディレクトリ以下のファイルを検索し、
 // 各ファイルを個別に es6 から es5 にダウンコンパイルした結果を lib/ 以下に出力します
 
 // --- console colors ---
@@ -16,7 +16,7 @@ var fs       = require("fs");
 var cp       = require("child_process");
 var readline = require("readline");
 var wmlib    = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod      = require(wmlib + "Module.js");
+var mod      = require(wmlib + "ModuleSystem.js");
 var Task     = require(wmlib + "Task.js");
 var argv     = process.argv.slice(2);
 
@@ -39,5 +39,5 @@ console.log( INFO + "  - target package.json: " + targetPackageJSON  + CLR + LB 
 
 // TODO: impl
 
-})((this || 0).self || global);
+})(GLOBAL);
 

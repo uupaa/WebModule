@@ -37,7 +37,7 @@ var fs      = require("fs");
 var cp      = require("child_process");
 var argv    = process.argv.slice(2);
 var wmlib   = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod     = require(wmlib + "Module.js");
+var mod     = require(wmlib + "ModuleSystem.js");
 var pkg     = JSON.parse(fs.readFileSync("./package.json", "utf8"));
 var wm      = pkg.webmodule;
 var Task    = require(wmlib + "Task.js");
@@ -583,5 +583,5 @@ function _if(value, fn, hint) {
 }
 //}@def
 
-})((this || 0).self || global);
+})(GLOBAL);
 

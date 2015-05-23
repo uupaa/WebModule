@@ -18,15 +18,15 @@ var INFO = "\u001b[32m";
 var CLR  = "\u001b[0m";
 
 // require("../lib/plato.js") は、score.js を呼び出したスクリプトのディレクトリを基準としたパスになるため、WebModule/run/lib/xxx.js などを require できない
-// fs.read("../lib/plato.js") は、score.js を呼び出したスクリプトのディレクトリを記述としたパスになる
+// fs.read("../lib/plato.js") は、score.js を呼び出したスクリプトのディレクトリを記述したパスになる
 
 //var Plato   = require("../lib/plato"); // WebModule/run/lib/plato.js
-var fs   = require("fs");
-var cp   = require("child_process");
-var argv = process.argv.slice(2);
-var pkg  = JSON.parse(fs.readFileSync("./package.json", "utf8"));
-var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod = require(wmlib + "Module.js");
+var fs     = require("fs");
+var cp     = require("child_process");
+var argv   = process.argv.slice(2);
+var pkg    = JSON.parse(fs.readFileSync("./package.json", "utf8"));
+var wmlib  = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
+var mod    = require(wmlib + "ModuleSystem.js");
 var target = mod.collectBuildTarget(pkg);
 
 var options = _parseCommandLineOptions({
@@ -84,7 +84,9 @@ function _do(options, callback) {
         console.log("command: " + command);
     }
     cp.exec(command, function(err) {
-        if (!err) {
+        if (err) {
+            console.error(ERR + err.message + CLR);
+        } else {
             if (options.verbose) {
                 console.log(command);
             }
@@ -93,7 +95,7 @@ function _do(options, callback) {
             _parseReportJS();
             _parseReportJSON();
         }
-        if (options.callback) {
+        if (callback) {
             callback(err);
         }
     });
@@ -194,5 +196,5 @@ function _multiline(fn) { // @arg Function:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
 
-})((this || 0).self || global);
+})(GLOBAL);
 

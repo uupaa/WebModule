@@ -1,12 +1,12 @@
 {
-  "name":           "GITHUB_USER_NAME.LOWER_REPOSITORY_FULLNAME",
+  "name":           "<<GITHUB_USER_NAME>>.<<LOWER_REPOSITORY_FULLNAME>>",
   "version":        "0.0.0",
-  "description":    "DESCRIPTION",
-  "url":            "https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME",
-  "keywords":       ["GITHUB_USER_NAME", "WebModule", "Unstable"],
+  "description":    "<<DESCRIPTION>>",
+  "url":            "https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>",
+  "keywords":       ["<<GITHUB_USER_NAME>>", "WebModule", "Unstable"],
   "repository": {
     "type":         "git",
-    "url":          "https://github.com/GITHUB_USER_NAME/REPOSITORY_FULLNAME.git"
+    "url":          "https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>.git"
   },
   "scripts": {
     "sync":         "node ../WebModule/run/sync.js; npm update; node ../WebModule/run/page.js",
@@ -31,20 +31,20 @@
     "develop":      false,
     "label":        ["@dev"],
     "browser": {
-      "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.b.min.js"
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
+      "output":     "release/<<REPOSITORY_NAME>>.b.min.js"
     },
     "worker": {
-      "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.w.min.js"
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
+      "output":     "release/<<REPOSITORY_NAME>>.w.min.js"
     },
     "node": {
-      "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.n.min.js"
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
+      "output":     "release/<<REPOSITORY_NAME>>.n.min.js"
     },
     "nw": {
-      "source":     ["lib/REPOSITORY_NAME.js"],
-      "output":     "release/REPOSITORY_NAME.nw.min.js"
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
+      "output":     "release/<<REPOSITORY_NAME>>.nw.min.js"
     }
   },
   "dependencies": {
@@ -53,7 +53,7 @@
   "devDependencies": {},
   "lib":            "./lib/",
   "main":           "./index.js",
-  "author":         "GITHUB_USER_NAME",
+  "author":         "<<GITHUB_USER_NAME>>",
   "license":        "MIT",
   "contributors":   []
 }

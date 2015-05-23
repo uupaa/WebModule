@@ -13,7 +13,7 @@ var fs       = require("fs");
 var cp       = require("child_process");
 var readline = require("readline");
 var wmlib    = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod      = require(wmlib + "Module.js");
+var mod      = require(wmlib + "ModuleSystem.js");
 var Task     = require(wmlib + "Task.js");
 var argv     = process.argv.slice(2);
 
@@ -35,14 +35,17 @@ console.log( INFO + "  - copy target dir:     " + targetDir          + CLR );   
 console.log( INFO + "  - source package.json: " + sourcePacakgeJSON  + CLR );       // "/Users/uupaa/oss/my/WebModule/MODULE_package.json"
 console.log( INFO + "  - target package.json: " + targetPackageJSON  + CLR + LB );  // "/Users/uupaa/oss/my/Foo.js/package.json"
 
-sync();
-upgrade();
-sortKeys();
-prettyPrint();
-buildWMTools("./test/wmtools.js");
-migrateSourceCode();
+// --- sync tasks ---
+if (1) {
+    syncPackageJSON();
+    upgradePackageJSON();
+    sortPackageJSONKeys();
+    prettyPrintPackageJSON();
+    buildWMTools("./test/wmtools.js");
+    migrateSourceCode();
+}
 
-console.log("  done.");
+console.log("  sync done.");
 
 function buildWMTools(output) { // @arg PathString
     var libs = ["Reflection.js", "Console.js", "Valid.js", "Help.js", "Task.js", "Test.js"];
@@ -65,7 +68,7 @@ function buildWMTools(output) { // @arg PathString
     }
 }
 
-function prettyPrint() {
+function prettyPrintPackageJSON() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
     var txt = JSON.stringify(json, null, 2);
 
@@ -77,7 +80,7 @@ function prettyPrint() {
 }
 
 // WebModule/MODULE_package.json sync to YOURWebModule/package.json
-function sync() {
+function syncPackageJSON() {
     // srcJSON = WebMdule/MODULE_package.json
     // tgtJSON = YOURWebModule/package.json
     var srcJSON = JSON.parse(fs.readFileSync(sourcePacakgeJSON, "UTF-8").replace(/REPOSITORY_FULLNAME/g, repositoryFullName));
@@ -143,7 +146,7 @@ function _buildNewObjectByKeyOrder(keys, values) {
 }
 
 // package.json convert "x-build": { ... } to "webmodule": { ... }
-function upgrade() {
+function upgradePackageJSON() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
 
     json = mod.upgradePackageJSON(json);
@@ -151,7 +154,7 @@ function upgrade() {
     fs.writeFileSync(targetPackageJSON, JSON.stringify(json, null, 2));
 }
 
-function sortKeys() {
+function sortPackageJSONKeys() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
     var order = ["name", "version", "description", "url", "keywords",
                  "repository", "scripts", "webmodule",
@@ -222,5 +225,5 @@ function migrateSourceCode() {
     }
 }
 
-})((this || 0).self || global);
+})(GLOBAL);
 

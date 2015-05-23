@@ -4,11 +4,18 @@
         "node":             true
     },
     "globals": {
+        "modules":          false,
+        "BENCHMARK":        false,
         "IN_NODE_OR_NW":    false,
         "IN_BROWSER":       false,
         "IN_WORKER":        false,
         "IN_NODE":          false,
-        "IN_NW":            false
+        "IN_NW":            false,
+        "$type":            false,
+        "$keys":            false,
+        "$some":            false,
+        "$args":            false,
+        "$valid":           false
     },
     "rules": {
         "strict":           [0],

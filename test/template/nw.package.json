@@ -1,5 +1,5 @@
 {
-  "name": "REPOSITORY_NAME",
+  "name": "<<REPOSITORY_NAME>>",
   "main": "./nw.html"
 }
 

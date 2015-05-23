@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 // page --verbose
+(function(global) {
 
 var ERR  = "\u001b[31m";
 var WARN = "\u001b[33m";
@@ -9,7 +10,7 @@ var CLR  = "\u001b[0m";
 
 var fs    = require("fs");
 var wmlib = process.argv[1].split("/").slice(0, -2).join("/") + "/lib/"; // "WebModule/lib/"
-var mod   = require(wmlib + "Module.js");
+var mod   = require(wmlib + "ModuleSystem.js");
 var argv  = process.argv.slice(2);
 var pkg   = JSON.parse(fs.readFileSync("package.json", "utf8"));
 var verbose = argv[0] === "--verbose" || argv[0] === "-v";
@@ -135,4 +136,6 @@ function _multiline(fn) { // @arg Function:
                           // @ret String:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
+
+})(GLOBAL);
 
