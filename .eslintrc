@@ -15,7 +15,9 @@
         "$keys":            false,
         "$some":            false,
         "$args":            false,
-        "$valid":           false
+        "$valid":           false,
+        "unescape":         false,
+        "escape":           false
     },
     "rules": {
         "strict":           [0],
