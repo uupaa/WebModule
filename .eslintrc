@@ -20,6 +20,7 @@
     "rules": {
         "strict":           [0],
         "new-cap":          [0],
+        "no-shadow":        [0],
         "camelcase":        [0],
         "key-spacing":      [0],
         "dot-notation":     [0],
