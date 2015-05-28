@@ -15,51 +15,6 @@ var WARN = "\u001b[33m";
 var INFO = "\u001b[32m";
 var CLR  = "\u001b[0m";
 
-// ---------------------------------------------------------
-//  fileName                    [scan, sourceFileName]
-var _CLONE_FILES = {
-    "alt": {
-        "REPOSITORY_NAME.ts":   [true],
-    },
-    "bin": {
-        "REPOSITORY_NAME.js":   [true],
-    },
-//  "es6": {
-//      "REPOSITORY_NAME.js":   [true],
-//  },
-    "lib": {
-        "WebModuleGlobal.js":   [true],
-        "REPOSITORY_NAME.js":   [true],
-    },
-    "lint": {
-        "plato": {
-            "README.md":        [],
-        }
-    },
-    "release": {
-        "README.md":            [],
-    },
-    "test": {
-        "template": {
-            "browser.html":     [true],
-            "node.js":          [true],
-            "nw.html":          [true],
-            "nw.package.json":  [true],
-            "worker.js":        [true],
-        },
-        "testcase.js":          [true],
-    },
-    ".gitignore":               [],
-//  ".jshintrc":                [],
-    ".eslintrc":                [],
-    ".eslintignore":            [],
-    ".npmignore":               [],
-    ".travis.yml":              [true, "MODULE_travis.yml"],
-    "index.js":                 [true, "MODULE_index.js"],
-//  "LICENSE":                  [true, "MODULE_LICENSE"],
-    "package.json":             [true, "MODULE_package.json"],
-    "README.md":                [true, "MODULE_README.md"]
-};
 
 var fs       = require("fs");
 var cp       = require("child_process");
@@ -73,15 +28,17 @@ var repositoryName     = repositoryFullName.indexOf(".") >= 0
                        ? repositoryFullName.split(".").slice(0, -1).join(".")
                        : repositoryFullName;
 
-var fromDir            = process.argv[1].split("/").slice(0, -2).join("/") + "/";
-var toDir              = process.cwd() + "/";
+var BASE_MODEL_DIR  = "BASE_MODEL/";
+var copySourceDir   = process.argv[1].split("/").slice(0, -2).join("/") + "/";
+var copyTargetDir   = process.cwd() + "/";
+var fileTree        = JSON.parse(fs.readFileSync(copySourceDir + BASE_MODEL_DIR + ".files.json", "UTF-8"));
 
 console.log(INFO + "  - repositoryFullName: " + repositoryFullName + CLR); // "Foo.js"
 console.log(INFO + "  - repositoryName:     " + repositoryName     + CLR); // "Foo"
-console.log(INFO + "  - copy source dir:    " + fromDir            + CLR); // "/Users/uupaa/oss/WebModule/"
-console.log(INFO + "  - copy target dir:    " + toDir              + CLR + "\n"); // "/Users/uupaa/oss/Foo.js"
+console.log(INFO + "  - copy source dir:    " + copySourceDir      + CLR);        // "/Users/uupaa/oss/WebModule/BASE_MODEL/"
+console.log(INFO + "  - copy target dir:    " + copyTargetDir      + CLR + "\n"); // "/Users/uupaa/oss/Foo.js"
 
-//return;
+//console.log(JSON.stringify(fileTree, null, 2));
 
 // -------------------------------------------------------------
 var options = _parseCommandLineOptions({
@@ -98,10 +55,10 @@ if (options.help) {
 }
 
 if (!options.alt) {
-    delete _CLONE_FILES.alt;
+    delete fileTree.alt;
 }
 if (!options.bin) {
-    delete _CLONE_FILES.bin;
+    delete fileTree.bin;
 }
 
 if (fs.existsSync("README.md") ) {
@@ -111,7 +68,7 @@ if (fs.existsSync("README.md") ) {
 getGitHubUserName(function(userName) {
 
     options.userName = userName;
-    _clone(fromDir, toDir, _CLONE_FILES, function() {
+    _clone(copySourceDir + BASE_MODEL_DIR, copyTargetDir, fileTree, function() {
         console.log("  ");
         console.log(INFO + "  done." + CLR + "\n");
         console.log(INFO + "  Available next actions," + CLR);
@@ -147,14 +104,14 @@ function getGitHubUserName(callback, errorCallback) {
     });
 }
 
-function _clone(fromDir,    // @arg String - copy from dir. has tail slash(/)
-                toDir,      // @arg String - copy to dir. has tail slash(/)
-                fileTree,   // @arg Object - source file tree.
-                callback) { // @arg Function - finished callback.
+function _clone(copySourceDir,  // @arg String - copy from dir. has tail slash(/)
+                copyTargetDir,  // @arg String - copy to dir. has tail slash(/)
+                fileTree,       // @arg Object - source file tree.
+                callback) {     // @arg Function - finished callback.
 
     var overwriteFiles = []; // [ [targetFile, sourceText], ... ]
 
-    _doClone(overwriteFiles, fromDir, toDir, fileTree);
+    _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree);
 
     if (overwriteFiles.length) {
         var rl = readline.createInterface(process.stdin, process.stdout);
@@ -184,35 +141,35 @@ function _clone(fromDir,    // @arg String - copy from dir. has tail slash(/)
     }
 }
 
-function _doClone(overwriteFiles, fromDir, toDir, fileTree) {
+function _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree) {
+
     for (fileName in fileTree) {
         _loop(overwriteFiles, fileName, fileTree);
     }
 
     function _loop(overwriteFiles, // @arg FileStringArray - ["file", ...]
-                   fileName,       // @arg FileNameString|DirNameString - "MODULE_README.md", "lib"
+                   name,           // @arg FileNameString|DirNameString - "README.md", "lib", ...
                    fileTree) {     // @arg Object - _CLONE_FILES or _CLONE_FILES subtree.
-        var options        = fileTree[fileName]; // [scan, sourceFileName]
-        var scan           = options[0] || false;
-        var sourceFileName = options[1] || "";
-        var isFileEntry    = Array.isArray(options);
+        var options     = fileTree[name]; // [ scan ]
+        var scan        = Array.isArray(options) && options.indexOf("scan") >= 0;
+        var isDirEntry  = !Array.isArray(options); // dir is {}, file is []
 
-        if ( !isFileEntry ) { // is directory entry
-            if ( !fs.existsSync(toDir + fileName) ) {
-                console.log("  mkdir:     " + toDir + fileName + "/");
-                fs.mkdirSync(toDir + fileName);
+        if (isDirEntry) {
+            if ( !fs.existsSync(copyTargetDir + name) ) {
+                console.log("  mkdir:     " + copyTargetDir + name + "/");
+                fs.mkdirSync(copyTargetDir + name);
             }
             // recursive call
             _doClone(overwriteFiles,
-                     fromDir + fileName + "/",
-                     toDir   + fileName + "/",
-                     fileTree[fileName]);
+                     copySourceDir + name + "/",
+                     copyTargetDir + name + "/",
+                     fileTree[name]);
 
         } else {
-            var sourceFile = fromDir + (sourceFileName || fileName);
-            var targetFile = toDir   + fileName;
+            var sourceFile = copySourceDir + name;
+            var targetFile = copyTargetDir + name;
 
-            // replace fileName. "lib/REPOSITORY_NAME.js" -> "lib/Foo.js"
+            // replace dir/file name. "lib/REPOSITORY_NAME.js" -> "lib/Foo.js"
             targetFile = _repleaceText(targetFile);
 
             var targetFileAlreadyExists = fs.existsSync(targetFile);

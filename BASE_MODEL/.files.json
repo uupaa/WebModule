@@ -1,0 +1,40 @@
+{
+    "alt": {
+        "REPOSITORY_NAME.ts":   ["scan"]
+    },
+    "bin": {
+        "REPOSITORY_NAME.js":   ["scan"]
+    },
+    "lib": {
+        "WebModuleGlobal.js":   ["scan"],
+        "REPOSITORY_NAME.js":   ["scan"]
+    },
+    "lint": {
+        "plato": {
+            "README.md":        []
+        }
+    },
+    "release": {
+        "README.md":            []
+    },
+    "test": {
+        "testcase.js":          ["scan"],
+        "template": {
+            "browser.html":     ["scan"],
+            "node.js":          ["scan"],
+            "nw.html":          ["scan"],
+            "nw.package.json":  ["scan"],
+            "worker.js":        ["scan"]
+        }
+    },
+    ".gitignore":               [],
+    ".jshintrc":                [],
+    ".eslintrc":                [],
+    ".eslintignore":            [],
+    ".npmignore":               [],
+    ".travis.yml":              ["scan"],
+    "index.js":                 ["scan"],
+    "package.json":             ["scan"],
+    "README.md":                ["scan"]
+}
+

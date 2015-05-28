@@ -14,5 +14,5 @@ Generate a JavaScript based module for Mobile Web Application.
 
 ## How to use
 
-See [Workflow](https://github.com/uupaa/WebModule/wiki/Workflow) [(日本語)](https://github.com/uupaa/WebModule/wiki/Workflow_ja).
+see [Workflow](https://github.com/uupaa/WebModule/wiki/Workflow)
 
