@@ -152,8 +152,13 @@ function _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree) {
                    fileTree) {     // @arg Object - _CLONE_FILES or _CLONE_FILES subtree.
         var options     = fileTree[name]; // [ scan ]
         var scan        = Array.isArray(options) && options.indexOf("scan") >= 0;
+        var disable     = Array.isArray(options) && options.indexOf("disable") >= 0;
         var isDirEntry  = !Array.isArray(options); // dir is {}, file is []
 
+        if (disable) {
+            console.log("  disable:   " + _repleaceText(copyTargetDir + name));
+            return;
+        }
         if (isDirEntry) {
             if ( !fs.existsSync(copyTargetDir + name) ) {
                 console.log("  mkdir:     " + copyTargetDir + name + "/");
@@ -167,14 +172,10 @@ function _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree) {
 
         } else {
             var sourceFile = copySourceDir + name;
-            var targetFile = copyTargetDir + name;
-
-            // replace dir/file name. "lib/REPOSITORY_NAME.js" -> "lib/Foo.js"
-            targetFile = _repleaceText(targetFile);
-
-            var targetFileAlreadyExists = fs.existsSync(targetFile);
+            var targetFile = _repleaceText(copyTargetDir + name); // replace file name. "lib/REPOSITORY_NAME.js" -> "lib/Foo.js"
+            var fileExists = fs.existsSync(targetFile);
             var sourceText = fs.readFileSync(sourceFile, "UTF-8");
-            var targetText = targetFileAlreadyExists ? fs.readFileSync(targetFile, "UTF-8") : "";
+            var targetText = fileExists ? fs.readFileSync(targetFile, "UTF-8") : "";
 
             if (scan) {
                 sourceText = _repleaceText(sourceText);
@@ -182,12 +183,12 @@ function _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree) {
             if (targetText && targetText !== sourceText) {
                 overwriteFiles.push([targetFile, sourceText]);
             } else {
-                if (targetFileAlreadyExists) {
-                    console.log("  overwrite: " + targetFile);
+                if (fileExists) {
+                    console.log("  exists:    " + targetFile);
                 } else {
                     console.log("  clone:     " + targetFile);
+                    fs.writeFileSync(targetFile, sourceText);
                 }
-                fs.writeFileSync(targetFile, sourceText);
             }
         }
     }

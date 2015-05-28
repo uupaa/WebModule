@@ -21,6 +21,9 @@
         "testcase.js":          ["scan"],
         "template": {
             "browser.html":     ["scan"],
+            "el.html":          ["scan", "disable"],
+            "el.package.json":  ["scan", "disable"],
+            "el.js":            ["scan", "disable"],
             "node.js":          ["scan"],
             "nw.html":          ["scan"],
             "nw.package.json":  ["scan"],
