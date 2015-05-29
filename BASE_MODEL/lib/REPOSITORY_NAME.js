@@ -50,12 +50,12 @@ function <<REPOSITORY_NAME>>_concat(a) { // @arg String
 }
 
 // --- validate and assert functions -----------------------
-//{@dev
-//function $type(obj, type)      { return GLOBAL["Valid"] ? GLOBAL["Valid"].type(obj, type)    : true; }
-//function $keys(obj, str)       { return GLOBAL["Valid"] ? GLOBAL["Valid"].keys(obj, str)     : true; }
-//function $some(val, str, ig)   { return GLOBAL["Valid"] ? GLOBAL["Valid"].some(val, str, ig) : true; }
-//function $args(fn, args)       { if (GLOBAL["Valid"]) { GLOBAL["Valid"].args(fn, args); } }
-//function $valid(val, fn, hint) { if (GLOBAL["Valid"]) { GLOBAL["Valid"](val, fn, hint); } }
+//{@dev https://github.com/uupaa/WebModule/wiki/Validate
+//function $type(value, types)                  { return GLOBAL["Valid"] ? GLOBAL["Valid"].type(value, types) : true; }
+//function $keys(value, keys)                   { return GLOBAL["Valid"] ? GLOBAL["Valid"].keys(value, keys)  : true; }
+//function $some(value, candidate, ignoreCase)  { return GLOBAL["Valid"] ? GLOBAL["Valid"].some(value, candidate, ignoreCase) : true; }
+//function $args(api, args)                     { if (GLOBAL["Valid"]) { GLOBAL["Valid"].args(api, args); } }
+//function $valid(value, api, highlihgt)        { if (GLOBAL["Valid"]) { GLOBAL["Valid"](value, api, highlihgt); } }
 //}@dev
 
 return <<REPOSITORY_NAME>>; // return entity

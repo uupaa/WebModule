@@ -1,6 +1,6 @@
 {
   "name":           "webmodule",
-  "version":        "0.5.7",
+  "version":        "0.5.8",
   "description":    "Generate a JavaScript based module for Mobile Web Application.",
   "url":            "https://github.com/uupaa/WebModule",
   "keywords":       ["uupaa", "WebModule"],
