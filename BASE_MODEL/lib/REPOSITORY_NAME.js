@@ -1,18 +1,15 @@
-(function moduleExporter(moduleName, moduleBody) { // http://git.io/WebModule
+(function moduleExporter(moduleName, moduleClosure) { // http://git.io/WebModule
    "use strict";
 
-    var alias  = moduleName in GLOBAL ? (moduleName + "_") : moduleName; // switch
-    var entity = moduleBody(GLOBAL);
+    var moduleEntity = moduleClosure(GLOBAL);
 
-    GLOBAL[alias] = entity;
-
-    if (typeof modules !== "undefined") {
-        GLOBAL["modules"]["register"](alias, moduleBody, entity["repository"]);
+    if (typeof webModule !== "undefined") {
+        GLOBAL["webModule"]["exports"](moduleEntity, moduleName, moduleClosure);
     }
     if (typeof exports !== "undefined") {
-        module["exports"] = entity;
+        module["exports"] = moduleEntity;
     }
-})("<<REPOSITORY_NAME>>", function moduleBody(global) {
+})("<<REPOSITORY_NAME>>", function moduleClosure(global) {
 
 "use strict";
 

@@ -12,7 +12,7 @@ onmessage = function(event) {
         self.console.table = function() {};
     }
 
-    importScripts("../lib/WebModuleGlobal.js");
+    importScripts("../lib/WebModule.js");
 
     __MODULES__
     __WMTOOLS__

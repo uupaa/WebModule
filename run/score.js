@@ -77,7 +77,8 @@ function _do(options, callback) {
         command += " --title " + options.title;
     }
     command += " --dir "   + options.output;
-    command += " --jshint .jshintrc";
+    command += " --eslint .eslintrc";
+    command += " --exclude WebModule.js";
     command += " " + options.files.join(" ");
 
     if (options.verbose) {

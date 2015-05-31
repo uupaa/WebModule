@@ -6,7 +6,7 @@
         "REPOSITORY_NAME.js":   ["scan"]
     },
     "lib": {
-        "WebModuleGlobal.js":   ["scan"],
+        "WebModule.js":         ["scan"],
         "REPOSITORY_NAME.js":   ["scan"]
     },
     "lint": {
@@ -31,7 +31,6 @@
         }
     },
     ".gitignore":               [],
-    ".jshintrc":                [],
     ".eslintrc":                [],
     ".eslintignore":            [],
     ".npmignore":               [],
