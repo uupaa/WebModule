@@ -1,3 +1,4 @@
+//export var <<REPOSITORY_NAME>> =
 (function moduleExporter(moduleName, moduleClosure) { // http://git.io/WebModule
    "use strict";
 
@@ -9,6 +10,8 @@
     if (typeof exports !== "undefined") {
         module["exports"] = moduleEntity;
     }
+    return moduleEntity;
+
 })("<<REPOSITORY_NAME>>", function moduleClosure(global) {
 
 "use strict";
@@ -40,7 +43,7 @@ function <<REPOSITORY_NAME>>(value) { // @arg String = "" - comment
 function <<REPOSITORY_NAME>>_concat(a) { // @arg String
          __REPOSITORY_NAME__             // @ret String
 //{@dev
-    $valid($type(a, "String"), <<REPOSITORY_NAME>>, "a");
+    $valid($type(a, "String"), <<REPOSITORY_NAME>>_concat, "a");
 //}@dev
 
     return this._value + a;
