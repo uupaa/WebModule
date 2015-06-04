@@ -1,4 +1,4 @@
-(function moduleExporter(moduleName, moduleClosure) { // http://git.io/WebModule
+(function moduleExporter(name, closure) { // http://git.io/WebModule
 "use strict";
 
 return GLOBAL["WebModule"] ? GLOBAL["WebModule"]["exports"](name, closure)
