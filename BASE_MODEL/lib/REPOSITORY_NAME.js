@@ -1,19 +1,10 @@
-//export var <<REPOSITORY_NAME>> =
 (function moduleExporter(moduleName, moduleClosure) { // http://git.io/WebModule
-   "use strict";
+"use strict";
 
-    var moduleEntity = moduleClosure(GLOBAL);
-
-    if (typeof webModule !== "undefined") {
-        GLOBAL["webModule"]["exports"](moduleEntity, moduleName, moduleClosure);
-    }
-    if (typeof exports !== "undefined") {
-        module["exports"] = moduleEntity;
-    }
-    return moduleEntity;
+return GLOBAL["WebModule"] ? GLOBAL["WebModule"]["exports"](name, closure)
+                           : closure(GLOBAL);
 
 })("<<REPOSITORY_NAME>>", function moduleClosure(global) {
-
 "use strict";
 
 // --- dependency modules ----------------------------------

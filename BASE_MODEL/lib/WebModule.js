@@ -20,60 +20,16 @@ GLOBAL["$valid"] = function(value, api, highlihgt)        { if (GLOBAL["Valid"])
 //}@dev
 
 // --- WebModule ------------------------------------------
-function WebModule() {
-    this._modules = {}; // { name: { code, size, hash, loaded, elapsed, repo }, ... }
-    this._totalSize = 0;
-    this._totalElapsed = 0;
-}
+GLOBAL.WebModule = {
+    exports: function(name, closure) {
+        var alias = name in GLOBAL ? (name + "_") : name;
+        var entity = alias in this ? this[alias]
+                                   : this[alias] = closure(GLOBAL);
 
-WebModule["HASH"] = true;
-WebModule["VERBOSE"] = false;
-WebModule.prototype.exports = function(entity, // @arg Function - module entity
-                                       name,   // @arg String   - module name
-                                       body) { // @arg Function - module body
-    // --- export to global ---
-    var alias = name in GLOBAL ? (name + "_") : name; // switch module name.
-
-    GLOBAL[alias] = entity;
-
-    if (name in this._modules) { return; } // already registered.
-
-    // --- register ---
-    var perf  = GLOBAL["performance"] ? GLOBAL["performance"] : Date;
-    var time1 = perf["now"]();
-    var time2 = time1;
-    var code  = body + ""; // to string
-    var hash  = 0;
-
-    if (WebModule["HASH"] && GLOBAL["Hash"]) {
-        hash  = GLOBAL["Hash"]["SourceCode"](code);
-        time2 = perf["now"]();
+        if (typeof exports !== "undefined") {
+            module["exports"] = entity;
+        }
+        return entity;
     }
-    if (WebModule["VERBOSE"]) {
-        console.log("WebModule#register: " + name + ", time: " + (time2 - time1));
-    }
-    this._totalSize    += code.length;
-    this._totalElapsed += time2 - time1;
-    this._modules[name] = {
-        "code":         code,
-        "size":         code.length,
-        "hash":         hash,               // hash("code")
-        "repo":         entity["repository"] || "",
-        "loaded":       time1,              // module loaded timeStamp
-        "elapsed":      time2 - time1,      // hash("code") elapsed time
-    };
 };
-
-WebModule.prototype.dump = function() {
-    var json = JSON.parse(JSON.stringify(this._modules));
-
-    json["total"] = {
-        "size":     (this._totalSize / 1024).toFixed(2) + " KB",
-        "elapsed":  (this._totalElapsed.toFixed(2)) + " ms",
-    };
-
-    console.table(json, ["loaded", "elapsed", "size", "hash", "repo"]);
-};
-
-GLOBAL.webModule = new WebModule();
 
