@@ -47,9 +47,7 @@
       "output":     "release/<<REPOSITORY_NAME>>.nw.min.js"
     }
   },
-  "dependencies": {
-    "uupaa.hash.js": ""
-  },
+  "dependencies": {},
   "devDependencies": {},
   "lib":            "./lib/",
   "main":           "./index.js",
