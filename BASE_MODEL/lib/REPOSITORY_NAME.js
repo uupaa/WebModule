@@ -1,10 +1,4 @@
-(function moduleExporter(name, closure) { // http://git.io/WebModule
-"use strict";
-
-return GLOBAL["WebModule"] ? GLOBAL["WebModule"]["exports"](name, closure)
-                           : closure(GLOBAL);
-
-})("<<REPOSITORY_NAME>>", function moduleClosure(global) {
+GLOBAL["WebModule"]["exports"]("<<REPOSITORY_NAME>>", function(global) {
 "use strict";
 
 // --- dependency modules ----------------------------------
