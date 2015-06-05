@@ -38,7 +38,7 @@ if (IN_BROWSER || IN_NW) {
 // --- test cases ------------------------------------------
 function test<<REPOSITORY_NAME>>_value(test, pass, miss) {
 
-    var instance = new <<REPOSITORY_NAME>>("a");
+    var instance = new WebModule.<<REPOSITORY_NAME>>("a");
 
     if (instance.value === "a") {
         instance.value = "b";
@@ -54,8 +54,8 @@ function test<<REPOSITORY_NAME>>_value(test, pass, miss) {
 function test<<REPOSITORY_NAME>>_concat(test, pass, miss) {
 
     var result = {
-            0: new <<REPOSITORY_NAME>>(   ).concat("a") === "a", // true
-            1: new <<REPOSITORY_NAME>>("b").concat("b") === "bb" // true
+            0: new WebModule.<<REPOSITORY_NAME>>(   ).concat("a") === "a", // true
+            1: new WebModule.<<REPOSITORY_NAME>>("b").concat("b") === "bb" // true
         };
 
     if ( /false/.test(JSON.stringify(result)) ) {
