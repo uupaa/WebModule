@@ -10,8 +10,8 @@
 ## Browser and NW.js(node-webkit)
 
 ```js
-<script src="<your-install-dir>/lib/WebModule.js"></script>
-<script src="<your-install-dir>/lib/<<REPOSITORY_FULLNAME>>"></script>
+<script src="<module-dir>/lib/WebModule.js"></script>
+<script src="<module-dir>/lib/<<REPOSITORY_FULLNAME>>"></script>
 <script>
     ...
 </script>
@@ -20,16 +20,16 @@
 ## WebWorkers
 
 ```js
-importScripts("<your-install-dir>lib/WebModule.js");
-importScripts("<your-install-dir>lib/<<REPOSITORY_FULLNAME>>");
+importScripts("<module-dir>lib/WebModule.js");
+importScripts("<module-dir>lib/<<REPOSITORY_FULLNAME>>");
 
 ```
 
 ## Node.js
 
 ```js
-require("<your-install-dir>lib/WebModule.js");
-require("<your-install-dir>lib/<<REPOSITORY_FULLNAME>>");
+require("<module-dir>lib/WebModule.js");
+require("<module-dir>lib/<<REPOSITORY_FULLNAME>>");
 
 ```
 

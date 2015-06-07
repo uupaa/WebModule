@@ -24,13 +24,9 @@ GLOBAL["$valid"] = function(value, api, highlihgt)        { if (GLOBAL["Valid"])
 GLOBAL.WebModule = {
     exports: function(name, closure) {
         var alias = name in GLOBAL["WebModule"] ? (name + "_") : name;
-        var entity = alias in this ? this[alias]
-                                   : this[alias] = closure(GLOBAL);
 
-        if (typeof exports !== "undefined") {
-            module["exports"] = entity;
-        }
-        return entity;
+        return alias in this ? this[alias]
+                             : this[alias] = closure(GLOBAL);
     }
 };
 

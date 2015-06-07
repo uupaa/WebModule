@@ -1,4 +1,14 @@
-GLOBAL["WebModule"]["exports"]("<<REPOSITORY_NAME>>", function(global) {
+(function moduleExporter(name, closure) {
+"use strict";
+
+var entity = GLOBAL["WebModule"]["exports"](name, closure);
+
+if (typeof module !== "undefined") {
+    module["exports"] = entity;
+}
+return entity;
+
+})("<<REPOSITORY_NAME>>", function moduleClosure(global) {
 "use strict";
 
 // --- dependency modules ----------------------------------
