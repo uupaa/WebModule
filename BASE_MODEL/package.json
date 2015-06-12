@@ -10,6 +10,7 @@
   },
   "scripts": {
     "sync":         "node ../WebModule/run/sync.js; npm update; node ../WebModule/run/page.js",
+    "wiki":         "node .._WebModule/run/wiki.js",
     "min":          "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
     "build":        "node ../WebModule/run/minify.js --verbose --strict --keep --release",
     "watch":        "node ../WebModule/run/watch.js --verbose --run lint",
