@@ -78,6 +78,8 @@ function _enumDevieceList(callback) {
 
         lines.split("\n").forEach(function(line) {
             if (/(iPhone|iPad|iPod)/.test(line)) {
+                if (/unavailable/.test(line)) { return; }
+
                 var name = line.split("(")[0].trim();
                 var uuid = line.split("(")[1].split(")")[0].trim();
                 var state = line.split("(")[2].split(")")[0].trim();
