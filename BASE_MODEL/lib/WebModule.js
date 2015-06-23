@@ -22,11 +22,15 @@ GLOBAL["$valid"] = function(value, api, highlihgt)        { if (GLOBAL["Valid"])
 
 // --- WebModule ------------------------------------------
 GLOBAL.WebModule = {
+    using: false,
     exports: function(name, closure) {
-        var alias = name in GLOBAL["WebModule"] ? (name + "_") : name;
+        var aka = this[name] ? (name + "_") : name;
 
-        return alias in this ? this[alias]
-                             : this[alias] = closure(GLOBAL);
+        return this[aka] || (this[aka] = _exportGlobal(closure(GLOBAL), this.using));
+
+        function _exportGlobal(entity, using) {
+            return (!using || GLOBAL[aka]) ? entity : (GLOBAL[aka] = entity);
+        }
     }
 };
 
