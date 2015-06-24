@@ -21,15 +21,15 @@ GLOBAL["$valid"] = function(value, api, highlihgt)        { if (GLOBAL["Valid"])
 //}@dev
 
 // --- WebModule ------------------------------------------
-GLOBAL.WebModule = {
-    using: false,
-    exports: function(name, closure) {
+GLOBAL["WebModule"] = {
+    "publish": false, // All WebModules publish to global.
+    "exports": function(name, closure) {
         var aka = this[name] ? (name + "_") : name;
 
-        return this[aka] || (this[aka] = _exportGlobal(closure(GLOBAL), this.using));
+        return this[aka] || (this[aka] = _publish(closure(GLOBAL), !this["publish"]));
 
-        function _exportGlobal(entity, using) {
-            return (!using || GLOBAL[aka]) ? entity : (GLOBAL[aka] = entity);
+        function _publish(entity, withhold) {
+            return (withhold || GLOBAL[aka]) ? entity : (GLOBAL[aka] = entity);
         }
     }
 };

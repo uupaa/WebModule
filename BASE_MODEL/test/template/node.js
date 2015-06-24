@@ -2,8 +2,8 @@
 
 require("../lib/WebModule.js");
 
-//Module export to global. eg: window.WebModule.Class -> window.Class
-//GLOBAL.WebModule.using = true;
+//publish to global. eg: window.WebModule.Class -> window.Class
+//WebModule.publish = true;
 
 __MODULES__
 __WMTOOLS__
