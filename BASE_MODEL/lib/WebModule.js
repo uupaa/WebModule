@@ -29,7 +29,7 @@ GLOBAL["WebModule"] = {
 
         return this[aka] || (function(wm) { // GLOBAL.WebModule
             wm[aka] = closure(GLOBAL);
-            wm["closure"][aka] = closure;
+            wm["closure"][aka] = closure + "";
             return (!wm["publish"] || GLOBAL[aka]) ? wm[aka]
                                                    : GLOBAL[aka] = wm[aka];
         })(this);
