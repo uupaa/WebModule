@@ -26,11 +26,11 @@ GLOBAL["WebModule"] = {
     "exports": function(name, closure) {
         var aka = this[name] ? (name + "_") : name;
 
-        return this[aka] || (this[aka] = _publish(closure(GLOBAL), !this["publish"]));
-
-        function _publish(entity, withhold) {
-            return (withhold || GLOBAL[aka]) ? entity : (GLOBAL[aka] = entity);
-        }
+        return this[aka] || (function(wm) { // GLOBAL.WebModule
+            wm[aka] = closure(GLOBAL);
+            return (!wm["publish"] || GLOBAL[aka]) ? wm[aka]
+                                                   : GLOBAL[aka] = wm[aka];
+        })(this);
     }
 };
 
