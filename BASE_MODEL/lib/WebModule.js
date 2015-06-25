@@ -23,11 +23,13 @@ GLOBAL["$valid"] = function(value, api, highlihgt)        { if (GLOBAL["Valid"])
 // --- WebModule ------------------------------------------
 GLOBAL["WebModule"] = {
     "publish": false, // All WebModules publish to global.
+    "closure": {},
     "exports": function(name, closure) {
         var aka = this[name] ? (name + "_") : name;
 
         return this[aka] || (function(wm) { // GLOBAL.WebModule
             wm[aka] = closure(GLOBAL);
+            wm["closure"][aka] = closure;
             return (!wm["publish"] || GLOBAL[aka]) ? wm[aka]
                                                    : GLOBAL[aka] = wm[aka];
         })(this);
