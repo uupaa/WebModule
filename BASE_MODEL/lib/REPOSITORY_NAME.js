@@ -22,7 +22,7 @@ function <<REPOSITORY_NAME>>(value) { // @arg String = "" - comment
     this._value = value || "";
 }
 
-<<REPOSITORY_NAME>>["repository"] = "https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_NAME>>.js"; // GitHub repository URL.
+<<REPOSITORY_NAME>>["repository"] = "https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_NAME>>.js";
 <<REPOSITORY_NAME>>["prototype"] = Object.create(<<REPOSITORY_NAME>>, {
     "constructor":  { "value": <<REPOSITORY_NAME>>                  }, // new <<REPOSITORY_NAME>>(value:String = ""):<<REPOSITORY_NAME>>
     // methods
