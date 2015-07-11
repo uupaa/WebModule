@@ -19,6 +19,7 @@
     "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/node.js",
     "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/node.js",
     "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "add-src":      "node ../WebModule/run/add-src.js",
     "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
     "simx":         "node ../WebModule/run/sim.js stop",
     "lint":         "eslint lib/*.js",

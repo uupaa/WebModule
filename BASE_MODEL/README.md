@@ -4,8 +4,8 @@
 
 <<DESCRIPTION>>
 
+- Please refer to [Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/) and [API Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/<<REPOSITORY_NAME>>) links.
 - The <<REPOSITORY_FULLNAME>> is made of [WebModule](https://github.com/uupaa/WebModule).
-    - Please refer to [Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/) and [API Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/<<REPOSITORY_NAME>>) links.
 
 ## Browser and NW.js(node-webkit)
 

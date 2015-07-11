@@ -33,9 +33,9 @@ var copySourceDir   = process.argv[1].split("/").slice(0, -2).join("/") + "/";
 var copyTargetDir   = process.cwd() + "/";
 var fileTree        = JSON.parse(fs.readFileSync(copySourceDir + BASE_MODEL_DIR + ".files.json", "UTF-8"));
 
-console.log(INFO + "  - repositoryFullName: " + repositoryFullName + CLR); // "Foo.js"
-console.log(INFO + "  - repositoryName:     " + repositoryName     + CLR); // "Foo"
-console.log(INFO + "  - copy source dir:    " + copySourceDir      + CLR);        // "/Users/uupaa/oss/WebModule/BASE_MODEL/"
+console.log(INFO + "  - repositoryFullName: " + repositoryFullName + CLR);        // "Foo.js"
+console.log(INFO + "  - repositoryName:     " + repositoryName     + CLR);        // "Foo"
+console.log(INFO + "  - copy source dir:    " + copySourceDir      + CLR);        // "/Users/uupaa/oss/WebModule/"
 console.log(INFO + "  - copy target dir:    " + copyTargetDir      + CLR + "\n"); // "/Users/uupaa/oss/Foo.js"
 
 //console.log(JSON.stringify(fileTree, null, 2));
