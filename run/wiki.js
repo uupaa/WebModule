@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-var cp          = require("child_process");
-var sourceDir   = process.argv[1].split("/").slice(0, -2).join("/") + "/";
-var json        = require(sourceDir + "package.json");
+var fs   = require("fs");
+var cp   = require("child_process");
+var json = JSON.parse(fs.readFileSync("./package.json", "utf8"));
+
+//console.log("open " + json.url + "/wiki/");
 
 cp.exec("open " + json.url + "/wiki/");
 
