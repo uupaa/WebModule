@@ -2,37 +2,44 @@
 
 // --- global variables ------------------------------------
 // https://github.com/uupaa/WebModule/wiki/WebModuleIdiom
-var GLOBAL = GLOBAL || (this || 0).self || global;
+var GLOBAL = (this || 0).self || global;
 
 // --- environment detection -------------------------------
-GLOBAL["IN_NODE_OR_NW"] = !!GLOBAL.global;
-GLOBAL["IN_BROWSER"]    = !GLOBAL["IN_NODE_OR_NW"] && "document" in GLOBAL;
-GLOBAL["IN_WORKER"]     = !GLOBAL["IN_NODE_OR_NW"] && "WorkerLocation" in GLOBAL;
-GLOBAL["IN_NODE"]       =  GLOBAL["IN_NODE_OR_NW"] && !/native/.test(setTimeout);
-GLOBAL["IN_NW"]         =  GLOBAL["IN_NODE_OR_NW"] &&  /native/.test(setTimeout);
+// https://github.com/uupaa/WebModule/wiki/EnvironmentDetection
+GLOBAL["IN_EL"]      = "__dirname" in GLOBAL && "__filename" in GLOBAL;
+GLOBAL["IN_BROWSER"] = !GLOBAL["IN_EL"] && !GLOBAL.global && "document" in GLOBAL;
+GLOBAL["IN_WORKER"]  = !GLOBAL["IN_EL"] && !GLOBAL.global && "WorkerLocation" in GLOBAL;
+GLOBAL["IN_NODE"]    = !GLOBAL["IN_EL"] &&  GLOBAL.global && !/native/.test(setTimeout);
+GLOBAL["IN_NW"]      = !GLOBAL["IN_EL"] &&  GLOBAL.global &&  /native/.test(setTimeout);
 
 // --- validate and assert functions -----------------------
 //{@dev https://github.com/uupaa/WebModule/wiki/Validate
-GLOBAL["$type"]  = function(value, types)                 { return GLOBAL["Valid"] ? GLOBAL["Valid"].type(value, types) : true; };
-GLOBAL["$keys"]  = function(value, keys)                  { return GLOBAL["Valid"] ? GLOBAL["Valid"].keys(value, keys)  : true; };
-GLOBAL["$some"]  = function(value, candidate, ignoreCase) { return GLOBAL["Valid"] ? GLOBAL["Valid"].some(value, candidate, ignoreCase) : true; };
-GLOBAL["$args"]  = function(api, args)                    { if (GLOBAL["Valid"]) { GLOBAL["Valid"].args(api, args); } };
-GLOBAL["$valid"] = function(value, api, highlihgt)        { if (GLOBAL["Valid"]) { GLOBAL["Valid"](value, api, highlihgt); } };
+GLOBAL["$type"]  = function(v, types)   { return GLOBAL["Valid"] ? GLOBAL["Valid"].type(v, types)  : true; };
+GLOBAL["$keys"]  = function(v, keys)    { return GLOBAL["Valid"] ? GLOBAL["Valid"].keys(v, keys)   : true; };
+GLOBAL["$some"]  = function(v, cd, ig)  { return GLOBAL["Valid"] ? GLOBAL["Valid"].some(v, cd, ig) : true; };
+GLOBAL["$args"]  = function(api, args)  { return GLOBAL["Valid"] ? GLOBAL["Valid"].args(api, args) : true; };
+GLOBAL["$valid"] = function(v, api, hl) { return GLOBAL["Valid"] ? GLOBAL["Valid"](v, api, hl)     : true; };
 //}@dev
 
-// --- WebModule ------------------------------------------
+// --- WebModule -------------------------------------------
 GLOBAL["WebModule"] = {
-    "publish": false, // All WebModules publish to global.
-    "closure": {},
-    "exports": function(name, closure) {
-        var aka = this[name] ? (name + "_") : name;
+    "publish": false, // WebModule based modules publish to global.
+    "closure": {},    // module script stocker
+    "exports": function(moduleName, moduleClosure) {
+        var wm = this; // GLOBAL.WebModule
 
-        return this[aka] || (function(wm) { // GLOBAL.WebModule
-            wm[aka] = closure(GLOBAL);
-            wm["closure"][aka] = closure + "";
-            return (!wm["publish"] || GLOBAL[aka]) ? wm[aka]
-                                                   : GLOBAL[aka] = wm[aka];
-        })(this);
+        // https://github.com/uupaa/WebModule/wiki/SwitchModulePattern
+        var alias = wm[moduleName] ? (moduleName + "_") : moduleName;
+
+        if (!wm[alias]) { // secondary module already exported -> skip
+            wm[alias] = moduleClosure(GLOBAL); // evaluate the module entity
+            wm["closure"][alias] = moduleClosure + ""; // stock
+
+            if (wm["publish"] && !GLOBAL[alias]) {
+                GLOBAL[alias] = wm[alias]; // publish to global
+            }
+        }
+        return wm[alias];
     }
 };
 
