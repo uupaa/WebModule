@@ -8,30 +8,32 @@ var test = new Test("<<REPOSITORY_NAME>>", {
         worker:     true,  // enable worker test.
         node:       true,  // enable node test.
         nw:         true,  // enable nw.js test.
+        el:         true,  // enable electron (render process) test.
         button:     true,  // show button.
         both:       true,  // test the primary and secondary modules.
         ignoreError:false, // ignore error.
         callback:   function() {
         },
         errorback:  function(error) {
+            console.error(error.message);
         }
     }).add([
-        // generic test
+        // Generic test
         test<<REPOSITORY_NAME>>_value,
         test<<REPOSITORY_NAME>>_concat,
     ]);
 
-if (IN_BROWSER || IN_NW) {
+if (IN_BROWSER || IN_NW || IN_EL) {
     test.add([
-        // browser and node-webkit test
+        // Browser, NW.js and Electron test
     ]);
 } else if (IN_WORKER) {
     test.add([
-        // worker test
+        // WebWorkers test
     ]);
 } else if (IN_NODE) {
     test.add([
-        // node.js and io.js test
+        // Node.js test
     ]);
 }
 

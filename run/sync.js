@@ -190,12 +190,13 @@ function migrateSourceCode() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
     var sources = ["test/testcase.js"];
 
-    for (var key in json.webmodule) { // develop, label, browser, worker, node, nw, ...
+    for (var key in json.webmodule) { // develop, label, browser, worker, node, nw, el, ...
         switch (key) {
         case "browser":
         case "worker":
         case "node":
         case "nw":
+        case "el":
             sources = sources.concat(json.webmodule[key].source);
             break;
         }

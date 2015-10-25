@@ -16,11 +16,13 @@
     "watch":        "node ../WebModule/run/watch.js --verbose --run lint",
     "page":         "node ../WebModule/run/page.js --verbose",
     "test":         "npm run min; npm run node; npm run browser",
-    "node":         "NODE_ENV=production NODE_PATH=lib node --harmony test/node.js",
-    "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/node.js",
-    "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "node":         "NODE_ENV=production NODE_PATH=lib node test/node/index.js",
+    "noded":        "NODE_ENV=production NODE_PATH=lib node --debug-brk test/node/index.js",
+    "browser":      "open http://localhost:8000/REPOSITORY_FULLNAME/test/browser/index.html",
+    "el":           "electron test/el",
+    "nw":           "nw test/nw",
     "add-src":      "node ../WebModule/run/add-src.js",
-    "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/index.html",
+    "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/browser/index.html",
     "simx":         "node ../WebModule/run/sim.js stop",
     "lint":         "eslint lib/*.js",
     "score":        "node ../WebModule/run/score.js; open lint/plato/index.html",
@@ -47,6 +49,10 @@
     "nw": {
       "source":     ["lib/<<REPOSITORY_NAME>>.js"],
       "output":     "release/<<REPOSITORY_NAME>>.nw.min.js"
+    },
+    "el": {
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
+      "output":     "release/<<REPOSITORY_NAME>>.el.min.js"
     }
   },
   "dependencies": {},

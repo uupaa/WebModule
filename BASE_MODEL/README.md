@@ -4,10 +4,13 @@
 
 <<DESCRIPTION>>
 
-- Please refer to [Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/) and [API Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/<<REPOSITORY_NAME>>) links.
-- The <<REPOSITORY_FULLNAME>> is made of [WebModule](https://github.com/uupaa/WebModule).
+This module made of [WebModule](https://github.com/uupaa/WebModule).
 
-## Browser and NW.js(node-webkit)
+## Documentation
+- [Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/)
+- [API Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/<<REPOSITORY_NAME>>)
+
+## Browser, NW.js and Electron
 
 ```js
 <script src="<module-dir>/lib/WebModule.js"></script>

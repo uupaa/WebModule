@@ -12,7 +12,7 @@ onmessage = function(event) {
         self.console.table = function() {};
     }
 
-    importScripts("../lib/WebModule.js");
+    importScripts("../../lib/WebModule.js");
 
     // publish to global
     WebModule.publish = true;

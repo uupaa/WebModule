@@ -6,7 +6,7 @@
     "globals": {
         "modules":          false,
         "BENCHMARK":        false,
-        "IN_NODE_OR_NW":    false,
+        "IN_EL":            false,
         "IN_BROWSER":       false,
         "IN_WORKER":        false,
         "IN_NODE":          false,
