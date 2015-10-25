@@ -71,11 +71,11 @@ getGitHubUserName(function(userName) {
     _clone(copySourceDir + BASE_MODEL_DIR, copyTargetDir, fileTree, function() {
         console.log("  ");
         console.log(INFO + "  done." + CLR + "\n");
-        console.log(INFO + "  Available next actions," + CLR);
-        console.log(INFO + "  `$ npm run`        # dump WebModule commands" + CLR);
-        console.log(INFO + "  `$ npm start`      # start local httpd server" + CLR);
-        console.log(INFO + "  `$ npm run sync`   # sync scripts, install/update modules" + CLR);
-        console.log(INFO + "  `$ npm t`          # create test pages, minify and test" + CLR);
+        console.log(INFO + "  You can be next actions." + CLR);
+        console.log(INFO + "  `$ npm run`        # Dump all WebModule commands" + CLR);
+        console.log(INFO + "  `$ npm start`      # Start local http server" + CLR);
+        console.log(INFO + "  `$ npm run sync`   # Update npm modules" + CLR);
+        console.log(INFO + "  `$ npm t`          # Minify and Test" + CLR);
     });
 
 }, function(err) {

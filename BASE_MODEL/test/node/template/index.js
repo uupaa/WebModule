@@ -1,6 +1,6 @@
 // <<REPOSITORY_NAME>> test
 
-require("../lib/WebModule.js");
+require("../../lib/WebModule.js");
 
 // publish to global
 WebModule.publish = true;

@@ -1,7 +1,6 @@
 language: node_js
 node_js:
-    - "0.12"
-    - "io.js"
+    - "4.1.2"
 # http://docs.travis-ci.com/user/workers/container-based-infrastructure/
 sudo: false
 cache:

@@ -6,11 +6,19 @@ var GLOBAL = (this || 0).self || global;
 
 // --- environment detection -------------------------------
 // https://github.com/uupaa/WebModule/wiki/EnvironmentDetection
-GLOBAL.IN_EL      = !/undefined/.test(typeof __dirname + typeof __filename);
-GLOBAL.IN_BROWSER = !GLOBAL.IN_EL &&  !GLOBAL.global && "document" in GLOBAL;
-GLOBAL.IN_WORKER  = !GLOBAL.IN_EL &&  !GLOBAL.global && "WorkerLocation" in GLOBAL;
-GLOBAL.IN_NODE    = !GLOBAL.IN_EL && !!GLOBAL.global && !/native/.test(setTimeout);
-GLOBAL.IN_NW      = !GLOBAL.IN_EL && !!GLOBAL.global &&  /native/.test(setTimeout);
+(function() {
+
+var hasGlobal   = !!GLOBAL.global;
+var processType = !!(GLOBAL.process || 0).type;
+var nativeTimer = !!/native/.test(setTimeout);
+
+GLOBAL.IN_BROWSER = !hasGlobal && "document" in GLOBAL;
+GLOBAL.IN_WORKER  = !hasGlobal && "WorkerLocation" in GLOBAL;
+GLOBAL.IN_NODE    =  hasGlobal && !processType && !nativeTimer;
+GLOBAL.IN_NW      =  hasGlobal && !processType &&  nativeTimer;
+GLOBAL.IN_EL      =  hasGlobal &&  processType;
+
+})();
 
 // --- validate and assert functions -----------------------
 //{@dev https://github.com/uupaa/WebModule/wiki/Validate

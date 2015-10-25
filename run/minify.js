@@ -77,15 +77,16 @@ if (!target.workDir) {
     return;
 }
 
-// $ npm run build は、package.json の webmodule.{browser|worker|node|nw}.source をビルドします
-// $ npm run build.release は、webmodule.{browser|worker|node|nw}.source に加え node_modules 以下の依存ファイルもビルドします
+// $ npm run build は、package.json の webmodule.{browser|worker|node|nw|el}.source をビルドします
+// $ npm run build.release は、webmodule.{browser|worker|node|nw|el}.source に加え node_modules 以下の依存ファイルもビルドします
 var browserSource = target.browser.source;
 var workerSource  = target.worker.source;
 var nodeSource    = target.node.source;
 var nwSource      = target.nw.source;
+var elSource      = target.el.source;
 
 if (options.release) {
-    // 依存関係にあるソース(deps.files.{browser|worker|node|nw})を取得する
+    // 依存関係にあるソース(deps.files.{browser|worker|node|nw|el})を取得する
     var deps = mod.getDependencies(options.release);
 
     // コードをマージし重複を取り除く
@@ -93,6 +94,7 @@ if (options.release) {
     workerSource  = mod.toUniqueArray([].concat(deps.files.worker,  workerSource));
     nodeSource    = mod.toUniqueArray([].concat(deps.files.node,    nodeSource));
     nwSource      = mod.toUniqueArray([].concat(deps.files.nw,      nwSource));
+    elSource      = mod.toUniqueArray([].concat(deps.files.el,      elSource));
 
     if (options.verbose) {
         var buildFiles = {
@@ -100,6 +102,7 @@ if (options.release) {
             "worker":  workerSource,
             "node":    nodeSource,
             "nw":      nwSource,
+            "el":      elSource,
             "label":   deps.files.label
         };
         console.log(INFO + "Release build: " + JSON.stringify(buildFiles, null, 2) + CLR);
@@ -111,6 +114,7 @@ if (options.release) {
             "worker":  workerSource,
             "node":    nodeSource,
             "nw":      nwSource,
+            "el":      elSource,
             "label":   wm.label
         };
         console.log(INFO + "Debug build: " + JSON.stringify(buildFiles, null, 2) + CLR);
@@ -121,7 +125,8 @@ if (!_isFileExists(options.externs) ||
     !_isFileExists(browserSource) ||
     !_isFileExists(workerSource) ||
     !_isFileExists(nodeSource) ||
-    !_isFileExists(nwSource)) {
+    !_isFileExists(nwSource) ||
+    !_isFileExists(elSource)) {
     return;
 }
 
@@ -147,22 +152,25 @@ var minifyOptions = {
 
 // --- コンパイル対象を決定する ---
 // できるだけ無駄なコンパイルは避ける
-// コンパイル対象のソースコードがbrowser,worker,node,nw の全てで同じ場合は一度だけ(browserだけを)コンパイルする
-// - browser,worker,node,nw が全て異なる場合は、それぞれの環境に向けて特殊化したビルドを行う。4回ビルドすることになる
+// コンパイル対象のソースコードがbrowser,worker,node,nw,el の全てで同じ場合は一度だけ(browserだけを)コンパイルする
+// - browser,worker,node,nw,el が全て異なる場合は、それぞれの環境に向けて特殊化したビルドを行う。4回ビルドすることになる
 // - browserとworkerが同じ場合は、browser用のファイルをworkerにコピーする
 // - browserとnodeが同じ場合は、browser用のファイルをnodeにコピーする
 // - browserとnwが同じ場合は、browser用のファイルをnwにコピーする
+// - browserとelが同じ場合は、browser用のファイルをelにコピーする
 // - workerとnodeが同じ場合は、worker用のファイルをnodeにコピーする
 var taskPlan = [];
 var copyBrowserFileToWorkerFile = false; // browser用のビルドをコピーしworkerとしても使用する
 var copyBrowserFileToNodeFile   = false; // browser用のビルドをコピーしnodeとしても使用する
 var copyBrowserFileToNWFile     = false; // browser用のビルドをコピーしnwとしても使用する
+var copyBrowserFileToELFile     = false; // browser用のビルドをコピーしelとしても使用する
 var copyWorkerFileToNodeFile    = false; // worker用のビルドをコピーしnodeとしても使用する
 
 if (wm.browser && browserSource.length) { taskPlan.push("browser"); }
 if (wm.worker  && workerSource.length)  { taskPlan.push("worker");  }
 if (wm.node    && nodeSource.length)    { taskPlan.push("node");    }
 if (wm.nw      && nwSource.length)      { taskPlan.push("nw");      }
+if (wm.el      && elSource.length)      { taskPlan.push("el");      }
 
 // browserとworkerのファイル構成が一緒の場合はまとめてしまい、workerのビルドを省略する
 if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("worker") >= 0) {
@@ -183,6 +191,13 @@ if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("nw") >= 0) {
     if (browserSource.join() === nwSource.join()) {
         copyBrowserFileToNWFile = true;
         taskPlan = taskPlan.filter(function(target) { return target !== "nw"; });
+    }
+}
+// browserとelのファイル構成が一緒の場合はまとめてしまい、elのビルドを省略する
+if (taskPlan.indexOf("browser") >= 0 && taskPlan.indexOf("el") >= 0) {
+    if (browserSource.join() === elSource.join()) {
+        copyBrowserFileToELFile = true;
+        taskPlan = taskPlan.filter(function(target) { return target !== "el"; });
     }
 }
 // workerとnodeのファイル構成が一緒の場合はまとめてしまい、nodeのビルドを省略する
@@ -211,6 +226,9 @@ Task.run(taskPlan.join(" > "), {
                 }
                 if (copyBrowserFileToNWFile) {
                     fs.writeFileSync(target.nw.output, js);
+                }
+                if (copyBrowserFileToELFile) {
+                    fs.writeFileSync(target.el.output, js);
                 }
                 task.pass();
             }
@@ -247,13 +265,26 @@ Task.run(taskPlan.join(" > "), {
     },
     "nw": function(task) {
         if (options.verbose) {
-            console.log("Build for the node-webkit...");
+            console.log("Build for the nw...");
         }
         Minify(nwSource, minifyOptions, function(err, js) {
             if (err || !js) {
                 task.miss();
             } else {
                 fs.writeFileSync(target.nw.output, js);
+                task.pass();
+            }
+        });
+    },
+    "el": function(task) {
+        if (options.verbose) {
+            console.log("Build for the electron...");
+        }
+        Minify(elSource, minifyOptions, function(err, js) {
+            if (err || !js) {
+                task.miss();
+            } else {
+                fs.writeFileSync(target.el.output, js);
                 task.pass();
             }
         });

@@ -24,13 +24,11 @@ function <<REPOSITORY_NAME>>(value) { // @arg String = "" - comment
 
 <<REPOSITORY_NAME>>["repository"] = "https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_NAME>>.js";
 <<REPOSITORY_NAME>>["prototype"] = Object.create(<<REPOSITORY_NAME>>, {
-    "constructor":  { "value": <<REPOSITORY_NAME>>                  }, // new <<REPOSITORY_NAME>>(value:String = ""):<<REPOSITORY_NAME>>
-    // methods
-    "concat":       { "value": <<REPOSITORY_NAME>>_concat           }, // <<REPOSITORY_NAME>>#concat(a:String):String
-    // property accessors
-    "value": {                                         // <<REPOSITORY_NAME>>#value:String
-        "set": function(v) { this._value = v;       },
-        "get": function()  { return this._value;    }
+    "constructor": { "value": <<REPOSITORY_NAME>>        }, // new <<REPOSITORY_NAME>>(value:String = ""):<<REPOSITORY_NAME>>
+    "concat":      { "value": <<REPOSITORY_NAME>>_concat }, // <<REPOSITORY_NAME>>#concat(a:String):String
+    "value": { // <<REPOSITORY_NAME>>#value:String
+        "set": function(v) { this._value = v;    },
+        "get": function()  { return this._value; }
     },
 });
 
