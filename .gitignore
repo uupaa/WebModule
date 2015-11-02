@@ -15,6 +15,7 @@ release/*.min.js
 #test/worker.js
 
 ## ignore the setting files
+.DS_Store
 
 ## dust
 lib/*.min.js
