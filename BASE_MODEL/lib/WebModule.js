@@ -31,6 +31,8 @@ GLOBAL.$valid = function(v, api, hl) { return GLOBAL.Valid ? GLOBAL.Valid(v, api
 
 // --- WebModule -------------------------------------------
 GLOBAL.WebModule = {
+    verify:  false, // Verify mode
+    verbose: false, // Verbose mode
     publish: false, // WebModule based modules publish to global.
     closure: {},    // module script stocker
     exports: function(moduleName, moduleClosure) {
