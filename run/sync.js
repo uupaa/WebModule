@@ -73,8 +73,8 @@ function prettyPrintPackageJSON() {
     var json = JSON.parse(fs.readFileSync(targetPackageJSON, "UTF-8"));
     var txt = JSON.stringify(json, null, 2);
 
-    txt = txt.replace(/: \[([^\]]*)\],/g, function(_, items) {
-        return ': [' + items.trim().replace(/\s*\n+\s*/g, " ") + '],';
+    txt = txt.replace(/"(keywords|label|contributors)": \[([^\]]*)\],/g, function(_, propertyName, items) {
+        return '"' + propertyName + '": [' + items.trim().replace(/\s*\n+\s*/g, " ") + '],';
     });
 
     fs.writeFileSync(targetPackageJSON, txt);
