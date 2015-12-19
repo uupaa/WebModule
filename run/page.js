@@ -5,10 +5,12 @@
 
 var USAGE = _multiline(function() {/*
     Usage:
-        node bin/page.js [--help]
+        node bin/page.js [-h][--help]
+                         [-v][--verify]
                          [--noverify]
                          [--noverbose]
                          [--nopublish]
+                         [--release]
 */});
 
 var ERR  = "\u001b[31m";
@@ -104,10 +106,6 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
                                               // @ret Object - { browser:String, worker:String, node:String, nw:String, el:String }
     var target = wmmodsys.collectBuildTarget(packagejson);
     var wm = packagejson["webmodule"];
-    var verify_state =  "WebModule.verify = "  + (options.verify_state  ? "true;" : "false;");
-    var verbose_state = "WebModule.verbose = " + (options.verbose_state ? "true;" : "false;");
-    var publish_state = "WebModule.publish = " + (options.publish_state ? "true;" : "false;");
-
     var browser = {
             template:       fs.readFileSync("test/browser/template/index.html", "utf8"),
             enable:         wm.browser,
@@ -116,9 +114,6 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
             __SOURCES__:    target.browser.source.map(_script_updir).join("\n"),
             __OUTPUT__:     _script_updir(target.browser.output),
             __TEST_CASE__:  _script("../testcase.js"),
-            __WEBMODULE_VERIFY__:  verify_state,
-            __WEBMODULE_VERBOSE__: verbose_state,
-            __WEBMODULE_PUBLISH__: publish_state,
         };
     var worker = {
             template:       fs.readFileSync("test/browser/template/worker.js", "utf8"),
@@ -128,9 +123,6 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
             __SOURCES__:    target.worker.source.map(_import_updir).join("\n    "),
             __OUTPUT__:     _import_updir(target.worker.output),
             __TEST_CASE__:  _import("../testcase.js"),
-            __WEBMODULE_VERIFY__:  verify_state,
-            __WEBMODULE_VERBOSE__: verbose_state,
-            __WEBMODULE_PUBLISH__: publish_state,
         };
     var node = {
             template:       fs.readFileSync("test/node/template/index.js", "utf8"),
@@ -140,9 +132,6 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
             __SOURCES__:    target.node.source.map(_require_updir).join("\n"),
             __OUTPUT__:     _require_updir(target.node.output),
             __TEST_CASE__:  _require("../testcase.js"), // node.js require spec. add "./"
-            __WEBMODULE_VERIFY__:  verify_state,
-            __WEBMODULE_VERBOSE__: verbose_state,
-            __WEBMODULE_PUBLISH__: publish_state,
         };
     var nw = {
             template:       fs.readFileSync("test/nw/template/index.html", "utf8"),
@@ -152,9 +141,6 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
             __SOURCES__:    target.nw.source.map(_script_updir).join("\n"),
             __OUTPUT__:     _script_updir(target.nw.output),
             __TEST_CASE__:  _script("../testcase.js"),
-            __WEBMODULE_VERIFY__:  verify_state,
-            __WEBMODULE_VERBOSE__: verbose_state,
-            __WEBMODULE_PUBLISH__: publish_state,
         };
     var el = {
             template:       fs.readFileSync("test/el/template/index.html", "utf8"),
@@ -164,9 +150,6 @@ function _convertTemplateFiles(files,         // @arg Object - { node, worker, b
             __SOURCES__:    target.el.source.map(_script_updir).join("\n"),
             __OUTPUT__:     _script_updir(target.el.output),
             __TEST_CASE__:  _script("../testcase.js"),
-            __WEBMODULE_VERIFY__:  verify_state,
-            __WEBMODULE_VERBOSE__: verbose_state,
-            __WEBMODULE_PUBLISH__: publish_state,
         };
 
     browser.template = _mapping(browser, _ignoreNotationVariability(_migration(browser.template)));
@@ -198,9 +181,9 @@ function _mapping(res, template) {
                     replace("__SOURCES__",   enable ? res.__SOURCES__   : "").
                     replace("__OUTPUT__",    enable ? res.__OUTPUT__    : "").
                     replace("__TEST_CASE__", enable ? res.__TEST_CASE__ : "").
-                    replace("__WEBMODULE_VERIFY__",  enable ? res.__WEBMODULE_VERIFY__  : "").
-                    replace("__WEBMODULE_VERBOSE__", enable ? res.__WEBMODULE_VERBOSE__ : "").
-                    replace("__WEBMODULE_PUBLISH__", enable ? res.__WEBMODULE_PUBLISH__ : "");
+                    replace("__WEBMODULE_VERIFY__",  options.verify_state  ? "true" : "false").
+                    replace("__WEBMODULE_VERBOSE__", options.verbose_state ? "true" : "false").
+                    replace("__WEBMODULE_PUBLISH__", options.publish_state ? "true" : "false");
 }
 
 function _ignoreNotationVariability(template) { // ( fix typo :)
@@ -225,6 +208,9 @@ function _parseCommandLineOptions(argv, options) {
         case "--noverify":  options.verify_state = false; break;
         case "--noverbose": options.verbose_state = false; break;
         case "--nopublish": options.publish_state = false; break;
+        case "--release":   options.verify_state = false;
+                            options.verbose_state = false;
+                            options.publish_state = false; break;
         default:
             throw new TypeError("UNKNOWN argument: " + argv[i]);
         }
