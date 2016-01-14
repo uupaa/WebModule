@@ -203,7 +203,7 @@ function _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree) {
         text = text.replace(/<<REPOSITORY_NAME>>/g,           repositoryName);                   // "Foo"
         text = text.replace(/__REPOSITORY_NAME__/g,           _spacer(repositoryName.length));   // "Foo"
         text = text.replace(/REPOSITORY_NAME/g,               repositoryName);                   // "Foo"
-
+        text = text.replace(/__19_SPACE_________/g,           _spacer(repositoryName.length));   // "Foo"
         return text;
     }
 }

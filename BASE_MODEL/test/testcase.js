@@ -1,8 +1,6 @@
 var ModuleTest<<REPOSITORY_NAME>> = (function(global) {
 
-global["BENCHMARK"] = false;
-
-var test = new Test("<<REPOSITORY_NAME>>", {
+var test = new Test(["<<REPOSITORY_NAME>>"], { // Add the ModuleName to be tested here (if necessary).
         disable:    false, // disable all tests.
         browser:    true,  // enable browser test.
         worker:     true,  // enable worker test.
@@ -17,53 +15,50 @@ var test = new Test("<<REPOSITORY_NAME>>", {
         errorback:  function(error) {
             console.error(error.message);
         }
-    }).add([
-        // Generic test
-        test<<REPOSITORY_NAME>>_value,
-        test<<REPOSITORY_NAME>>_concat,
-    ]);
+    });
 
+if (IN_BROWSER || IN_NW || IN_EL || IN_WORKER || IN_NODE) {
+    test.add([
+        test<<REPOSITORY_NAME>>_method,
+        test<<REPOSITORY_NAME>>_accessor,
+    ]);
+}
 if (IN_BROWSER || IN_NW || IN_EL) {
     test.add([
-        // Browser, NW.js and Electron test
     ]);
-} else if (IN_WORKER) {
+}
+if (IN_WORKER) {
     test.add([
-        // WebWorkers test
     ]);
-} else if (IN_NODE) {
+}
+if (IN_NODE) {
     test.add([
-        // Node.js test
     ]);
 }
 
 // --- test cases ------------------------------------------
-function test<<REPOSITORY_NAME>>_value(test, pass, miss) {
-
-    var instance = new WebModule.<<REPOSITORY_NAME>>("a");
-
-    if (instance.value === "a") {
-        instance.value = "b";
-
-        if (instance.value === "b") {
-            test.done(pass());
-            return;
-        }
-    }
-    test.done(miss());
-}
-
-function test<<REPOSITORY_NAME>>_concat(test, pass, miss) {
+function test<<REPOSITORY_NAME>>_method(test, pass, miss) {
 
     var result = {
-            0: new WebModule.<<REPOSITORY_NAME>>(   ).concat("a") === "a", // true
-            1: new WebModule.<<REPOSITORY_NAME>>("b").concat("b") === "bb" // true
+            0: new WebModule.<<REPOSITORY_NAME>>().method("a", "b") === "ab", // true
         };
 
     if ( /false/.test(JSON.stringify(result)) ) {
         test.done(miss());
     } else {
         test.done(pass());
+    }
+}
+
+function test<<REPOSITORY_NAME>>_accessor(test, pass, miss) {
+
+    var instance = new WebModule.<<REPOSITORY_NAME>>();
+    instance.value = "a"; // setter
+
+    if (instance.value === "a") { // getter
+        test.done(pass());
+    } else {
+        test.done(miss());
     }
 }
 

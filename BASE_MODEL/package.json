@@ -22,6 +22,7 @@
     "el":           "electron test/el",
     "nw":           "nw test/nw",
     "add-src":      "node ../WebModule/run/add-src.js",
+    "add-subclass": "node ../WebModule/run/add-subclass.js",
     "sim":          "node ../WebModule/run/sim.js http://localhost:8000/REPOSITORY_FULLNAME/test/browser/index.html",
     "simx":         "node ../WebModule/run/sim.js stop",
     "lint":         "eslint lib/*.js",
@@ -35,24 +36,24 @@
     "develop":      false,
     "label":        ["@dev"],
     "browser": {
-      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
-      "output":     "release/<<REPOSITORY_NAME>>.b.min.js"
+      "output":     "release/<<REPOSITORY_NAME>>.b.min.js",
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"]
     },
     "worker": {
-      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
-      "output":     "release/<<REPOSITORY_NAME>>.w.min.js"
+      "output":     "release/<<REPOSITORY_NAME>>.w.min.js",
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"]
     },
     "node": {
-      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
-      "output":     "release/<<REPOSITORY_NAME>>.n.min.js"
+      "output":     "release/<<REPOSITORY_NAME>>.n.min.js",
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"]
     },
     "nw": {
-      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
-      "output":     "release/<<REPOSITORY_NAME>>.nw.min.js"
+      "output":     "release/<<REPOSITORY_NAME>>.nw.min.js",
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"]
     },
     "el": {
-      "source":     ["lib/<<REPOSITORY_NAME>>.js"],
-      "output":     "release/<<REPOSITORY_NAME>>.el.min.js"
+      "output":     "release/<<REPOSITORY_NAME>>.el.min.js",
+      "source":     ["lib/<<REPOSITORY_NAME>>.js"]
     }
   },
   "dependencies": {},

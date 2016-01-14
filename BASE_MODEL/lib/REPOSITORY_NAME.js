@@ -13,33 +13,42 @@ return entity;
 
 // --- dependency modules ----------------------------------
 // --- define / local variables ----------------------------
-// --- class / interfaces ----------------------------------
-function <<REPOSITORY_NAME>>(value) { // @arg String = "" - comment
-//{@dev
-    $valid($type(value, "String|omit"), <<REPOSITORY_NAME>>, "value");
-//}@dev
+var VERIFY  = global["WebModule"]["verify"]  || false;
+var VERBOSE = global["WebModule"]["verbose"] || false;
 
-    this._value = value || "";
+// --- class / interfaces ----------------------------------
+function <<REPOSITORY_NAME>>() {
+    this._value = "";
 }
 
 <<REPOSITORY_NAME>>["repository"] = "https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_NAME>>.js";
 <<REPOSITORY_NAME>>["prototype"] = Object.create(<<REPOSITORY_NAME>>, {
-    "constructor": { "value": <<REPOSITORY_NAME>>        }, // new <<REPOSITORY_NAME>>(value:String = ""):<<REPOSITORY_NAME>>
-    "concat":      { "value": <<REPOSITORY_NAME>>_concat }, // <<REPOSITORY_NAME>>#concat(a:String):String
-    "value": { // <<REPOSITORY_NAME>>#value:String
+    "constructor": {
+        "value": <<REPOSITORY_NAME>> // new <<REPOSITORY_NAME>>():<<REPOSITORY_NAME>>
+    },
+    // --- methods ---
+    "method": {
+        "value": <<REPOSITORY_NAME>>_method // <<REPOSITORY_NAME>>#method(a:String, b:String):String
+    },
+    // --- accessor ---
+    "value": {
         "set": function(v) { this._value = v;    },
         "get": function()  { return this._value; }
     },
 });
 
 // --- implements ------------------------------------------
-function <<REPOSITORY_NAME>>_concat(a) { // @arg String
-         __REPOSITORY_NAME__             // @ret String
+function <<REPOSITORY_NAME>>_method(a,   // @arg String
+         __19_SPACE_________        b) { // @arg String
+         __19_SPACE_________             // @ret String - a + b
 //{@dev
-    $valid($type(a, "String"), <<REPOSITORY_NAME>>_concat, "a");
+    if (VERIFY) {
+        $valid($type(a, "String"), <<REPOSITORY_NAME>>_method, "a");
+        $valid($type(b, "String"), <<REPOSITORY_NAME>>_method, "b");
+    }
 //}@dev
 
-    return this._value + a;
+    return a + b;
 }
 
 return <<REPOSITORY_NAME>>; // return entity
