@@ -23,10 +23,11 @@ GLOBAL.IN_EL      =  hasGlobal &&  processType;
 // --- validate and assert functions -----------------------
 //{@dev https://github.com/uupaa/WebModule/wiki/Validate
 GLOBAL.$type  = function(v, types)   { return GLOBAL.Valid ? GLOBAL.Valid.type(v, types)  : true; };
-GLOBAL.$keys  = function(v, keys)    { return GLOBAL.Valid ? GLOBAL.Valid.keys(v, keys)   : true; };
+GLOBAL.$keys  = function(o, keys)    { return GLOBAL.Valid ? GLOBAL.Valid.keys(o, keys)   : true; };
 GLOBAL.$some  = function(v, cd, ig)  { return GLOBAL.Valid ? GLOBAL.Valid.some(v, cd, ig) : true; };
 GLOBAL.$args  = function(api, args)  { return GLOBAL.Valid ? GLOBAL.Valid.args(api, args) : true; };
 GLOBAL.$valid = function(v, api, hl) { return GLOBAL.Valid ? GLOBAL.Valid(v, api, hl)     : true; };
+GLOBAL.$values = function(o, vals)   { return GLOBAL.Valid ? GLOBAL.Valid.values(o, vals) : true; };
 //}@dev
 
 // --- WebModule -------------------------------------------
