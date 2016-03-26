@@ -8,14 +8,14 @@ if (typeof module !== "undefined") {
 }
 return entity;
 
-})("<<SUB_CLASS_NAME>>", function moduleClosure(global) {
+})("<<SUB_CLASS_NAME>>", function moduleClosure(global, WebModule, VERIFY, VERBOSE) {
 "use strict";
 
+// --- technical terms / data structure --------------------
 // --- dependency modules ----------------------------------
+// --- import / local extract functions --------------------
 // --- define / local variables ----------------------------
-var VERIFY  = global["WebModule"]["verify"]  || false;
-var VERBOSE = global["WebModule"]["verbose"] || false;
-var <<BASE_CLASS_NAME>> = global["WebModule"]["<<BASE_CLASS_NAME>>"];
+var <<BASE_CLASS_NAME>> = WebModule["<<BASE_CLASS_NAME>>"];
 
 // --- class / interfaces ----------------------------------
 function <<SUB_CLASS_NAME>>() {

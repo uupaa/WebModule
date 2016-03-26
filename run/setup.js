@@ -33,10 +33,18 @@ var copySourceDir   = process.argv[1].split("/").slice(0, -2).join("/") + "/";
 var copyTargetDir   = process.cwd() + "/";
 var fileTree        = JSON.parse(fs.readFileSync(copySourceDir + BASE_MODEL_DIR + ".files.json", "UTF-8"));
 
+var GITHUB_TEMPLATE_DIR = ".github/";
+var GITHUB_TEMPLATE_FILElIST = [
+    "CONTRIBUTING.md",
+    "CONTRIBUTORS.md",
+    "ISSUE_TEMPLATE.md",
+    "PULL_REQUEST_TEMPLATE.md"
+];
+
 console.log(INFO + "  - repositoryFullName: " + repositoryFullName + CLR);        // "Foo.js"
 console.log(INFO + "  - repositoryName:     " + repositoryName     + CLR);        // "Foo"
 console.log(INFO + "  - copy source dir:    " + copySourceDir      + CLR);        // "/Users/uupaa/oss/WebModule/"
-console.log(INFO + "  - copy target dir:    " + copyTargetDir      + CLR + "\n"); // "/Users/uupaa/oss/Foo.js"
+console.log(INFO + "  - copy target dir:    " + copyTargetDir      + CLR + "\n"); // "/Users/uupaa/oss/Foo.js/"
 
 //console.log(JSON.stringify(fileTree, null, 2));
 
@@ -68,14 +76,21 @@ if (fs.existsSync("README.md") ) {
 getGitHubUserName(function(userName) {
 
     options.userName = userName;
-    _clone(copySourceDir + BASE_MODEL_DIR, copyTargetDir, fileTree, function() {
-        console.log("  ");
-        console.log(INFO + "  done." + CLR + "\n");
-        console.log(INFO + "  You can be next actions." + CLR);
-        console.log(INFO + "  `$ npm run`        # Dump all WebModule commands" + CLR);
-        console.log(INFO + "  `$ npm start`      # Start local http server" + CLR);
-        console.log(INFO + "  `$ npm run sync`   # Update npm modules" + CLR);
-        console.log(INFO + "  `$ npm t`          # Minify and Test" + CLR);
+    _clone(copySourceDir + BASE_MODEL_DIR,
+           copyTargetDir, fileTree,
+           function() {
+        _copyGitHubTemplateFiles(copySourceDir + GITHUB_TEMPLATE_DIR,
+                                 copyTargetDir + GITHUB_TEMPLATE_DIR,
+                                 GITHUB_TEMPLATE_FILElIST,
+                                 function() {
+            console.log("  ");
+            console.log(INFO + "  done." + CLR + "\n");
+            console.log(INFO + "  You can be next actions." + CLR);
+            console.log(INFO + "  `$ npm run`        # Dump all WebModule commands" + CLR);
+            console.log(INFO + "  `$ npm start`      # Start local http server" + CLR);
+            console.log(INFO + "  `$ npm run sync`   # Update npm modules" + CLR);
+            console.log(INFO + "  `$ npm t`          # Minify and Test" + CLR);
+        });
     });
 
 }, function(err) {
@@ -205,6 +220,63 @@ function _doClone(overwriteFiles, copySourceDir, copyTargetDir, fileTree) {
         text = text.replace(/REPOSITORY_NAME/g,               repositoryName);                   // "Foo"
         text = text.replace(/__19_SPACE_________/g,           _spacer(repositoryName.length));   // "Foo"
         return text;
+    }
+}
+
+function _copyGitHubTemplateFiles(copySourceDir, // @arg String - copy from dir. has tail slash(/)
+                                  copyTargetDir, // @arg String - copy to dir. has tail slash(/)
+                                  fileList,      // @arg StringArray -
+                                  callback) {    // @arg Function - finished callback.
+    var overwriteFiles = []; // [ [targetFile, sourceText], ... ]
+
+    if ( !fs.existsSync(copyTargetDir) ) {
+        console.log("  mkdir:     " + copyTargetDir);
+        fs.mkdirSync(copyTargetDir);
+    }
+    fileList.forEach(function(name) {
+        var sourceFile = copySourceDir + name;
+        var targetFile = copyTargetDir + name;
+        var fileExists = fs.existsSync(targetFile);
+        var sourceText = fs.readFileSync(sourceFile, "UTF-8");
+        var targetText = fileExists ? fs.readFileSync(targetFile, "UTF-8") : "";
+
+        if (targetText && targetText !== sourceText) {
+            overwriteFiles.push([targetFile, sourceText]);
+        } else {
+            if (fileExists) {
+                console.log("  exists:    " + targetFile);
+            } else {
+                console.log("  clone:     " + targetFile);
+                fs.writeFileSync(targetFile, sourceText);
+            }
+        }
+    });
+
+    if (overwriteFiles.length) {
+        var rl = readline.createInterface(process.stdin, process.stdout);
+        Task.loop(overwriteFiles, _tick, function() {
+            rl.close();
+            callback();
+        });
+
+        function _tick(task, index, overwriteFiles) {
+            var ary = overwriteFiles[index];
+            var targetFile = ary[0];
+            var sourceText = ary[1];
+
+            rl.question("  exists:    " + targetFile + " - overwrite it? (y/n): ", function(answer) {
+
+                if (/^y$/i.test(answer)) {
+                    console.log(WARN + "  overwrite: " + targetFile + CLR);
+                    fs.writeFileSync(targetFile, sourceText);
+                } else {
+                    console.log("  skip:      " + targetFile);
+                }
+                task.pass();
+            });
+        }
+    } else {
+        callback();
     }
 }
 

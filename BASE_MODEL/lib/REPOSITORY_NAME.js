@@ -8,14 +8,13 @@ if (typeof module !== "undefined") {
 }
 return entity;
 
-})("<<REPOSITORY_NAME>>", function moduleClosure(global) {
+})("<<REPOSITORY_NAME>>", function moduleClosure(global, WebModule, VERIFY, VERBOSE) {
 "use strict";
 
+// --- technical terms / data structure --------------------
 // --- dependency modules ----------------------------------
+// --- import / local extract functions --------------------
 // --- define / local variables ----------------------------
-var VERIFY  = global["WebModule"]["verify"]  || false;
-var VERBOSE = global["WebModule"]["verbose"] || false;
-
 // --- class / interfaces ----------------------------------
 function <<REPOSITORY_NAME>>() {
     this._value = "";

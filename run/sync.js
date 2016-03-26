@@ -46,7 +46,7 @@ if (1) {
     migrateSourceCode();
 }
 
-console.log("  sync done.");
+console.log("  module syncing and updates...\n");
 
 function buildWMTools(output) { // @arg PathString
     var libs = ["Reflection.js", "Console.js", "Valid.js", "Help.js", "Task.js", "Test.js"];
