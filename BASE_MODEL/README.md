@@ -23,16 +23,16 @@ This module made of [WebModule](https://github.com/uupaa/WebModule).
 ## WebWorkers
 
 ```js
-importScripts("<module-dir>lib/WebModule.js");
-importScripts("<module-dir>lib/<<REPOSITORY_FULLNAME>>");
+importScripts("<module-dir>/lib/WebModule.js");
+importScripts("<module-dir>/lib/<<REPOSITORY_FULLNAME>>");
 
 ```
 
 ## Node.js
 
 ```js
-require("<module-dir>lib/WebModule.js");
-require("<module-dir>lib/<<REPOSITORY_FULLNAME>>");
+require("<module-dir>/lib/WebModule.js");
+require("<module-dir>/lib/<<REPOSITORY_FULLNAME>>");
 
 ```
 
