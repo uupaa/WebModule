@@ -1,6 +1,9 @@
 # WebModule
 
-Generate a JavaScript based module for Mobile Web Application.
+Generate a JavaScript based module for Mobile Web Applications.
 
-see [WebModule wiki](https://github.com/uupaa/WebModule/wiki/)
+- [Document](https://github.com/uupaa/WebModule/wiki/)
+- [Change Log](https://github.com/uupaa/WebModule/wiki/ChangeLog)
+- [Module List](https://github.com/uupaa/WebModule/wiki/ModuleList)
+
 
