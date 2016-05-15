@@ -76,22 +76,26 @@ function _createTestPages() {
     if ( !fs["existsSync"]("test") ) {
         console.error(ERR + "ERROR. test/ directory was not found." + CLR);
     }
-    var files = _convertTemplateFiles(deps.files, modpkg); // { browser, worker, node, nw, el }
+    var browser = _convertBrowserFile(deps.files, modpkg);
+    var worker  = _convertWorkerFile(deps.files, modpkg);
+    var node    = _convertNodeFile(deps.files, modpkg);
+    var nw      = _convertNWFile(deps.files, modpkg);
+    var el      = _convertElectronFile(deps.files, modpkg);
 
     if (options.verbose) {
-        console.log( "update test/browser/index.html: \n    " + files.browser.replace(/\n/g, "\n    " ) );
-        console.log( "update test/browser/worker.js: \n    "  + files.worker.replace(/\n/g, "\n    " ) );
-        console.log( "update test/node/index.js: \n    "      + files.node.replace(/\n/g, "\n    " ) );
-        console.log( "update test/nw/index.html: \n    "      + files.nw.replace(/\n/g, "\n    " ) );
-        console.log( "update test/el/index.html: \n    "      + files.el.replace(/\n/g, "\n    " ) );
+        if (browser) { console.log( "update test/browser/index.html: \n    " + browser.replace(/\n/g, "\n    " ) ); }
+        if (worker)  { console.log( "update test/browser/worker.js: \n    "  + worker.replace(/\n/g, "\n    " ) ); }
+        if (node)    { console.log( "update test/node/index.js: \n    "      + node.replace(/\n/g, "\n    " ) ); }
+        if (nw)      { console.log( "update test/nw/index.html: \n    "      + nw.replace(/\n/g, "\n    " ) ); }
+        if (el)      { console.log( "update test/el/index.html: \n    "      + el.replace(/\n/g, "\n    " ) ); }
     }
     // package.json に webmodule{browser|worker|node|nw|el} プロパティが無い場合でも、
     // テスト用のページはそれぞれ生成します。
-    fs.writeFileSync("test/browser/index.html", files.browser);
-    fs.writeFileSync("test/browser/worker.js",  files.worker);
-    fs.writeFileSync("test/node/index.js",    files.node);
-    fs.writeFileSync("test/nw/index.html",    files.nw);
-    fs.writeFileSync("test/el/index.html",    files.el);
+    if (browser) { fs.writeFileSync("test/browser/index.html", browser); }
+    if (worker)  { fs.writeFileSync("test/browser/worker.js",  worker); }
+    if (node)    { fs.writeFileSync("test/node/index.js",      node); }
+    if (nw)      { fs.writeFileSync("test/nw/index.html",      nw); }
+    if (el)      { fs.writeFileSync("test/el/index.html",      el); }
 
 /*
     // copy test/template/nw.package.json to test/package.json
@@ -101,78 +105,117 @@ function _createTestPages() {
  */
 }
 
-function _convertTemplateFiles(files,         // @arg Object - { node, worker, browser, nw, el, label }
-                               packagejson) { // @arg Object - module package.json
-                                              // @ret Object - { browser:String, worker:String, node:String, nw:String, el:String }
+function _convertBrowserFile(files,         // @arg Object - { node, worker, browser, nw, el, label }
+                             packagejson) { // @arg Object - module package.json
+                                            // @ret String
     var target = wmmodsys.collectBuildTarget(packagejson);
     var wm = packagejson["webmodule"];
-    var browser = {
-            template:       fs.readFileSync("test/browser/template/index.html", "utf8"),
-            enable:         wm.browser,
-            __MODULES__:    files.browser.map(_script_updir).join("\n"),
-            __WMTOOLS__:    _script("../wmtools.js"),
-            __SOURCES__:    target.browser.source.map(_script_updir).join("\n"),
-            __OUTPUT__:     _script_updir(target.browser.output),
-            __TEST_CASE__:  _script("../testcase.js"),
-        };
-    var worker = {
-            template:       fs.readFileSync("test/browser/template/worker.js", "utf8"),
-            enable:         wm.worker,
-            __MODULES__:    files.worker.map(_import_updir).join("\n    "),
-            __WMTOOLS__:    _import("../wmtools.js"),
-            __SOURCES__:    target.worker.source.map(_import_updir).join("\n    "),
-            __OUTPUT__:     _import_updir(target.worker.output),
-            __TEST_CASE__:  _import("../testcase.js"),
-        };
-    var node = {
-            template:       fs.readFileSync("test/node/template/index.js", "utf8"),
-            enable:         wm.node,
-            __MODULES__:    files.node.map(_require_updir).join("\n"),
-            __WMTOOLS__:    _require("../wmtools.js"),  // node.js require spec. add "./"
-            __SOURCES__:    target.node.source.map(_require_updir).join("\n"),
-            __OUTPUT__:     _require_updir(target.node.output),
-            __TEST_CASE__:  _require("../testcase.js"), // node.js require spec. add "./"
-        };
-    var nw = {
-            template:       fs.readFileSync("test/nw/template/index.html", "utf8"),
-            enable:         wm.nw,
-            __MODULES__:    files.nw.map(_script_updir).join("\n"),
-            __WMTOOLS__:    _script("../wmtools.js"),
-            __SOURCES__:    target.nw.source.map(_script_updir).join("\n"),
-            __OUTPUT__:     _script_updir(target.nw.output),
-            __TEST_CASE__:  _script("../testcase.js"),
-        };
-    var el = {
-            template:       fs.readFileSync("test/el/template/index.html", "utf8"),
-            enable:         wm.el,
-            __MODULES__:    files.el.map(_script_updir).join("\n"),
-            __WMTOOLS__:    _script("../wmtools.js"),
-            __SOURCES__:    target.el.source.map(_script_updir).join("\n"),
-            __OUTPUT__:     _script_updir(target.el.output),
-            __TEST_CASE__:  _script("../testcase.js"),
-        };
 
-    browser.template = _mapping(browser, _ignoreNotationVariability(_migration(browser.template)));
-    worker.template  = _mapping(worker,  _ignoreNotationVariability(_migration(worker.template)));
-    node.template    = _mapping(node,    _ignoreNotationVariability(_migration(node.template)));
-    nw.template      = _mapping(nw,      _ignoreNotationVariability(_migration(nw.template)));
-    el.template      = _mapping(el,      _ignoreNotationVariability(_migration(el.template)));
-
-    return {
-        browser: browser.template,
-        worker:  worker.template,
-        node:    node.template,
-        nw:      nw.template,
-        el:      el.template,
-    };
-
-    function _script(file)        { return '<script src="'          + file + '"></script>'; }
-    function _script_updir(file)  { return '<script src="../../'    + file + '"></script>'; }
-    function _import(file)        { return 'importScripts("'        + file + '");'; }
-    function _import_updir(file)  { return 'importScripts("../../'  + file + '");'; }
-    function _require(file)       { return 'require("'              + file + '");'; }
-    function _require_updir(file) { return 'require("../../'        + file + '");'; }
+    if (fs.existsSync("test/browser/template/index.html")) {
+        var browser = {
+                template:       fs.readFileSync("test/browser/template/index.html", "utf8"),
+                enable:         wm.browser,
+                __MODULES__:    files.browser.map(_script_updir).join("\n"),
+                __WMTOOLS__:    _script("../wmtools.js"),
+                __SOURCES__:    target.browser.source.map(_script_updir).join("\n"),
+                __OUTPUT__:     _script_updir(target.browser.output),
+                __TEST_CASE__:  _script("../testcase.js"),
+            };
+        return _mapping(browser, _ignoreNotationVariability(_migration(browser.template)));
+    }
+    return "";
 }
+
+function _convertWorkerFile(files,         // @arg Object - { node, worker, browser, nw, el, label }
+                            packagejson) { // @arg Object - module package.json
+                                           // @ret String
+    var target = wmmodsys.collectBuildTarget(packagejson);
+    var wm = packagejson["webmodule"];
+
+    if (fs.existsSync("test/browser/template/worker.html")) {
+        var worker = {
+                template:       fs.readFileSync("test/browser/template/worker.js", "utf8"),
+                enable:         wm.worker,
+                __MODULES__:    files.worker.map(_import_updir).join("\n    "),
+                __WMTOOLS__:    _import("../wmtools.js"),
+                __SOURCES__:    target.worker.source.map(_import_updir).join("\n    "),
+                __OUTPUT__:     _import_updir(target.worker.output),
+                __TEST_CASE__:  _import("../testcase.js"),
+            };
+        return _mapping(worker,  _ignoreNotationVariability(_migration(worker.template)));
+    }
+    return "";
+}
+
+function _convertNodeFile(files,         // @arg Object - { node, worker, browser, nw, el, label }
+                          packagejson) { // @arg Object - module package.json
+                                         // @ret String
+    var target = wmmodsys.collectBuildTarget(packagejson);
+    var wm = packagejson["webmodule"];
+
+    if (fs.existsSync("test/node/template/index.js")) {
+        var node = {
+                template:       fs.readFileSync("test/node/template/index.js", "utf8"),
+                enable:         wm.node,
+                __MODULES__:    files.node.map(_require_updir).join("\n"),
+                __WMTOOLS__:    _require("../wmtools.js"),  // node.js require spec. add "./"
+                __SOURCES__:    target.node.source.map(_require_updir).join("\n"),
+                __OUTPUT__:     _require_updir(target.node.output),
+                __TEST_CASE__:  _require("../testcase.js"), // node.js require spec. add "./"
+            };
+        return _mapping(node,    _ignoreNotationVariability(_migration(node.template)));
+    }
+    return "";
+}
+
+function _convertNWFile(files,         // @arg Object - { node, worker, browser, nw, el, label }
+                        packagejson) { // @arg Object - module package.json
+                                       // @ret String
+    var target = wmmodsys.collectBuildTarget(packagejson);
+    var wm = packagejson["webmodule"];
+
+    if (fs.existsSync("test/nw/template/index.html")) {
+        var nw = {
+                template:       fs.readFileSync("test/nw/template/index.html", "utf8"),
+                enable:         wm.nw,
+                __MODULES__:    files.nw.map(_script_updir).join("\n"),
+                __WMTOOLS__:    _script("../wmtools.js"),
+                __SOURCES__:    target.nw.source.map(_script_updir).join("\n"),
+                __OUTPUT__:     _script_updir(target.nw.output),
+                __TEST_CASE__:  _script("../testcase.js"),
+            };
+        return _mapping(nw,      _ignoreNotationVariability(_migration(nw.template)));
+    }
+    return "";
+}
+
+function _convertElectronFile(files,         // @arg Object - { node, worker, browser, nw, el, label }
+                              packagejson) { // @arg Object - module package.json
+                                             // @ret String
+    var target = wmmodsys.collectBuildTarget(packagejson);
+    var wm = packagejson["webmodule"];
+
+    if (fs.existsSync("test/el/template/index.html")) {
+        var el = {
+                template:       fs.readFileSync("test/el/template/index.html", "utf8"),
+                enable:         wm.el,
+                __MODULES__:    files.el.map(_script_updir).join("\n"),
+                __WMTOOLS__:    _script("../wmtools.js"),
+                __SOURCES__:    target.el.source.map(_script_updir).join("\n"),
+                __OUTPUT__:     _script_updir(target.el.output),
+                __TEST_CASE__:  _script("../testcase.js"),
+            };
+        return _mapping(el,      _ignoreNotationVariability(_migration(el.template)));
+    }
+    return "";
+}
+
+function _script(file)        { return '<script src="'          + file + '"></script>'; }
+function _script_updir(file)  { return '<script src="../../'    + file + '"></script>'; }
+function _import(file)        { return 'importScripts("'        + file + '");'; }
+function _import_updir(file)  { return 'importScripts("../../'  + file + '");'; }
+function _require(file)       { return 'require("'              + file + '");'; }
+function _require_updir(file) { return 'require("../../'        + file + '");'; }
 
 function _mapping(res, template) {
     var enable = res.enable;
