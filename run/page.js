@@ -132,7 +132,7 @@ function _convertWorkerFile(files,         // @arg Object - { node, worker, brow
     var target = wmmodsys.collectBuildTarget(packagejson);
     var wm = packagejson["webmodule"];
 
-    if (fs.existsSync("test/browser/template/worker.html")) {
+    if (fs.existsSync("test/browser/template/worker.js")) {
         var worker = {
                 template:       fs.readFileSync("test/browser/template/worker.js", "utf8"),
                 enable:         wm.worker,
