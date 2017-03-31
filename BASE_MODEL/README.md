@@ -7,7 +7,7 @@
 This module made of [WebModule](https://github.com/uupaa/WebModule).
 
 ## Documentation
-- [Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/)
+- [Overview](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/)
 - [API Spec](https://github.com/<<GITHUB_USER_NAME>>/<<REPOSITORY_FULLNAME>>/wiki/<<REPOSITORY_NAME>>)
 
 ## Browser, NW.js and Electron

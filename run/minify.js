@@ -8,7 +8,6 @@ var USAGE = _multiline(function() {/*
                        [--help]
                        [--verbose]
                        [--nowrap]
-                       [--nocompile]
                        [--header file]
                        [--footer file]
                        [--es5in]
@@ -16,13 +15,14 @@ var USAGE = _multiline(function() {/*
                        [--es5out]
                        [--es6out]
                        [--keep]
-                       [--simple]
-                       [--strict]
                        [--pretty]
                        [--option "compile option"]
                        [--extern file]
                        [--label @label]
-                       [--release]
+                       [--optimize num]
+                       [--include_modules]
+
+                       [--release] -> optimize=3
 
     See:
         https://github.com/uupaa/Minify.js/wiki/Minify
@@ -55,15 +55,14 @@ var options = _parseCommandLineOptions({
         es6in:      false,          // Boolean      - input ES6 code.
         es5out:     false,          // Boolean      - output ES5 code.
         es6out:     false,          // Boolean      - output ES6 code.
-        strict:     false,          // Boolean      - true -> add 'use strict'.
+        strict:     true,           // Boolean      - true -> add 'use strict'.
         pretty:     false,          // Boolean      - true -> pretty print.
         option:     [],             // OptionStringArray - ["language_in ECMASCRIPT5_STRICT", ...]
-        compile:    true,           // Boolean      - true -> compile.
-        release:    false,          // Boolean      - true -> release build, use NodeModule.files().
+        optimize:   1,              // Number       - 0 -> Concat, 1 -> WhiteSpace, 2 -> Simple, 3 -> Advanced
         externs:    [],             // FilePathArray- ["externs-file-name", ...]
         verbose:    false,          // Boolean      - true -> verbose mode.
         workDir:    "release/",     // PathString   - work dir.
-        advanced:   true            // Boolean      - true -> ADVANCED_OPTIMIZATIONS MODE.
+        include_modules: false,     // Boolean      - true -> include npm_modules. use NodeModule.files().
     });
 
 if (options.help) {
@@ -77,17 +76,15 @@ if (!target.workDir) {
     return;
 }
 
-// $ npm run build は、package.json の webmodule.{browser|worker|node|nw|el}.source をビルドします
-// $ npm run build.release は、webmodule.{browser|worker|node|nw|el}.source に加え node_modules 以下の依存ファイルもビルドします
 var browserSource = target.browser.source;
 var workerSource  = target.worker.source;
 var nodeSource    = target.node.source;
 var nwSource      = target.nw.source;
 var elSource      = target.el.source;
 
-if (options.release) {
+if (options.include_modules) {
     // 依存関係にあるソース(deps.files.{browser|worker|node|nw|el})を取得する
-    var deps = mod.getDependencies(options.release);
+    var deps = mod.getDependencies(true);
 
     // コードをマージし重複を取り除く
     browserSource = mod.toUniqueArray([].concat(deps.files.browser, browserSource));
@@ -105,19 +102,7 @@ if (options.release) {
             "el":      elSource,
             "label":   deps.files.label
         };
-        console.log(INFO + "Release build: " + JSON.stringify(buildFiles, null, 2) + CLR);
-    }
-} else {
-    if (options.verbose) {
-        var buildFiles = {
-            "browser": browserSource,
-            "worker":  workerSource,
-            "node":    nodeSource,
-            "nw":      nwSource,
-            "el":      elSource,
-            "label":   wm.label
-        };
-        console.log(INFO + "Debug build: " + JSON.stringify(buildFiles, null, 2) + CLR);
+        console.log(INFO + "Include node_modules: " + JSON.stringify(buildFiles, null, 2) + CLR);
     }
 }
 
@@ -143,11 +128,10 @@ var minifyOptions = {
     "strict":       options.strict,
     "pretty":       options.pretty,
     "option":       options.option,
-    "compile":      options.compile,
     "externs":      options.externs,
     "verbose":      options.verbose,
     "workDir":      options.workDir,
-    "advanced":     options.advanced
+    "optimize":     options.optimize,
 };
 
 // --- コンパイル対象を決定する ---
@@ -321,23 +305,28 @@ function _parseCommandLineOptions(options) {
         case "-v":
         case "--verbose":   options.verbose = true; break;
         case "--nowrap":    options.nowrap = true; break;
-        case "--nocompile": options.compile = false; break;
         case "--header":    options.header = fs.readFileSync(argv[++i], "utf8"); break;
         case "--footer":    options.footer = fs.readFileSync(argv[++i], "utf8"); break;
         case "--es5in":     options.es5in = true; break;
         case "--es6in":     options.es6in = true; break;
         case "--es5out":    options.es5out = true; break;
         case "--es6out":    options.es6out = true; break;
-        case "--strict":    options.strict = true; break;
-        case "--pretty":    options.pretty = true; break;
+        case "--strict":    break; // [DEPRECATED]
         case "--keep":      options.keep = true; break;
-        case "--simple":    options.advanced = false; break;
+        case "--simple":    break; // [DEPRECATED]
         case "--extern":
         case "--externs":   _pushif(options.externs, argv[++i]); break;
         case "--option":    _pushif(options.option, argv[++i]); break;
-        case "--module":
-        case "--release":   options.release = true; break;
+        case "--pretty":    options.pretty = true; break;
+        case "--optimize":  _pushif(options.externs, argv[++i]); break;
+        case "--concat":    options.optimize = 0;
+                            options.include_modules = true; break;
+        case "--debug":     options.optimize = 1;
+                            options.include_modules = true; break;
+        case "--release":   options.optimize = 3;
+                            options.include_modules = true; break;
         case "--label":     _pushif(options.label, argv[++i].replace(/^@/, "")); break;
+        case "--include_modules": options.include_modules = true; break;
         default:
             if ( /^@/.test(argv[i]) ) { // @label
                 _pushif(options.label, argv[i].replace(/^@/, ""));
@@ -389,7 +378,7 @@ var TMP_FILE      = "./.Minify.tmp.js";
 
 // --- class / interfaces ----------------------------------
 function Minify(sources, // @arg StringArray - JavaScript sources file path. [path, ...]
-                options, // @arg Object = null - { keep, label, nowrap, header, footer, es5in, es6in, es5out, es6out, strict, pretty, option, compile, externs, verbose, workDir, advanced }
+                options, // @arg Object = null - { keep, label, nowrap, header, footer, es5in, es6in, es5out, es6out, strict, pretty, option, externs, verbose, workDir, optimize }
                          // @options.keep       Boolean = false  - keep temporary file.
                          // @options.label      LabelStringArray = null - ["@label", ...]
                          // @options.nowrap     Boolean = false  - false is wrap WebModule idiom.
@@ -402,26 +391,26 @@ function Minify(sources, // @arg StringArray - JavaScript sources file path. [pa
                          // @options.strict     Boolean = false  - true is add 'use strict'.
                          // @options.pretty     Boolean = false  - true is pretty strict.
                          // @options.option     StringArray = [] - ClosureCompiler additional options string.
-                         // @options.compile    Boolean = false  - true is compile. false is concat files.
                          // @options.externs    StringArray = [] - Clouser Compiler externs definition file path
                          // @options.verbose    boolean = false  - true is verbose mode.
                          // @options.workDir    String = ""      - work dir.
-                         // @options.advanced   Boolean = false  - true is advanced build mode
+                         // @options.optimize   Number = 0       - 0 = Concat, 1 = WhiteSpace, 2 = Simple, 3 = Advanced
                 fn) {    // @arg Function = null - callback function. fn(err:Error, result:String)
 //{@dev
     _if(!Array.isArray(sources), Minify, "sources");
     if (options) {
         _if(options.constructor !== ({}).constructor, Minify, "options");
-        _if(!_keys(options, "keep,label,nowrap,header,footer,es5in,es6in,es5out,es6out,strict,pretty,option,compile,externs,verbose,workDir,advanced"), Minify, "options");
+        _if(!_keys(options, "keep,label,nowrap,header,footer,es5in,es6in,es5out,es6out,strict,pretty,option,externs,verbose,workDir,optimize"), Minify, "options");
     }
     if (fn) {
         _if(typeof fn !== "function", Minify, "fn");
     }
 //}@dev
 
-    var optionsString = _makeClouserCompilerOptions(options);
 
-    if (options.compile) {
+    if (options.optimize > 0) {
+        var optionsString = _makeClouserCompilerOptions(options);
+
         cp.exec("which -s closure-compiler", function(err) {
                 // $ node install uupaa.compile.js
                 _offlineMinificationNode(sources, options, optionsString, fn);
@@ -440,13 +429,19 @@ function _makeClouserCompilerOptions(options) { // @arg Object - { keep, nowrap,
   //result["transform_amd_modules"] = "";
   //result["create_source_map"] = "source.map";
 
-    if (options.advanced) {
+    switch (options.optimize) {
+    case 3:
         result.push("--compilation_level ADVANCED_OPTIMIZATIONS");
         if (options.externs && options.externs.length) {
             result.push("--externs " + options.externs.join(" --externs "));
         }
-    } else {
+        break;
+    case 2:
         result.push("--compilation_level SIMPLE_OPTIMIZATIONS");
+        break;
+    case 1:
+        result.push("--compilation_level WHITESPACE_ONLY");
+        break;
     }
     if (!options.nowrap) { // wrap WebModule idiom
       //result.push("--output_wrapper '(function(global){\n%output%\n})((this||0).self||global);'");
